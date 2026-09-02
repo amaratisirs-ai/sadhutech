@@ -108,7 +108,7 @@ export async function decodeTransaction(tx: TxRequest): Promise<SimulationResult
           break;
         }
         case "permit": {
-          const [, spender, permitValue] = decoded.args as [Address, Address, bigint];
+          const [, spender, permitValue] = decoded.args as unknown as [Address, Address, bigint];
           approvals.push({
             kind: "permit",
             token,
