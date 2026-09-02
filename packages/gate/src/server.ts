@@ -50,7 +50,7 @@ app.post<{ Body: AnalyzeRequest }>("/v1/analyze", async (request, reply) => {
 // Community "waggle" report: submit a suspected malicious address.
 app.post<{ Body: ReportRequest }>("/v1/report", async (request, reply) => {
   const intel = await createIntelAsync();
-  const body = request.body;
+  const body = request.body as ReportRequest;
   if (!body?.address || !body.category || !body.reporterId) {
     return reply.status(400).send({ error: "address, category and reporterId are required" });
   }
