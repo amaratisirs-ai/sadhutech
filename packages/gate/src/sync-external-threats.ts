@@ -56,7 +56,7 @@ async function fetchScamSnifferThreats(): Promise<ExternalThreat[]> {
     });
 
     if (!res.ok) {
-      console.log("[sync] Scam Sniffer unavailable (non-fatal)");
+      console.log(`[sync] Scam Sniffer unavailable (${res.status}) (non-fatal)`);
       return [];
     }
 
@@ -73,7 +73,7 @@ async function fetchScamSnifferThreats(): Promise<ExternalThreat[]> {
       }))
       .filter((t: ExternalThreat) => t.address && /^0x[a-f0-9]{40}$/.test(t.address)) as ExternalThreat[];
   } catch (err) {
-    console.log("[sync] Scam Sniffer fetch failed (non-fatal)");
+    console.log(`[sync] Scam Sniffer fetch error: ${err instanceof Error ? err.message : String(err)}`);
     return [];
   }
 }
@@ -91,7 +91,7 @@ async function fetchRugdocThreats(): Promise<ExternalThreat[]> {
     });
 
     if (!res.ok) {
-      console.log("[sync] Rugdoc unavailable (non-fatal)");
+      console.log(`[sync] Rugdoc unavailable (${res.status}) (non-fatal)`);
       return [];
     }
 
@@ -108,7 +108,7 @@ async function fetchRugdocThreats(): Promise<ExternalThreat[]> {
       }))
       .filter((t: ExternalThreat) => t.address && /^0x[a-f0-9]{40}$/.test(t.address)) as ExternalThreat[];
   } catch (err) {
-    console.log("[sync] Rugdoc fetch failed (non-fatal)");
+    console.log(`[sync] Rugdoc fetch error: ${err instanceof Error ? err.message : String(err)}`);
     return [];
   }
 }
@@ -126,7 +126,7 @@ async function fetchSlowMistThreats(): Promise<ExternalThreat[]> {
     });
 
     if (!res.ok) {
-      console.log("[sync] SlowMist unavailable (non-fatal)");
+      console.log(`[sync] SlowMist unavailable (${res.status}) (non-fatal)`);
       return [];
     }
 
@@ -143,7 +143,7 @@ async function fetchSlowMistThreats(): Promise<ExternalThreat[]> {
       }))
       .filter((t: ExternalThreat) => t.address && /^0x[a-f0-9]{40}$/.test(t.address)) as ExternalThreat[];
   } catch (err) {
-    console.log("[sync] SlowMist fetch failed (non-fatal)");
+    console.log(`[sync] SlowMist fetch error: ${err instanceof Error ? err.message : String(err)}`);
     return [];
   }
 }
