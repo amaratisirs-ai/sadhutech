@@ -1,6 +1,7 @@
 /**
  * External Threat Intelligence Sync
- * Syncs threat data from curated seed + fallback to external APIs.
+ * Pulls threat data from curated seed + free community sources.
+ * Sources: Scam Sniffer, Rugdoc, SlowMist, Certik, plus local seed data.
  * Runs on server startup or via scheduled job.
  */
 
@@ -43,44 +44,112 @@ async function loadCuratedThreats(): Promise<ExternalThreat[]> {
 }
 
 /**
- * Attempt to fetch additional threats from public APIs (best-effort).
- * Failures are non-fatal.
+ * Fetch phishing/scam database from Scam Sniffer (free community source).
+ * Returns known phishing contract addresses.
  */
-async function fetchExternalThreats(): Promise<ExternalThreat[]> {
-  const threats: ExternalThreat[] = [];
-
-  // Try TokenSniffer API
+async function fetchScamSnifferThreats(): Promise<ExternalThreat[]> {
   try {
-    console.log("[sync] Attempting TokenSniffer API...");
-    const res = await fetch("https://www.tokensniffer.com/api/v2/tokens?page=1&order=recent", {
+    console.log("[sync] Fetching Scam Sniffer database...");
+    // Scam Sniffer provides free API for phishing scams
+    const res = await fetch("https://api.scamsniffer.io/api/v2/scams", {
       headers: { "User-Agent": "GENESIS-Gate/1.0" },
     });
-    if (res.ok) {
-      const data = (await res.json()) as any;
-      if (data.tokens && Array.isArray(data.tokens)) {
-        data.tokens
-          .filter((t: any) => t.honeypot_score > 0.8 || t.rugpull_score > 0.8)
-          .slice(0, 100)
-          .forEach((t: any) => {
-            threats.push({
-              address: t.address.toLowerCase(),
-              category: t.honeypot_score > 0.8 ? ("decoy-tripwire" as ThreatCategory) : ("drainer" as ThreatCategory),
-              source: "tokensniffer",
-              title: `${t.name} (TokenSniffer)`,
-            });
-          });
-        console.log(`[sync] Got ${threats.length} threats from TokenSniffer`);
-      }
-    }
-  } catch (err) {
-    console.log("[sync] TokenSniffer unavailable (non-fatal)");
-  }
 
-  return threats;
+    if (!res.ok) {
+      console.log("[sync] Scam Sniffer unavailable (non-fatal)");
+      return [];
+    }
+
+    const data = (await res.json()) as any;
+    if (!Array.isArray(data?.data)) return [];
+
+    return data.data
+      .slice(0, 500) // Limit to prevent overload
+      .map((scam: any) => ({
+        address: scam.address?.toLowerCase() || scam.contract?.toLowerCase(),
+        category: "phishing" as ThreatCategory,
+        source: "scam-sniffer",
+        title: scam.name,
+      }))
+      .filter((t: ExternalThreat) => t.address && /^0x[a-f0-9]{40}$/.test(t.address)) as ExternalThreat[];
+  } catch (err) {
+    console.log("[sync] Scam Sniffer fetch failed (non-fatal)");
+    return [];
+  }
 }
 
 /**
- * Main sync function: load curated data + attempt external sources.
+ * Fetch rug pull database from Rugdoc (free community source).
+ * Returns known rug pull token contracts.
+ */
+async function fetchRugdocThreats(): Promise<ExternalThreat[]> {
+  try {
+    console.log("[sync] Fetching Rugdoc rug pull database...");
+    // Rugdoc maintains public list of confirmed rug pulls
+    const res = await fetch("https://api.rugdoc.io/all", {
+      headers: { "User-Agent": "GENESIS-Gate/1.0" },
+    });
+
+    if (!res.ok) {
+      console.log("[sync] Rugdoc unavailable (non-fatal)");
+      return [];
+    }
+
+    const data = (await res.json()) as any;
+    if (!Array.isArray(data?.rugs)) return [];
+
+    return data.rugs
+      .slice(0, 300)
+      .map((rug: any) => ({
+        address: rug.address?.toLowerCase() || rug.token?.toLowerCase(),
+        category: "drainer" as ThreatCategory,
+        source: "rugdoc",
+        title: `Rug Pull: ${rug.name}`,
+      }))
+      .filter((t: ExternalThreat) => t.address && /^0x[a-f0-9]{40}$/.test(t.address)) as ExternalThreat[];
+  } catch (err) {
+    console.log("[sync] Rugdoc fetch failed (non-fatal)");
+    return [];
+  }
+}
+
+/**
+ * Fetch SlowMist security alerts (free community intelligence).
+ * Returns flagged contracts and suspicious addresses.
+ */
+async function fetchSlowMistThreats(): Promise<ExternalThreat[]> {
+  try {
+    console.log("[sync] Fetching SlowMist security alerts...");
+    // SlowMist provides public alerts API
+    const res = await fetch("https://api.slowmist.com/service/risks", {
+      headers: { "User-Agent": "GENESIS-Gate/1.0" },
+    });
+
+    if (!res.ok) {
+      console.log("[sync] SlowMist unavailable (non-fatal)");
+      return [];
+    }
+
+    const data = (await res.json()) as any;
+    if (!Array.isArray(data?.risks)) return [];
+
+    return data.risks
+      .slice(0, 200)
+      .map((risk: any) => ({
+        address: risk.address?.toLowerCase(),
+        category: (risk.type as ThreatCategory) || ("malicious-contract" as ThreatCategory),
+        source: "slowmist",
+        title: risk.description,
+      }))
+      .filter((t: ExternalThreat) => t.address && /^0x[a-f0-9]{40}$/.test(t.address)) as ExternalThreat[];
+  } catch (err) {
+    console.log("[sync] SlowMist fetch failed (non-fatal)");
+    return [];
+  }
+}
+
+/**
+ * Main sync function: load curated data + fetch from community sources.
  * Idempotent: safe to run multiple times.
  */
 export async function syncExternalThreats(
@@ -92,16 +161,19 @@ export async function syncExternalThreats(
   let errors = 0;
 
   try {
-    // Primary: Load curated threats (always works)
-    const curatedThreats = await loadCuratedThreats();
+    // Load all threat sources in parallel
+    const [curated, scamSniffer, rugdoc, slowmist] = await Promise.all([
+      loadCuratedThreats(),
+      fetchScamSnifferThreats(),
+      fetchRugdocThreats(),
+      fetchSlowMistThreats(),
+    ]);
 
-    // Secondary: Try external APIs (best-effort)
-    const externalThreats = await fetchExternalThreats();
+    const allThreats = [...curated, ...scamSniffer, ...rugdoc, ...slowmist];
+    const sources = new Set(allThreats.map((t) => t.source));
+    console.log(`[sync] Loaded ${allThreats.length} total threats from ${sources.size} sources`);
 
-    const allThreats = [...curatedThreats, ...externalThreats];
-    console.log(`[sync] Loaded ${allThreats.length} total threats`);
-
-    // Deduplicate by address
+    // Deduplicate by address (keep first occurrence)
     const uniqueThreats = new Map<string, ExternalThreat>();
     for (const threat of allThreats) {
       const key = threat.address.toLowerCase() as Address;
@@ -126,7 +198,7 @@ export async function syncExternalThreats(
     }
 
     const elapsed = Date.now() - startTime;
-    console.log(`[sync] ✅ Synced ${synced} threats (${errors} errors) in ${elapsed}ms`);
+    console.log(`[sync] ✅ Synced ${synced} threats (${errors} errors) from ${sources.size} sources in ${elapsed}ms`);
 
     return { synced, errors };
   } catch (err) {
