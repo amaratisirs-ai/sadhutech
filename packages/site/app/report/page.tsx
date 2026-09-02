@@ -32,6 +32,7 @@ export default function ReportPage() {
         body: JSON.stringify({
           address: address.toLowerCase(),
           category: category as any,
+          reporterId: `reporter-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`,
           description: description || undefined,
         }),
       });
