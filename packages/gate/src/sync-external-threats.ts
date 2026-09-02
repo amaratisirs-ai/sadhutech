@@ -1,8 +1,14 @@
 /**
  * External Threat Intelligence Sync
- * Pulls threat data from curated seed + free community sources.
- * Sources: Scam Sniffer, Rugdoc, SlowMist, Certik, plus local seed data.
- * Runs on server startup or via scheduled job.
+ * Pulls threat data from curated seed + community reports + future API integrations.
+ * 
+ * GROWTH MODEL:
+ * - Phase 1 (Now): 20+ curated threats + community reports via POST /v1/report
+ * - Phase 2 (Q4 2026): Blockaid.io dApp scanning API integration (requires API key)
+ * - Phase 3 (2027): Chainalysis enterprise feed + custom scoring
+ * 
+ * Community-driven approach: Users submit threats via the website, database grows organically.
+ * This is more resilient than scraping unreliable external APIs.
  */
 
 import { ThreatIntelPostgres } from "./intel-postgres.js";

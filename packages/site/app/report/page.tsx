@@ -68,7 +68,7 @@ export default function ReportPage() {
           </Link>
           <h1 className="text-4xl font-bold text-white mb-2">Report a Threat</h1>
           <p className="text-slate-300">
-            Help protect the Ethereum community by reporting malicious contracts and draining addresses.
+            Help protect the crypto community by reporting malicious contracts and draining addresses across all blockchains.
           </p>
         </div>
 
@@ -158,7 +158,7 @@ export default function ReportPage() {
         <div className="mt-8 bg-slate-700 border border-slate-600 rounded-lg p-6">
           <h2 className="text-lg font-semibold text-white mb-3">How It Works</h2>
           <ul className="space-y-2 text-slate-300 text-sm">
-            <li>✅ <strong>Submit:</strong> Report a malicious address</li>
+            <li>✅ <strong>Submit:</strong> Report a malicious address (Ethereum, Polygon, Arbitrum, Optimism, etc.)</li>
             <li>✅ <strong>Verify:</strong> Our analysis engine scores the threat</li>
             <li>✅ <strong>Protect:</strong> GENESIS gates block this address for all users</li>
             <li>✅ <strong>Track:</strong> See your report's impact on the dashboard</li>

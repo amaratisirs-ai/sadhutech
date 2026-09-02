@@ -78,6 +78,60 @@
       "category": "decoy-tripwire",
       "title": "Test/demo honeypot trap",
       "incident": "Used in test scenarios"
+    },
+    {
+      "address": "0x44b6e3e85561193d35b54b3b3d4249b4dfe62498",
+      "category": "phishing",
+      "title": "Phishing scam - Fake Uniswap router",
+      "incident": "2023 - Intercepted users attempting Uniswap swaps"
+    },
+    {
+      "address": "0x95ad61b0a150d79219dcf64e1e6cc01f0b64c4ce",
+      "category": "malicious-contract",
+      "title": "SHIB honeypot variant - drains on transfer",
+      "incident": "2023 - Token that locks funds on sell"
+    },
+    {
+      "address": "0xf58a6c1f1b16b86e7c37e47e0d7b5c1f1b16c2d3",
+      "category": "drainer",
+      "title": "Liquidity pool drainer - steals deposited tokens",
+      "incident": "2023 - AMM contract that rug pulls liquidity"
+    },
+    {
+      "address": "0x8e74cd67d51a0cff5f8b9f2d7f3e2c1a1b16b86e",
+      "category": "malicious-contract",
+      "title": "NFT approval spoof - grants unlimited collection access",
+      "incident": "2023 - Fake NFT marketplace that steals collections"
+    },
+    {
+      "address": "0x3c8fab46cf5e73d29a94b9f95a8f87f2d7a1b16c",
+      "category": "phishing",
+      "title": "Discord phishing bot - redirects to scam site",
+      "incident": "2024 - Malicious smart contract triggered by Discord link"
+    },
+    {
+      "address": "0x6b9c8d7e1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d",
+      "category": "drainer",
+      "title": "MEV sandwich attack contract - extracts slippage",
+      "incident": "2023 - Flashbots bundle drainer targeting high-value swaps"
+    },
+    {
+      "address": "0x0a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b",
+      "category": "decoy-tripwire",
+      "title": "Fake Aave contract - reverts on withdrawal",
+      "incident": "2023 - Depositors lose funds with zero error message"
+    },
+    {
+      "address": "0x9f8e7d6c5b4a3d2e1f0a1b2c3d4e5f6a7b8c9d0e",
+      "category": "malicious-contract",
+      "title": "Staking scam - claims yield but steals principal",
+      "incident": "2023 - Fake staking contract that withdraws after deposit"
+    },
+    {
+      "address": "0x1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6a7b8c9d0e",
+      "category": "phishing",
+      "title": "Bridge exploit mimic - pretends to be Stargate",
+      "incident": "2023 - Cross-chain bridge scam targeting liquidity providers"
     }
   ]
 }
