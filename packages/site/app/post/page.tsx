@@ -31,8 +31,8 @@ export default function PostPage() {
         return;
       }
 
-      // Call the gate API
-      const gateUrl = process.env.NEXT_PUBLIC_GATE_URL || "http://localhost:8787";
+      // Call the gate API (production URL)
+      const gateUrl = process.env.NEXT_PUBLIC_GATE_URL || "https://genesis-gate.onrender.com";
       const response = await fetch(`${gateUrl}/v1/analyze`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },

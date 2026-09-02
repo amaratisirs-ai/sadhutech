@@ -4,6 +4,8 @@ import type { AnalyzeRequest, ReportRequest } from "@genesis/shared";
 import { analyze } from "./analyze.js";
 import { createIntelAsync } from "./index.js";
 import { TESTER_HTML } from "./ui.js";
+import { initSyncService } from "./sync-external-threats.js";
+import type { ThreatIntelPostgres } from "./intel-postgres.js";
 
 const app = Fastify({ logger: true });
 
@@ -66,7 +68,18 @@ app.post<{ Body: ReportRequest }>("/v1/report", async (request, reply) => {
 async function start(): Promise<void> {
   try {
     // Pre-warm threat feeds/intel before listening.
-    await createIntelAsync();
+    const intel = await createIntelAsync();
+
+    // If using PostgreSQL, sync external threats in background
+    if (intel instanceof (await import("./intel-postgres.js")).ThreatIntelPostgres) {
+      const postgresIntel = intel as ThreatIntelPostgres;
+      // Start sync service: run now, then every 6 hours
+      initSyncService(postgresIntel, { runOnStartup: true, intervalHours: 6 }).catch((err) => {
+        console.error("[startup] Sync service failed:", err);
+        // Don't crash, just log - firewall can still work with stale data
+      });
+    }
+
     const port = Number(process.env.PORT ?? 8787);
     await app.listen({ port, host: "0.0.0.0" });
     app.log.info(`GENESIS gate listening on :${port} with loaded threat intel`);
