@@ -98,7 +98,7 @@ export default function Home() {
                 Your Personal Crypto Bodyguard
               </h1>
 
-              <p className="text-xl text-slate-300 leading-relaxed">
+              <p className="text-xl text-white leading-relaxed">
               Before you sign any crypto transaction, let GENESIS check if it's safe. Get instant verdicts on approvals,
               transfers, and complex deals.
             </p>
@@ -129,7 +129,7 @@ export default function Home() {
       <section className="space-y-8">
         <div className="text-center">
           <h2 className="text-4xl md:text-5xl font-black text-white mb-4">The Risk Most People Don't See</h2>
-          <p className="text-slate-400 text-lg">You already own crypto. Here's what can go wrong.</p>
+          <p className="text-slate-200 text-lg font-medium">You already own crypto. Here's what can go wrong.</p>
         </div>
 
         <div className="grid md:grid-cols-3 gap-6">
@@ -213,7 +213,7 @@ export default function Home() {
       <section className="space-y-8">
         <div className="text-center">
           <h2 className="text-4xl md:text-5xl font-black text-white mb-4">Get started in seconds</h2>
-          <p className="text-slate-400 text-lg">Choose what works for you</p>
+          <p className="text-slate-200 text-lg font-medium">Choose what works for you</p>
         </div>
 
         <div className="grid md:grid-cols-3 gap-6">
@@ -225,7 +225,7 @@ export default function Home() {
               </svg>
             </div>
             <h3 className="text-xl font-bold text-white">Verify Transactions</h3>
-            <p className="text-sm text-slate-300">Analyze real transactions and get instant verdicts. No signup required.</p>
+            <p className="text-sm text-slate-200 font-medium">Analyze real transactions and get instant verdicts. No signup required.</p>
             <div className="pt-4 space-y-2">
               <p className="text-xs font-semibold text-teal-400">✓ Real verdicts</p>
               <p className="text-xs font-semibold text-teal-400">✓ Any blockchain</p>
@@ -247,7 +247,7 @@ export default function Home() {
               </svg>
             </div>
             <h3 className="text-xl font-bold text-white">MetaMask Snap</h3>
-            <p className="text-sm text-slate-300">One-click install for automatic protection on every transaction sign.</p>
+            <p className="text-sm text-slate-200 font-medium">One-click install for automatic protection on every transaction sign.</p>
             <div className="pt-4 space-y-2">
               <p className="text-xs font-semibold text-orange-400">✓ Seamless integration</p>
               <p className="text-xs font-semibold text-orange-400">✓ Auto-protection</p>
@@ -268,7 +268,7 @@ export default function Home() {
               </svg>
             </div>
             <h3 className="text-xl font-bold text-white">API Integration</h3>
-            <p className="text-sm text-slate-300">For developers. Build safer wallets and dapps with our HTTP API.</p>
+            <p className="text-sm text-slate-200 font-medium">For developers. Build safer wallets and dapps with our HTTP API.</p>
             <div className="pt-4 space-y-2">
               <p className="text-xs font-semibold text-teal-400">✓ Production-ready</p>
               <p className="text-xs font-semibold text-teal-400">✓ Full documentation</p>
@@ -286,7 +286,7 @@ export default function Home() {
       <section className="space-y-8">
         <div className="text-center">
           <h2 className="text-4xl md:text-5xl font-black text-white mb-4">How it works in 3 steps</h2>
-          <p className="text-slate-400 text-lg">Simple, fast, and transparent</p>
+          <p className="text-slate-200 text-lg font-medium">Simple, fast, and transparent</p>
         </div>
 
         {/* Visual Flow Diagram */}

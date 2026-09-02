@@ -50,8 +50,8 @@ const scenarios = [
     },
   },
   {
-    name: "Approve to Drainer",
-    desc: "Approving to a known malicious address. GENESIS will block this!",
+    name: "Approve to Known Drainer",
+    desc: "Approving to 0x000...dead, a known malicious address. GENESIS will block this!",
     icon: "M12 9v2m0 4v2m0 5v.01M7.08 6.24l1.41 1.41m2.83-2.83l1.41-1.41m4.24 4.24l1.41 1.41m2.83-2.83l1.41-1.41M7.08 17.76l1.41-1.41m2.83 2.83l1.41 1.41m4.24-4.24l1.41-1.41m2.83 2.83l1.41 1.41",
     tx: {
       chainId: 1,
@@ -66,7 +66,9 @@ export default function DemoPage() {
   const [response, setResponse] = useState<AnalyzeResponse | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [gateUrl, setGateUrl] = useState("http://localhost:8787");
+  const [gateUrl, setGateUrl] = useState(
+    process.env.NEXT_PUBLIC_GATE_URL || "https://genesis-gate.onrender.com"
+  );
   const [expandedHelp, setExpandedHelp] = useState<string | null>(null);
 
   const analyze = async (tx: unknown) => {
@@ -124,7 +126,7 @@ export default function DemoPage() {
           </div>
           <h1 className="text-5xl font-black text-white">Interactive Demo</h1>
         </div>
-        <p className="text-slate-400 text-lg">
+        <p className="text-slate-200 text-lg font-medium">
           Test GENESIS with sample transactions. Click a scenario to see how GENESIS analyzes it.
         </p>
       </div>
@@ -147,27 +149,27 @@ export default function DemoPage() {
           </div>
 
           {expandedHelp === "gateUrl" && (
-            <div className="bg-teal-500/10 border border-teal-500/30 rounded-lg p-4 text-sm text-slate-300 space-y-3">
+            <div className="bg-teal-500/10 border border-teal-500/30 rounded-lg p-4 text-sm text-slate-200 space-y-3">
               <p><strong>What is it?</strong> The GENESIS Gate Server is the backend service that analyzes transactions. It decodes calldata, checks threats, and returns verdicts.</p>
               
-              <p><strong>Is it running?</strong> By default, it runs on <code className="bg-slate-800 px-2 py-1 rounded text-teal-400 font-mono">http://localhost:8787</code> when you start the development environment.</p>
+              <p><strong>Default URL:</strong> This demo uses <code className="bg-slate-800 px-2 py-1 rounded text-teal-300 font-mono">https://genesis-gate.onrender.com</code> (production). For local testing, use <code className="bg-slate-800 px-2 py-1 rounded text-teal-300 font-mono">http://localhost:10000</code></p>
               
               <div>
-                <p className="font-semibold text-slate-300 mb-2">To start the gate server:</p>
-                <p className="bg-slate-800 px-3 py-2 rounded text-teal-400 font-mono text-xs break-all">
+                <p className="font-semibold text-slate-100 mb-2">To start the gate server (localhost):</p>
+                <p className="bg-slate-800 px-3 py-2 rounded text-teal-300 font-mono text-xs break-all">
                   pnpm gate
                 </p>
-                <p className="text-xs text-slate-400 mt-2">Run this in a separate terminal from <code className="bg-slate-800 px-2 py-1 rounded text-teal-400">pnpm site dev</code></p>
+                <p className="text-xs text-slate-400 mt-2">Run this in a separate terminal from <code className="bg-slate-800 px-2 py-1 rounded text-teal-300">pnpm site dev</code></p>
               </div>
 
               <div>
-                <p className="font-semibold text-slate-300 mb-2">Can I change the URL?</p>
-                <p className="text-slate-400">Yes! If you're running GENESIS on a different server or port, update the URL here and it will use that instead. Press Enter or change another field to save.</p>
+                <p className="font-semibold text-slate-100 mb-2">Can I change the URL?</p>
+                <p className="text-slate-300">Yes! If you're running GENESIS on a different server or port, update the URL here and it will use that instead.</p>
               </div>
 
               <div className="bg-slate-800/50 border border-slate-600 rounded p-3">
-                <p className="text-xs font-bold text-yellow-400 mb-1">⚠️ Common issue:</p>
-                <p className="text-xs text-slate-400">"Connection failed" error? Make sure you ran <code className="bg-slate-800 px-1 py-0.5 rounded text-teal-400 font-mono">pnpm gate</code> in another terminal window.</p>
+                <p className="text-xs font-bold text-yellow-300 mb-1">⚠️ Common issue:</p>
+                <p className="text-xs text-slate-300">"Connection failed" error? Make sure you ran <code className="bg-slate-800 px-1 py-0.5 rounded text-teal-300 font-mono">pnpm gate</code> in another terminal window, or check that the gate server is reachable.</p>
               </div>
             </div>
           )}
@@ -177,10 +179,10 @@ export default function DemoPage() {
             value={gateUrl}
             onChange={(e) => setGateUrl(e.target.value)}
             className="w-full px-4 py-3 backdrop-blur-md bg-slate-800 border-2 border-teal-500/30 rounded-lg text-sm focus:ring-2 focus:ring-teal-500 focus:border-transparent text-white placeholder-slate-400 transition font-mono"
-            placeholder="http://localhost:8787"
+            placeholder="https://genesis-gate.onrender.com"
           />
           <p className="text-xs text-slate-400">
-            Click the <span className="text-teal-400">?</span> icon for help. Default: <code className="bg-slate-800 px-2 py-1 rounded text-teal-400 font-mono">localhost:8787</code>
+            Click the <span className="text-teal-400">?</span> icon for help. Default: <code className="bg-slate-800 px-2 py-1 rounded text-teal-400 font-mono">https://genesis-gate.onrender.com</code>
           </p>
         </div>
       </div>
@@ -188,7 +190,7 @@ export default function DemoPage() {
       {/* Scenarios Grid */}
       <div className="space-y-4">
         <div className="flex items-center gap-2">
-          <h2 className="text-lg font-bold text-white">Sample Transactions</h2>
+          <h2 className="text-xl font-bold text-white">Sample Transactions</h2>
           <button
             type="button"
             onClick={() => setExpandedHelp(expandedHelp === "scenarios" ? null : "scenarios")}
@@ -202,15 +204,15 @@ export default function DemoPage() {
         </div>
 
         {expandedHelp === "scenarios" && (
-          <div className="bg-teal-500/10 border border-teal-500/30 rounded-lg p-4 text-sm text-slate-300 space-y-2">
+          <div className="bg-teal-500/10 border border-teal-500/30 rounded-lg p-4 text-sm text-slate-200 space-y-2">
             <p><strong>What are these?</strong> Pre-built sample transactions showing different real-world scenarios. Click "Run" on any scenario to see how GENESIS analyzes it.</p>
-            <ul className="list-disc list-inside space-y-1 text-slate-400">
-              <li><strong>Simple Token Transfer:</strong> A normal, safe transaction</li>
+            <ul className="list-disc list-inside space-y-1 text-slate-300">
+              <li><strong>Simple Token Transfer:</strong> A normal, safe transaction (ALLOW)</li>
               <li><strong>Unlimited Approval:</strong> Granting dangerous unlimited spending access (WARN)</li>
-              <li><strong>NFT Collection Approval:</strong> Giving access to manage your whole NFT collection (RISKY)</li>
-              <li><strong>Approve to Drainer:</strong> Approving to a known malicious address (BLOCK)</li>
+              <li><strong>NFT Collection Approval:</strong> Giving access to manage your whole NFT collection (WARN)</li>
+              <li><strong>Approve to Known Drainer:</strong> Approving to a verified malicious address (BLOCK)</li>
             </ul>
-            <p className="text-xs text-teal-400 pt-2">💡 Use these to learn how GENESIS works before analyzing your own transactions.</p>
+            <p className="text-xs text-teal-300 pt-2">💡 Use these to learn how GENESIS works before analyzing your own transactions.</p>
           </div>
         )}
 
