@@ -1,0 +1,12 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "noEmit": true
+  },
+  "include": ["packages/*/src"],
+  "references": [
+    { "path": "packages/shared" },
+    { "path": "packages/gate" },
+    { "path": "packages/wc-middleware" }
+  ]
+}

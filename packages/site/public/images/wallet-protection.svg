@@ -1,0 +1,17 @@
+<svg viewBox="0 0 1024 768" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="wallet1" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" style="stop-color:#3b82f6;stop-opacity:1" />
+          <stop offset="100%" style="stop-color:#06b6d4;stop-opacity:1" />
+        </linearGradient>
+      </defs>
+      <rect width="1024" height="768" fill="#0f172a"/>
+      <rect x="350" y="250" width="324" height="220" rx="20" fill="#06b6d4" opacity="0.2" stroke="url(#wallet1)" stroke-width="2"/>
+      <rect x="370" y="280" width="284" height="40" rx="10" fill="#3b82f6" opacity="0.3"/>
+      <circle cx="400" cy="380" r="30" fill="#06b6d4" opacity="0.6"/>
+      <circle cx="512" cy="380" r="30" fill="#3b82f6" opacity="0.6"/>
+      <circle cx="624" cy="380" r="30" fill="#06b6d4" opacity="0.6"/>
+      <path d="M 380 450 L 644 450" stroke="#06b6d4" stroke-width="2" opacity="0.6"/>
+      <path d="M 385 460 L 390 470 M 425 460 L 430 470 M 465 460 L 470 470 M 505 460 L 510 470 M 545 460 L 550 470 M 585 460 L 590 470 M 625 460 L 630 470" stroke="#3b82f6" stroke-width="2" opacity="0.6"/>
+      <text x="512" y="650" font-size="48" font-weight="bold" text-anchor="middle" fill="#06b6d4">SECURED</text>
+    </svg>

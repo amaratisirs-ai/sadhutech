@@ -1,0 +1,18 @@
+{
+  "name": "@genesis/snap",
+  "version": "0.0.1",
+  "private": true,
+  "description": "GENESIS transaction-insight Snap — routes pre-sign txs through the Chakravyuha gate",
+  "type": "module",
+  "main": "./dist/bundle.js",
+  "scripts": {
+    "build": "mm-snap build",
+    "serve": "mm-snap serve"
+  },
+  "dependencies": {
+    "@metamask/snaps-sdk": "^6.17.1"
+  },
+  "devDependencies": {
+    "@metamask/snaps-cli": "^6.5.4"
+  }
+}

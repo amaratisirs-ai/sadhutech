@@ -1,0 +1,22 @@
+{
+  "version": "0.0.1",
+  "description": "GENESIS pre-sign transaction firewall",
+  "proposedName": "GENESIS Firewall",
+  "repository": { "type": "git", "url": "" },
+  "source": {
+    "shasum": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=",
+    "location": {
+      "npm": {
+        "filePath": "dist/bundle.js",
+        "iconPath": "images/icon.svg",
+        "packageName": "@genesis/snap",
+        "registry": "https://registry.npmjs.org/"
+      }
+    }
+  },
+  "initialPermissions": {
+    "endowment:transaction-insight": { "allowTransactionOrigin": true },
+    "endowment:network-access": {}
+  },
+  "manifestVersion": "0.1"
+}
