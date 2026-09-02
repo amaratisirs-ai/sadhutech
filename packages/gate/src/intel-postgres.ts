@@ -18,14 +18,14 @@ export class ThreatIntelPostgres {
     this.pool = new Pool({ connectionString: databaseUrl, max: 10 });
   }
 
-  /** Ensure schema exists; idempotent. */
+  /** Ensure schema exists; idempotent. Runs full migration from packages/gate/data/migrations/001-threat-intel.sql. */
   async initialize(): Promise<void> {
     if (this.initialized) return;
     try {
       await this.pool.query(`
         CREATE TABLE IF NOT EXISTS threat_intel (
           address CHAR(42) PRIMARY KEY,
-          category TEXT NOT NULL,
+          category TEXT NOT NULL CHECK (category IN ('drainer', 'malicious-contract', 'decoy-tripwire', 'sanctioned', 'phishing')),
           reporters TEXT[] NOT NULL DEFAULT '{}',
           trusted BOOLEAN DEFAULT false,
           first_seen TIMESTAMPTZ DEFAULT NOW(),
@@ -37,6 +37,7 @@ export class ThreatIntelPostgres {
         CREATE INDEX IF NOT EXISTS idx_threat_intel_last_seen ON threat_intel(last_seen DESC);
       `);
       this.initialized = true;
+      console.log("[threat-intel-postgres] Schema initialized (idempotent)");
     } catch (err) {
       console.error("[threat-intel-postgres] Initialize failed:", err);
       throw err;
@@ -72,7 +73,7 @@ export class ThreatIntelPostgres {
          VALUES ($1, $2, ARRAY[$3])
          ON CONFLICT (address) DO UPDATE
          SET reporters = ARRAY(SELECT DISTINCT * FROM UNNEST(threat_intel.reporters || ARRAY[$3])),
-             category = GREATEST(threat_intel.category, EXCLUDED.category, BY TEXT),
+             category = COALESCE(EXCLUDED.category, threat_intel.category),
              last_seen = NOW()
          RETURNING address, category, reporters, trusted, first_seen, last_seen, metadata`,
         [key, req.category, req.reporterId]
