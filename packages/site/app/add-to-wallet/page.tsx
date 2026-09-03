@@ -32,23 +32,8 @@ export default function AddToWallet() {
       details: [
         "Mobile-friendly flow",
         "Connect supported wallets directly",
-        "Use the demo or API Explorer next",
+        "Use the API Explorer to test real requests",
         "No MetaMask required",
-      ],
-    },
-    {
-      id: "demo",
-      name: "Try the Demo First",
-      description: "See ALLOW, WARN, and BLOCK before you connect anything.",
-      icon: "🧪",
-      badge: "No install",
-      status: "ready",
-      action: () => router.push("/demo"),
-      details: [
-        "Great for first-time users",
-        "No wallet connection needed",
-        "See a live transaction analysis",
-        "Understand the product before onboarding",
       ],
     },
   ];
@@ -59,13 +44,13 @@ export default function AddToWallet() {
       <div className="text-center space-y-4">
         <h1 className="text-5xl md:text-6xl font-black text-white">🛡️ Choose Your GENESIS Onboarding Path</h1>
         <p className="text-xl text-teal-200 max-w-2xl mx-auto">
-          Pick the path that matches your wallet: MetaMask Snap, WalletConnect wallets, or demo-first if you want to learn before installing.
+          Pick the path that matches your wallet: MetaMask Snap for MetaMask, or WalletConnect for supported wallets.
         </p>
       </div>
 
       <section className="bg-gradient-to-br from-indigo-900/30 to-slate-900 border-2 border-indigo-500/40 rounded-2xl p-6 max-w-4xl mx-auto space-y-3">
         <h2 className="text-2xl font-bold text-white">Start here</h2>
-        <div className="grid md:grid-cols-3 gap-4 text-sm text-slate-200">
+        <div className="grid md:grid-cols-2 gap-4 text-sm text-slate-200">
           <div className="rounded-xl border border-slate-700 bg-slate-950/40 p-4 space-y-2">
             <p className="font-bold text-white">1. MetaMask Snap</p>
             <p>Use this if you sign in MetaMask and want GENESIS inside the wallet.</p>
@@ -73,10 +58,6 @@ export default function AddToWallet() {
           <div className="rounded-xl border border-slate-700 bg-slate-950/40 p-4 space-y-2">
             <p className="font-bold text-white">2. WalletConnect</p>
             <p>Use this for Trust Wallet, Rainbow, Argent, and other supported wallets.</p>
-          </div>
-          <div className="rounded-xl border border-slate-700 bg-slate-950/40 p-4 space-y-2">
-            <p className="font-bold text-white">3. Demo first</p>
-            <p>Try a sample analysis if you want to see how verdicts look before connecting anything.</p>
           </div>
         </div>
       </section>

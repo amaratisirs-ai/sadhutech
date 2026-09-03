@@ -188,7 +188,7 @@ export default function WalletConnect() {
         <p className="text-xl text-teal-200 max-w-2xl mx-auto">
           {isMobile
             ? "Use Trust Wallet, Argent, Rainbow, and other supported wallets." 
-            : "Connect a supported wallet, then analyze transactions in the demo or API Explorer."}
+            : "Connect a supported wallet, then test real transactions in the API Explorer."}
         </p>
       </div>
 
@@ -200,9 +200,6 @@ export default function WalletConnect() {
         <div className="flex flex-wrap gap-3">
           <a href="/snap-install" className="px-4 py-2 rounded-lg bg-slate-800 text-slate-100 border border-slate-600 hover:border-teal-400 transition text-sm font-semibold">
             MetaMask Snap →
-          </a>
-          <a href="/demo" className="px-4 py-2 rounded-lg bg-teal-500 text-slate-950 hover:bg-teal-400 transition text-sm font-semibold">
-            Try the Demo →
           </a>
           <a href="/api-explorer" className="px-4 py-2 rounded-lg bg-slate-800 text-slate-100 border border-slate-600 hover:border-teal-400 transition text-sm font-semibold">
             API Explorer →
@@ -237,14 +234,14 @@ export default function WalletConnect() {
                   <li>1. Tap your wallet above</li>
                   <li>2. Tap the open button to launch the wallet</li>
                   <li>3. Approve connection in wallet</li>
-                  <li>4. Use the demo or API Explorer next</li>
+                  <li>4. Use the API Explorer to test a real transaction</li>
                 </>
               ) : (
                 <>
                   <li>1. Tap a wallet or scan QR</li>
                   <li>2. {selectedWallet ? "Scan QR with your phone" : "Select a wallet to see options"}</li>
                   <li>3. Approve connection in wallet</li>
-                  <li>4. Use the demo or API Explorer next</li>
+                  <li>4. Use the API Explorer to test a real transaction</li>
                 </>
               )}
             </ol>
@@ -303,11 +300,8 @@ export default function WalletConnect() {
                 )}
                 {connectionState.connectionApproved && (
                     <div className="space-y-3">
-                      <p className="text-xs text-teal-200">✅ Connected. Next step: analyze a transaction in the demo or API Explorer.</p>
+                      <p className="text-xs text-teal-200">✅ Connected. Next step: analyze a real transaction in the API Explorer.</p>
                       <div className="flex flex-col sm:flex-row gap-3">
-                        <a href="/demo" className="flex-1 text-center px-4 py-2 rounded-lg bg-teal-500 text-slate-950 font-bold hover:bg-teal-400 transition">
-                          Open Demo
-                        </a>
                         <a href="/api-explorer" className="flex-1 text-center px-4 py-2 rounded-lg border border-slate-500 text-white font-semibold hover:border-teal-400 transition">
                           Open API Explorer
                         </a>
@@ -359,7 +353,7 @@ export default function WalletConnect() {
           ) : connectionState.connectionApproved ? (
             <div className="bg-green-900/40 border border-green-500/50 rounded-lg p-4 text-center space-y-2">
               <p className="text-green-200 font-semibold">✅ Connection Approved!</p>
-              <p className="text-xs text-green-300">Wallet connected. Try the demo or API Explorer next.</p>
+              <p className="text-xs text-green-300">Wallet connected. Test a real transaction in the API Explorer next.</p>
             </div>
           ) : (
             <div className="space-y-4">

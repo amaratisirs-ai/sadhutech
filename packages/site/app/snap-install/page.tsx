@@ -304,12 +304,6 @@ export default function SnapInstallPage() {
                   >
                     Use WalletConnect Instead
                   </a>
-                  <a
-                    href="/demo"
-                    className="flex-1 px-6 py-3 border border-slate-600 text-slate-100 font-semibold rounded-xl hover:bg-slate-800 transition-all text-center"
-                  >
-                    Try the Demo
-                  </a>
                 </div>
 
                 <button
@@ -514,12 +508,6 @@ export default function SnapInstallPage() {
                   className="flex-1 px-4 py-2 bg-teal-500 text-slate-950 font-bold rounded-lg text-center text-sm"
                 >
                   Use WalletConnect Instead
-                </a>
-                <a
-                  href="/demo"
-                  className="flex-1 px-4 py-2 border border-slate-600 text-slate-100 font-semibold rounded-lg text-center text-sm"
-                >
-                  Try the Demo
                 </a>
               </div>
             </div>

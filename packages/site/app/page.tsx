@@ -117,7 +117,7 @@ export default function Home() {
                   href="/demo"
                   className="px-8 py-4 bg-slate-800 text-white rounded-lg font-bold border-2 border-teal-500 hover:border-teal-400 hover:shadow-lg transition-all"
                 >
-                  Try Demo
+                  API Explorer
                 </a>
               </div>
             </div>
@@ -756,10 +756,10 @@ export default function Home() {
         <p className="text-slate-600 dark:text-slate-400 text-lg">Join thousands of crypto users already using GENESIS</p>
         <div className="flex gap-4 justify-center flex-wrap">
           <a
-            href="/demo"
+            href="/api-explorer"
             className="px-8 py-4 bg-gradient-to-r from-indigo-600 to-indigo-600 text-white rounded-lg font-semibold hover:shadow-xl transition-all hover:scale-105"
           >
-            Try Demo (No signup)
+            Open API Explorer
           </a>
           <a
             href="https://github.com/amaratisirs-ai/sadhutech"
