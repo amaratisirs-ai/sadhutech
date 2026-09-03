@@ -59,6 +59,10 @@ export default function RootLayout({
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8m0 8l-6-4m6 4l6-4" /></svg>
                       Report
                     </NavLink>
+                    <NavLink href="/help">
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.291-.994.599 0 .11.023.207.066.286m0 0a9.75 9.75 0 01-.466 4.04m.466-4.04a9.75 9.75 0 001.457 4.04m0 0a9.75 9.75 0 001.457-4.04m0 0a9.75 9.75 0 01-.466-4.04" /></svg>
+                      Help
+                    </NavLink>
                     <NavLink href="/api-explorer">
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 20l4-16m4 4l4 4m0 0l-4 4m4-4H3" /></svg>
                       API Docs
@@ -101,7 +105,42 @@ export default function RootLayout({
           {/* Footer */}
           <footer className="border-t-2 border-teal-500 bg-slate-950 backdrop-blur-xl mt-20">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-              <div className="text-center text-sm text-teal-200">
+              <div className="grid md:grid-cols-4 gap-8 mb-8">
+                <div>
+                  <h4 className="font-bold text-white mb-4">Product</h4>
+                  <ul className="space-y-2 text-sm text-teal-300">
+                    <li><a href="/snap-install" className="hover:text-white transition">Install Snap</a></li>
+                    <li><a href="/after-install" className="hover:text-white transition">Getting Started</a></li>
+                    <li><a href="/threats" className="hover:text-white transition">Threats Hub</a></li>
+                  </ul>
+                </div>
+                <div>
+                  <h4 className="font-bold text-white mb-4">Community</h4>
+                  <ul className="space-y-2 text-sm text-teal-300">
+                    <li><a href="/report" className="hover:text-white transition">Report Threat</a></li>
+                    <li><a href="/community" className="hover:text-white transition">Community</a></li>
+                    <li><a href="https://github.com/sadhutech/genesis" className="hover:text-white transition">GitHub</a></li>
+                  </ul>
+                </div>
+                <div>
+                  <h4 className="font-bold text-white mb-4">Support</h4>
+                  <ul className="space-y-2 text-sm text-teal-300">
+                    <li><a href="/help" className="hover:text-white transition">Help Center</a></li>
+                    <li><a href="/api-explorer" className="hover:text-white transition">API Docs</a></li>
+                    <li><a href="mailto:support@genesis.com" className="hover:text-white transition">Email Support</a></li>
+                  </ul>
+                </div>
+                <div>
+                  <h4 className="font-bold text-white mb-4">Legal</h4>
+                  <ul className="space-y-2 text-sm text-teal-300">
+                    <li><a href="#privacy" className="hover:text-white transition">Privacy</a></li>
+                    <li><a href="#terms" className="hover:text-white transition">Terms</a></li>
+                    <li><a href="#security" className="hover:text-white transition">Security</a></li>
+                  </ul>
+                </div>
+              </div>
+
+              <div className="border-t border-teal-500/20 pt-8 text-center text-sm text-teal-200">
                 <p className="font-medium">GENESIS Firewall v0.1 — Community-powered pre-sign gate for crypto wallets</p>
                 <p className="mt-2 text-xs text-teal-300">
                   Made for wallet security. <a href="https://github.com/sadhutech" className="text-teal-300 hover:text-teal-100 underline transition">Join us on GitHub</a>

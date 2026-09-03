@@ -172,10 +172,10 @@ export default function SnapInstallPage() {
               </div>
 
               <a
-                href="/demo"
+                href="/after-install"
                 className="block px-6 py-3 bg-teal-500 text-slate-950 font-bold rounded-xl hover:bg-teal-400 transition-all text-center"
               >
-                Try a Test Transaction →
+                What's Next? →
               </a>
 
               <a
@@ -208,6 +208,68 @@ export default function SnapInstallPage() {
               <p className="text-sm text-slate-400">{step.desc}</p>
             </div>
           ))}
+        </div>
+      </div>
+
+      {/* Permissions Explained */}
+      <div className="bg-indigo-500/10 border-2 border-indigo-500/30 rounded-2xl p-12">
+        <h2 className="text-2xl font-bold text-white mb-6">🔐 About Snap Permissions</h2>
+        <p className="text-slate-300 mb-8">
+          When you install GENESIS, MetaMask asks for two permissions. Here's why we need them and how they keep you safe:
+        </p>
+
+        <div className="grid md:grid-cols-2 gap-8">
+          <div className="space-y-4">
+            <div className="bg-slate-900/50 rounded-lg p-6 border border-indigo-500/20">
+              <h3 className="text-lg font-bold text-white mb-3">🔍 Transaction Insight</h3>
+              <p className="text-slate-300 mb-4">
+                This lets GENESIS <strong>see transactions before you sign</strong> so it can analyze them for risks.
+              </p>
+              <div className="bg-slate-800/50 rounded p-3 text-sm text-slate-400 space-y-2">
+                <p><strong>GENESIS sees:</strong></p>
+                <ul className="list-disc list-inside space-y-1">
+                  <li>Which address you're sending to</li>
+                  <li>What function you're calling</li>
+                  <li>Transaction amount</li>
+                </ul>
+                <p className="mt-3 pt-3 border-t border-slate-700"><strong>GENESIS does NOT see:</strong></p>
+                <ul className="list-disc list-inside space-y-1">
+                  <li>Your private key (impossible)</li>
+                  <li>Your IP address or location</li>
+                  <li>Other personal info</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <div className="space-y-4">
+            <div className="bg-slate-900/50 rounded-lg p-6 border border-indigo-500/20">
+              <h3 className="text-lg font-bold text-white mb-3">🌐 Network Access</h3>
+              <p className="text-slate-300 mb-4">
+                This lets GENESIS <strong>fetch the latest threat database</strong> from our servers so it has current threat intel.
+              </p>
+              <div className="bg-slate-800/50 rounded p-3 text-sm text-slate-400 space-y-2">
+                <p><strong>Network access allows:</strong></p>
+                <ul className="list-disc list-inside space-y-1">
+                  <li>Download threat database (4,100+ addresses)</li>
+                  <li>Check latest community reports</li>
+                  <li>Send threat analysis (no personal data)</li>
+                </ul>
+                <p className="mt-3 pt-3 border-t border-slate-700"><strong>We never collect:</strong></p>
+                <ul className="list-disc list-inside space-y-1">
+                  <li>Your wallet addresses</li>
+                  <li>Transaction history</li>
+                  <li>Browsing data</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="mt-8 p-6 bg-teal-500/10 border border-teal-500/30 rounded-lg">
+          <p className="text-teal-200">
+            <strong>✅ Your security:</strong> GENESIS runs in MetaMask's sandbox. It can't access your keys, funds, or personal info. All analysis happens locally on your device.
+          </p>
         </div>
       </div>
 
