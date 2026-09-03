@@ -25,8 +25,8 @@ export default function SnapInstallPage() {
         return;
       }
 
-      // In production, this would use the actual Snap ID
-      const snapId = "npm:@genesis/snap"; // Or use local://...
+      // Snap ID published to npm: https://www.npmjs.com/package/genesis-snap
+      const snapId = "npm:genesis-snap";
       
       // Attempt to install the snap
       await window.ethereum.request({
@@ -91,7 +91,12 @@ export default function SnapInstallPage() {
               <div className="text-center space-y-2">
                 <div className="text-6xl">🦊</div>
                 <h3 className="text-xl font-bold text-white">MetaMask Snap</h3>
-                <p className="text-sm text-slate-400">Version 1.0.0 (MVP)</p>
+                <p className="text-sm text-slate-400">npm: genesis-snap v0.0.1</p>
+                <p className="text-xs text-teal-400 mt-1">
+                  <a href="https://www.npmjs.com/package/genesis-snap" target="_blank" rel="noopener noreferrer" className="underline hover:text-teal-300">
+                    View on npm →
+                  </a>
+                </p>
               </div>
 
               <div className="bg-slate-900/50 rounded-lg p-4 space-y-2 text-sm">
