@@ -124,8 +124,8 @@ A: Only on MetaMask Mobile if it supports Snaps (expanding support in 2026).
 
 - 🌐 [Website](https://sadhutech-site.vercel.app)
 - 📖 [Docs](https://sadhutech-site.vercel.app)
-- 🐛 [Report Issues](https://github.com/sadhutech/genesis/issues)
-- 🔐 [Security](https://github.com/sadhutech/genesis#security)
+- 🐛 [Report Issues](https://github.com/amaratisirs-ai/sadhutech/issues)
+- 🔐 [Security](https://github.com/amaratisirs-ai/sadhutech#security)
 
 ## License
 

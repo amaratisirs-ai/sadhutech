@@ -228,7 +228,7 @@ The snap analysis shows up in the **"Insights" section** when you're about to si
 // Add to homepage footer:
 
 **Need help?** → [Support](/help)
-**Found a bug?** → [Report](https://github.com/sadhutech/genesis/issues)
+**Found a bug?** → [Report](https://github.com/amaratisirs-ai/sadhutech/issues)
 **Have feedback?** → [Suggest feature](mailto:feedback@genesis.com)
 ```
 

@@ -89,7 +89,7 @@ export default function HelpPage() {
         },
         {
           q: "Is GENESIS open source?",
-          a: "Yes! Full source code at github.com/sadhutech/genesis. Audit it yourself.",
+          a: "Yes! Full source code at github.com/amaratisirs-ai/sadhutech. Audit it yourself.",
         },
         {
           q: "Who maintains the threat database?",
@@ -106,7 +106,7 @@ export default function HelpPage() {
       questions: [
         {
           q: "Snap shows 'Error: Cannot connect to gate'",
-          a: "GENESIS backend is temporarily down. Check status at github.com/sadhutech/genesis/issues. Try again in 5 minutes. You can still sign (analysis just won't show).",
+          a: "GENESIS backend is temporarily down. Check status at github.com/amaratisirs-ai/sadhutech/issues. Try again in 5 minutes. You can still sign (analysis just won't show).",
         },
         {
           q: "Snap doesn't appear in MetaMask after install",
@@ -143,7 +143,7 @@ export default function HelpPage() {
         },
         {
           q: "How do I suggest a new feature?",
-          a: "Open an issue at github.com/sadhutech/genesis/issues with label 'enhancement'. Community votes on priority.",
+          a: "Open an issue at github.com/amaratisirs-ai/sadhutech/issues with label 'enhancement'. Community votes on priority.",
         },
         {
           q: "I want to contribute threat intel",
@@ -151,7 +151,7 @@ export default function HelpPage() {
         },
         {
           q: "Is there a bug bounty program?",
-          a: "Check github.com/sadhutech/genesis for security policy. Report vulnerabilities responsibly.",
+          a: "Check github.com/amaratisirs-ai/sadhutech for security policy. Report vulnerabilities responsibly.",
         },
       ],
     },
@@ -171,7 +171,7 @@ export default function HelpPage() {
       {/* Quick Links */}
       <div className="grid md:grid-cols-3 gap-6">
         <a
-          href="https://github.com/sadhutech/genesis/issues"
+          href="https://github.com/amaratisirs-ai/sadhutech/issues"
           target="_blank"
           rel="noopener noreferrer"
           className="bg-slate-900/50 border border-teal-500/30 rounded-2xl p-8 hover:border-teal-500/60 hover:shadow-lg hover:shadow-teal-500/20 transition-all group"
@@ -258,7 +258,7 @@ export default function HelpPage() {
             Email support@genesis.com
           </a>
           <a
-            href="https://github.com/sadhutech/genesis/discussions"
+            href="https://github.com/amaratisirs-ai/sadhutech/discussions"
             target="_blank"
             rel="noopener noreferrer"
             className="px-6 py-3 border-2 border-teal-500 text-teal-300 font-bold rounded-xl hover:bg-teal-500/10 transition-all"

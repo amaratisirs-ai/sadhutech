@@ -61,7 +61,7 @@ npm notice
 3. Snap version: `0.0.1`
 4. Icon: Upload `packages/snap/images/icon.svg`
 5. Website: `https://sadhutech-site.vercel.app`
-6. Source code: `https://github.com/sadhutech/genesis`
+6. Source code: `https://github.com/amaratisirs-ai/sadhutech`
 
 ### 3c. Complete Registration
 1. MetaMask will verify the snap can be installed
@@ -154,7 +154,7 @@ pnpm publish
 
 - 📖 MetaMask Snaps Docs: https://docs.metamask.io/snaps/
 - 🔗 npm Publishing Docs: https://docs.npmjs.com/
-- 🐛 GENESIS Issues: https://github.com/sadhutech/genesis/issues
+- 🐛 GENESIS Issues: https://github.com/amaratisirs-ai/sadhutech/issues
 
 ---
 

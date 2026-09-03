@@ -47,7 +47,7 @@ export function LayoutClient({ children }: { children: ReactNode }) {
                 + Add to MetaMask
               </a>
               <a
-                href="https://github.com/sadhutech/genesis"
+                href="https://github.com/amaratisirs-ai/sadhutech"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="p-2 text-teal-300 hover:text-white hover:bg-teal-500/20 rounded-lg transition-all"
@@ -134,7 +134,7 @@ export function LayoutClient({ children }: { children: ReactNode }) {
               <ul className="space-y-2 text-sm text-teal-300">
                 <li><a href="/report" className="hover:text-white transition">Report Threat</a></li>
                 <li><a href="/community" className="hover:text-white transition">Community</a></li>
-                <li><a href="https://github.com/sadhutech/genesis" className="hover:text-white transition">GitHub</a></li>
+                <li><a href="https://github.com/amaratisirs-ai/sadhutech" className="hover:text-white transition">GitHub</a></li>
               </ul>
             </div>
             <div>
@@ -158,7 +158,7 @@ export function LayoutClient({ children }: { children: ReactNode }) {
           <div className="border-t border-teal-500/20 pt-8 text-center text-sm text-teal-200">
             <p className="font-medium">GENESIS Firewall v0.1 — Community-powered pre-sign gate for crypto wallets</p>
             <p className="mt-2 text-xs text-teal-300">
-              Made for wallet security. <a href="https://github.com/sadhutech" className="text-teal-300 hover:text-teal-100 underline transition">Join us on GitHub</a>
+              Made for wallet security. <a href="https://github.com/amaratisirs-ai" className="text-teal-300 hover:text-teal-100 underline transition">Join us on GitHub</a>
             </p>
           </div>
         </div>

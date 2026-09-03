@@ -159,4 +159,4 @@ Multiple sources are deduplicated by address, so integration costs scale linearl
 **Need Help?**
 - Blockaid Docs: https://developer.blockaid.io/
 - Blockaid Support: support@blockaid.io
-- GENESIS Issues: https://github.com/sadhutech/genesis/issues
+- GENESIS Issues: https://github.com/amaratisirs-ai/sadhutech/issues

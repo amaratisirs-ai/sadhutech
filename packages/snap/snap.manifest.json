@@ -4,7 +4,7 @@
   "proposedName": "GENESIS Firewall",
   "repository": {
     "type": "git",
-    "url": "https://github.com/sadhutech/genesis.git",
+    "url": "https://github.com/amaratisirs-ai/sadhutech.git",
     "directory": "packages/snap"
   },
   "source": {

@@ -761,7 +761,7 @@ export default function Home() {
             Try Demo (No signup)
           </a>
           <a
-            href="https://github.com/sadhutech/genesis"
+            href="https://github.com/amaratisirs-ai/sadhutech"
             target="_blank"
             rel="noopener noreferrer"
             className="px-8 py-4 bg-white dark:bg-slate-800 text-slate-900 dark:text-white rounded-lg font-semibold border-2 border-slate-200 dark:border-slate-700 hover:border-slate-400 dark:hover:border-slate-600 transition"
