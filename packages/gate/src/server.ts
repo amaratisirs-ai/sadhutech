@@ -438,7 +438,7 @@ app.get("/v1/admin/raw-threats", async (request, reply) => {
       all_threats: allResult.rows[0].total,
       filtered_threats: filteredResult.rows[0].total,
       hours_back: hoursBack,
-      sample: sampleResult.rows.map((r) => ({
+      sample: sampleResult.rows.map((r: any) => ({
         address: r.address.slice(0, 10) + "...",
         category: r.category,
         reporter_count: r.reporter_count,
