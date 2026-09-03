@@ -85,6 +85,39 @@ export class ThreatIntelPostgres {
     }
   }
 
+  /** Batch insert multiple threats (100x faster for sync operations). */
+  async batchReport(requests: ReportRequest[]): Promise<number> {
+    await this.initialize();
+    if (requests.length === 0) return 0;
+
+    try {
+      // Build dynamic VALUES clause: ($1,$2,$3),($4,$5,$6),...
+      const values: any[] = [];
+      const placeholders: string[] = [];
+      
+      requests.forEach((req, idx) => {
+        const baseIdx = idx * 3 + 1;
+        placeholders.push(`($${baseIdx}, $${baseIdx + 1}, ARRAY[$${baseIdx + 2}])`);
+        values.push(req.address.toLowerCase(), req.category, req.reporterId);
+      });
+
+      await this.pool.query(
+        `INSERT INTO threat_intel (address, category, reporters)
+         VALUES ${placeholders.join(",")}
+         ON CONFLICT (address) DO UPDATE
+         SET reporters = ARRAY(SELECT DISTINCT * FROM UNNEST(threat_intel.reporters || EXCLUDED.reporters)),
+             category = COALESCE(EXCLUDED.category, threat_intel.category),
+             last_seen = NOW()`,
+        values
+      );
+
+      return requests.length;
+    } catch (err) {
+      console.error(`[threat-intel-postgres] Batch insert failed (${requests.length} threats):`, err);
+      throw err;
+    }
+  }
+
   /** Return the confirmed/unconfirmed threat entry for an address, if any. */
   async lookup(address: Address): Promise<ThreatEntry | undefined> {
     await this.initialize();

@@ -509,46 +509,49 @@ export async function syncExternalThreats(
       { name: "slowmist", fn: fetchSlowMistThreats },
     ];
 
-    const results = await Promise.all(
-      sources.map(async (src) => {
-        const srcStart = Date.now();
-        try {
-          const threats = await src.fn();
-          const duration = Date.now() - srcStart;
-          
-          // Calculate categories distribution
-          const categories = {} as Record<ThreatCategory, number>;
-          threats.forEach((t) => {
-            categories[t.category] = (categories[t.category] || 0) + 1;
-          });
+    // Load sources sequentially for better debugging and error visibility
+    const allThreats: ExternalThreat[] = [];
+    
+    for (const src of sources) {
+      const srcStart = Date.now();
+      try {
+        console.log(`[sync] Loading ${src.name}...`);
+        const threats = await src.fn();
+        const duration = Date.now() - srcStart;
+        
+        // Calculate categories distribution
+        const categories = {} as Record<ThreatCategory, number>;
+        threats.forEach((t) => {
+          categories[t.category] = (categories[t.category] || 0) + 1;
+        });
 
-          sourceMetrics.push({
-            name: src.name,
-            count: threats.length,
-            errors: 0,
-            duration_ms: duration,
-            categories,
-            status: threats.length > 0 ? "success" : "skipped",
-          });
+        sourceMetrics.push({
+          name: src.name,
+          count: threats.length,
+          errors: 0,
+          duration_ms: duration,
+          categories,
+          status: threats.length > 0 ? "success" : "skipped",
+        });
 
-          return threats;
-        } catch (err) {
-          const duration = Date.now() - srcStart;
-          sourceMetrics.push({
-            name: src.name,
-            count: 0,
-            errors: 1,
-            duration_ms: duration,
-            status: "failed",
-          });
-          console.error(`[sync] Source "${src.name}" failed:`, err);
-          return [];
-        }
-      })
-    );
+        console.log(`[sync]   ✅ ${src.name}: ${threats.length} threats [${Object.entries(categories)
+          .map(([k, v]) => `${k}:${v}`)
+          .join(", ")}] in ${duration}ms`);
 
-    // Flatten all threats
-    const allThreats = results.flat();
+        allThreats.push(...threats);
+      } catch (err) {
+        const duration = Date.now() - srcStart;
+        sourceMetrics.push({
+          name: src.name,
+          count: 0,
+          errors: 1,
+          duration_ms: duration,
+          status: "failed",
+        });
+        console.error(`[sync]   ❌ ${src.name} FAILED: ${err instanceof Error ? err.message : String(err)}`);
+      }
+    }
+
     console.log(
       `[sync] Loaded ${allThreats.length} total threats from ${sources.length} sources`
     );
@@ -563,18 +566,25 @@ export async function syncExternalThreats(
     }
     const deduped = allThreats.length - uniqueThreats.size;
 
-    // Insert into database
-    for (const [address, threat] of uniqueThreats) {
+    // Batch insert into database (100x faster than individual inserts)
+    const threatsList = Array.from(uniqueThreats.values());
+    const batchSize = 100;
+    
+    for (let i = 0; i < threatsList.length; i += batchSize) {
+      const batch = threatsList.slice(i, i + batchSize);
       try {
-        await intel.report({
-          address: address as Address,
+        const requests = batch.map((threat) => ({
+          address: threat.address as Address,
           category: threat.category,
           reporterId: `sync-${threat.source}`,
-        });
-        totalSynced++;
+        }));
+        await intel.batchReport(requests);
+        totalSynced += requests.length;
+        console.log(`[sync] Batch insert: ${totalSynced}/${threatsList.length} threats`);
       } catch (err) {
-        console.error(`[sync] Failed to insert ${address}:`, (err as any)?.message || err);
-        totalErrors++;
+        const batchErrors = batch.length;
+        totalErrors += batchErrors;
+        console.error(`[sync] Batch insert failed (${batchErrors} threats):`, err);
       }
     }
 
