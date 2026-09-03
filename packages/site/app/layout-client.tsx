@@ -25,7 +25,7 @@ export function LayoutClient({ children }: { children: ReactNode }) {
               <div className="hidden md:flex gap-1">
                 <NavLink href="/">Home</NavLink>
                 <NavLink href="/#how-it-works">How It Works</NavLink>
-                <NavLink href="/snap-install">Get Protected</NavLink>
+                <NavLink href="/add-to-wallet">Get Protected</NavLink>
                 <NavLink href="/threats">Threats Hub</NavLink>
                 <NavLink href="/community">Community</NavLink>
                 <NavLink href="/report">Report</NavLink>
@@ -82,14 +82,14 @@ export function LayoutClient({ children }: { children: ReactNode }) {
               <div className="space-y-2">
                 <MobileNavLink href="/" onClick={() => setMobileMenuOpen(false)}>Home</MobileNavLink>
                 <MobileNavLink href="/#how-it-works" onClick={() => setMobileMenuOpen(false)}>How It Works</MobileNavLink>
-                <MobileNavLink href="/snap-install" onClick={() => setMobileMenuOpen(false)}>Get Protected</MobileNavLink>
+                <MobileNavLink href="/add-to-wallet" onClick={() => setMobileMenuOpen(false)}>Get Protected</MobileNavLink>
                 <MobileNavLink href="/threats" onClick={() => setMobileMenuOpen(false)}>Threats Hub</MobileNavLink>
                 <MobileNavLink href="/community" onClick={() => setMobileMenuOpen(false)}>Community</MobileNavLink>
                 <MobileNavLink href="/report" onClick={() => setMobileMenuOpen(false)}>Report</MobileNavLink>
                 <MobileNavLink href="/help" onClick={() => setMobileMenuOpen(false)}>Help</MobileNavLink>
                 <MobileNavLink href="/api-explorer" onClick={() => setMobileMenuOpen(false)}>API Docs</MobileNavLink>
                 <a
-                  href="/snap-install"
+                  href="/add-to-wallet"
                   className="block w-full px-4 py-2.5 text-sm font-bold text-slate-950 bg-teal-400 hover:bg-teal-300 rounded-lg transition-all text-center mt-4"
                   onClick={() => setMobileMenuOpen(false)}
                 >
@@ -111,7 +111,7 @@ export function LayoutClient({ children }: { children: ReactNode }) {
         <div className="flex justify-around items-center h-20">
           <BottomNavLink href="/" label="Home" icon={<HomeIcon />} />
           <BottomNavLink href="/threats" label="Threats" icon={<ThreatsIcon />} />
-          <BottomNavLink href="/snap-install" label="Protect" icon={<ProtectIcon />} />
+          <BottomNavLink href="/add-to-wallet" label="Protect" icon={<ProtectIcon />} />
           <BottomNavLink href="/report" label="Report" icon={<ReportIcon />} />
           <BottomNavLink href="/help" label="Help" icon={<HelpIcon />} />
         </div>
@@ -124,7 +124,7 @@ export function LayoutClient({ children }: { children: ReactNode }) {
             <div>
               <h4 className="font-bold text-white mb-4">Product</h4>
               <ul className="space-y-2 text-sm text-teal-300">
-                <li><a href="/snap-install" className="hover:text-white transition">Install Snap</a></li>
+                <li><a href="/add-to-wallet" className="hover:text-white transition">Add to Wallet</a></li>
                 <li><a href="/after-install" className="hover:text-white transition">Getting Started</a></li>
                 <li><a href="/threats" className="hover:text-white transition">Threats Hub</a></li>
               </ul>

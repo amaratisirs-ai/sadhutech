@@ -11,7 +11,7 @@ export default function HelpPage() {
       questions: [
         {
           q: "Where do I install GENESIS Snap?",
-          a: "Visit sadhutech.com/snap-install and click '+ Install GENESIS Snap'. MetaMask will open with installation details.",
+          a: "Visit sadhutech.com/add-to-wallet and select your wallet. Choose MetaMask, Coinbase Wallet, or other supported options for one-click installation.",
         },
         {
           q: "What are the system requirements?",

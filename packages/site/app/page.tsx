@@ -108,10 +108,10 @@ export default function Home() {
 
               <div className="flex gap-4 flex-wrap pt-2">
                 <a
-                  href="/snap-install"
+                  href="/add-to-wallet"
                   className="px-8 py-4 bg-gradient-to-r from-teal-500 to-teal-400 text-slate-950 rounded-lg font-bold hover:shadow-xl transition-all hover:shadow-teal-500/50 text-lg"
                 >
-                  🦊 Add to MetaMask
+                  🔐 Add to Your Wallet
                 </a>
                 <a
                   href="/demo"
@@ -271,25 +271,26 @@ export default function Home() {
             </a>
           </div>
 
-          {/* MetaMask Snap */}
+          {/* Wallet Protection */}
           <div className="group bg-gradient-to-br from-orange-900/50 to-slate-900 rounded-xl p-8 border-2 border-orange-400 space-y-4 hover:shadow-2xl hover:shadow-orange-500/40 hover:border-orange-300 transition-all">
             <div className="w-14 h-14 bg-orange-500/40 rounded-lg flex items-center justify-center group-hover:bg-orange-500/60 transition">
               <svg className="w-8 h-8 text-orange-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
               </svg>
             </div>
-            <h3 className="text-2xl font-bold text-orange-100">MetaMask Snap</h3>
-            <p className="text-sm text-slate-100 font-medium">One-click install for automatic protection on every transaction sign.</p>
+            <h3 className="text-2xl font-bold text-orange-100">Wallet Protection</h3>
+            <p className="text-sm text-slate-100 font-medium">Add GENESIS to your wallet for automatic threat detection on every transaction.</p>
             <div className="pt-4 space-y-2">
-              <p className="text-sm font-semibold text-orange-300">✓ Seamless integration</p>
-              <p className="text-sm font-semibold text-orange-300">✓ Auto-protection</p>
-              <p className="text-sm font-semibold text-amber-400">⏳ Coming Q4 2026</p>
+              <p className="text-sm font-semibold text-orange-300">✓ Multi-wallet support</p>
+              <p className="text-sm font-semibold text-orange-300">✓ One-click installation</p>
+              <p className="text-sm font-semibold text-green-400">✓ Available now</p>
             </div>
-            <div
-              className="inline-block mt-4 px-6 py-3 bg-slate-700 text-slate-200 rounded-lg font-bold cursor-not-allowed opacity-80 border border-slate-600"
+            <a
+              href="/add-to-wallet"
+              className="inline-block mt-4 px-6 py-3 bg-orange-600 hover:bg-orange-500 text-white rounded-lg font-bold transition shadow-lg hover:shadow-orange-500/50"
             >
-              Coming Soon
-            </div>
+              Get Started →
+            </a>
           </div>
 
           {/* API Integration */}
