@@ -595,12 +595,15 @@ export async function syncExternalThreats(
     // Insert into database (individual inserts for reliability)
     for (const threat of uniqueThreats.values()) {
       try {
-        await intel.report({
+        const result = await intel.report({
           address: threat.address as Address,
           category: threat.category,
           reporterId: `sync-${threat.source}`,
         });
         totalSynced++;
+        if (totalSynced % 100 === 0) {
+          console.log(`[sync] Inserted ${totalSynced} threats...`);
+        }
       } catch (err) {
         console.error(`[sync] Failed to insert ${threat.address}:`, err instanceof Error ? err.message : String(err));
         totalErrors++;

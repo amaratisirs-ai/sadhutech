@@ -350,6 +350,39 @@ app.post("/v1/admin/sync", async (request, reply) => {
   }
 });
 
+// GET /v1/admin/db-count - Check actual database record count (debugging only)
+app.get("/v1/admin/db-count", async (request, reply) => {
+  try {
+    const intel = await createIntelAsync();
+    if (!(intel instanceof (await import("./intel-postgres.js")).ThreatIntelPostgres)) {
+      return reply.status(400).send({
+        error: "Database endpoint only available with PostgreSQL backend",
+      });
+    }
+
+    const postgresIntel = intel as any;
+    const result = await postgresIntel.pool.query(
+      `SELECT COUNT(*) as total, COUNT(DISTINCT category) as categories FROM threat_intel`
+    );
+
+    const categoryBreakdown = await postgresIntel.pool.query(
+      `SELECT category, COUNT(*) as count FROM threat_intel GROUP BY category ORDER BY count DESC`
+    );
+
+    return {
+      total_in_db: result.rows[0].total,
+      category_count: result.rows[0].categories,
+      breakdown: categoryBreakdown.rows,
+    };
+  } catch (err) {
+    reply.status(500);
+    return {
+      error: "Database query failed",
+      message: err instanceof Error ? err.message : String(err),
+    };
+  }
+});
+
 // Async startup with proper initialization.
 async function start(): Promise<void> {
   try {
