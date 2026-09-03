@@ -250,65 +250,65 @@ export default function Home() {
 
         <div className="grid md:grid-cols-3 gap-6">
           {/* Verify Transactions */}
-          <div className="group bg-slate-900 rounded-xl p-8 border-2 border-teal-500/50 space-y-4 hover:shadow-lg hover:shadow-teal-500/20 transition">
-            <div className="w-12 h-12 bg-teal-500/20 rounded-lg flex items-center justify-center">
-              <svg className="w-6 h-6 text-teal-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="group bg-gradient-to-br from-teal-900/50 to-slate-900 rounded-xl p-8 border-2 border-teal-400 space-y-4 hover:shadow-2xl hover:shadow-teal-500/40 hover:border-teal-300 transition-all">
+            <div className="w-14 h-14 bg-teal-500/40 rounded-lg flex items-center justify-center group-hover:bg-teal-500/60 transition">
+              <svg className="w-8 h-8 text-teal-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
               </svg>
             </div>
-            <h3 className="text-xl font-bold text-white">Verify Transactions</h3>
-            <p className="text-sm text-slate-200 font-medium">Analyze real transactions and get instant verdicts. No signup required.</p>
+            <h3 className="text-2xl font-bold text-teal-100">Verify Transactions</h3>
+            <p className="text-sm text-slate-100 font-medium">Analyze real transactions and get instant verdicts. No signup required.</p>
             <div className="pt-4 space-y-2">
-              <p className="text-xs font-semibold text-teal-400">✓ Real verdicts</p>
-              <p className="text-xs font-semibold text-teal-400">✓ Any blockchain</p>
-              <p className="text-xs font-semibold text-teal-400">✓ Instant results</p>
+              <p className="text-sm font-semibold text-teal-300">✓ Real verdicts</p>
+              <p className="text-sm font-semibold text-teal-300">✓ Any blockchain</p>
+              <p className="text-sm font-semibold text-teal-300">✓ Instant results</p>
             </div>
             <a
               href="/post"
-              className="inline-block mt-4 px-6 py-2 bg-teal-600 hover:bg-teal-500 text-white rounded-lg font-bold transition"
+              className="inline-block mt-4 px-6 py-3 bg-teal-600 hover:bg-teal-500 text-white rounded-lg font-bold transition shadow-lg hover:shadow-teal-500/50"
             >
               Verify Now →
             </a>
           </div>
 
           {/* MetaMask Snap */}
-          <div className="group bg-slate-900 rounded-xl p-8 border-2 border-orange-500/50 space-y-4 hover:shadow-lg hover:shadow-orange-500/20 transition">
-            <div className="w-12 h-12 bg-orange-500/20 rounded-lg flex items-center justify-center">
-              <svg className="w-6 h-6 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="group bg-gradient-to-br from-orange-900/50 to-slate-900 rounded-xl p-8 border-2 border-orange-400 space-y-4 hover:shadow-2xl hover:shadow-orange-500/40 hover:border-orange-300 transition-all">
+            <div className="w-14 h-14 bg-orange-500/40 rounded-lg flex items-center justify-center group-hover:bg-orange-500/60 transition">
+              <svg className="w-8 h-8 text-orange-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
               </svg>
             </div>
-            <h3 className="text-xl font-bold text-white">MetaMask Snap</h3>
-            <p className="text-sm text-slate-200 font-medium">One-click install for automatic protection on every transaction sign.</p>
+            <h3 className="text-2xl font-bold text-orange-100">MetaMask Snap</h3>
+            <p className="text-sm text-slate-100 font-medium">One-click install for automatic protection on every transaction sign.</p>
             <div className="pt-4 space-y-2">
-              <p className="text-xs font-semibold text-orange-400">✓ Seamless integration</p>
-              <p className="text-xs font-semibold text-orange-400">✓ Auto-protection</p>
-              <p className="text-xs font-semibold text-orange-400">⏳ Coming Q4 2026</p>
+              <p className="text-sm font-semibold text-orange-300">✓ Seamless integration</p>
+              <p className="text-sm font-semibold text-orange-300">✓ Auto-protection</p>
+              <p className="text-sm font-semibold text-amber-400">⏳ Coming Q4 2026</p>
             </div>
             <div
-              className="inline-block mt-4 px-6 py-2 bg-slate-700 text-slate-400 rounded-lg font-bold cursor-not-allowed opacity-70"
+              className="inline-block mt-4 px-6 py-3 bg-slate-700 text-slate-200 rounded-lg font-bold cursor-not-allowed opacity-80 border border-slate-600"
             >
               Coming Soon
             </div>
           </div>
 
           {/* API Integration */}
-          <div className="group bg-slate-900 rounded-xl p-8 border-2 border-teal-500/50 space-y-4 hover:shadow-lg hover:shadow-teal-500/20 transition">
-            <div className="w-12 h-12 bg-teal-500/20 rounded-lg flex items-center justify-center">
-              <svg className="w-6 h-6 text-teal-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="group bg-gradient-to-br from-indigo-900/50 to-slate-900 rounded-xl p-8 border-2 border-indigo-400 space-y-4 hover:shadow-2xl hover:shadow-indigo-500/40 hover:border-indigo-300 transition-all">
+            <div className="w-14 h-14 bg-indigo-500/40 rounded-lg flex items-center justify-center group-hover:bg-indigo-500/60 transition">
+              <svg className="w-8 h-8 text-indigo-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 20l4-16m4 4l4 4m0 0l-4 4m4-4H3" />
               </svg>
             </div>
-            <h3 className="text-xl font-bold text-white">API Integration</h3>
-            <p className="text-sm text-slate-200 font-medium">For developers. Build safer wallets and dapps with our HTTP API.</p>
+            <h3 className="text-2xl font-bold text-indigo-100">API Integration</h3>
+            <p className="text-sm text-slate-100 font-medium">For developers. Build safer wallets and dapps with our HTTP API.</p>
             <div className="pt-4 space-y-2">
-              <p className="text-xs font-semibold text-teal-400">✓ Production-ready</p>
-              <p className="text-xs font-semibold text-teal-400">✓ Full documentation</p>
-              <p className="text-xs font-semibold text-teal-400">✓ Available now</p>
+              <p className="text-sm font-semibold text-indigo-300">✓ Production-ready</p>
+              <p className="text-sm font-semibold text-indigo-300">✓ Full documentation</p>
+              <p className="text-sm font-semibold text-indigo-300">✓ Available now</p>
             </div>
             <a
               href="/api-explorer"
-              className="inline-block mt-4 px-6 py-2 bg-teal-600 hover:bg-teal-500 text-white rounded-lg font-bold transition"
+              className="inline-block mt-4 px-6 py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg font-bold transition shadow-lg hover:shadow-indigo-500/50"
             >
               Explore API →
             </a>
