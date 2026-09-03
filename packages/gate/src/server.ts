@@ -6,13 +6,52 @@ import { createIntelAsync } from "./index.js";
 import { TESTER_HTML } from "./ui.js";
 import { initSyncService } from "./sync-external-threats.js";
 import type { ThreatIntelPostgres } from "./intel-postgres.js";
+import {
+  loadApiKeys,
+  createApiKeyMiddleware,
+  createRateLimitMiddleware,
+  createSecurityHeadersMiddleware,
+  SimpleRateLimiter,
+  validateAnalyzeRequest,
+  validateReportRequest,
+} from "./security.js";
 
 const app = Fastify({ logger: true });
 
-// Permissive CORS for local dev (Snap / separate UI origins).
+// Load API keys from environment
+const authorizedApiKeys = loadApiKeys();
+
+// Initialize rate limiter: 100 requests per 15 minutes per IP
+const rateLimiter = new SimpleRateLimiter(100, 15 * 60 * 1000);
+
+// ============================================================================
+// SECURITY MIDDLEWARE
+// ============================================================================
+
+// 1. Add security headers to all responses
+app.addHook("onRequest", createSecurityHeadersMiddleware());
+
+// 2. Handle CORS (restricted origin, not "*")
 app.addHook("onRequest", async (req, reply) => {
-  reply.header("access-control-allow-origin", "*");
-  reply.header("access-control-allow-headers", "content-type");
+  const origin = req.headers.origin;
+
+  // Allow specific origins only (localhost for dev, production domains)
+  const allowedOrigins = [
+    "http://localhost:3000",
+    "http://localhost:8787",
+    "https://sadhutech-site.vercel.app",
+    "https://genesis-gate.onrender.com",
+  ];
+
+  if (allowedOrigins.includes(origin ?? "")) {
+    reply.header("access-control-allow-origin", origin);
+  } else if (!origin) {
+    // No origin = same-site request, allow it
+    reply.header("access-control-allow-origin", "*");
+  }
+  // Otherwise: deny by not setting header (browser enforces SOP)
+
+  reply.header("access-control-allow-headers", "content-type, x-api-key");
   reply.header("access-control-allow-methods", "GET,POST,OPTIONS");
   if (req.method === "OPTIONS") reply.status(204).send();
 });
@@ -24,45 +63,85 @@ app.get("/", async (_req, reply) => {
 
 app.get("/health", async () => ({ status: "ok", service: "genesis-gate" }));
 
-// Chakravyuha pre-sign gate: analyze a transaction before the user signs it.
-app.post<{ Body: AnalyzeRequest }>("/v1/analyze", async (request, reply) => {
-  const intel = await createIntelAsync();
-  const body = request.body;
-  const tx = body?.tx;
-  if (!tx || tx.chainId === undefined) {
-    return reply.status(400).send({ error: "tx.chainId is required" });
-  }
-  if (!isAddress(tx.from ?? "")) {
-    return reply.status(400).send({ error: `Invalid 'from' address: ${tx.from ?? "(missing)"}` });
-  }
-  if (!isAddress(tx.to ?? "")) {
-    return reply.status(400).send({ error: `Invalid 'to' address: ${tx.to ?? "(missing)"}` });
-  }
-  if (tx.data && !/^0x[0-9a-fA-F]*$/.test(tx.data)) {
-    return reply.status(400).send({ error: "Invalid 'data': must be 0x-prefixed hex" });
-  }
-  try {
-    return await analyze(body, intel);
-  } catch (err) {
-    request.log.error(err);
-    return reply.status(400).send({ error: "Could not analyze transaction (malformed input)" });
-  }
-});
+// ============================================================================
+// POST /v1/analyze - Analyze transaction before signing
+// ============================================================================
+app.post<{ Body: AnalyzeRequest }>("/v1/analyze", 
+  { 
+    onRequest: createRateLimitMiddleware(rateLimiter),
+  }, 
+  async (request, reply) => {
+    // Validate input
+    const validationErrors = validateAnalyzeRequest(request.body);
+    if (validationErrors.length > 0) {
+      return reply.status(400).send({
+        error: "Invalid request",
+        details: validationErrors,
+      });
+    }
 
-// Community "waggle" report: submit a suspected malicious address.
-app.post<{ Body: ReportRequest }>("/v1/report", async (request, reply) => {
-  const intel = await createIntelAsync();
-  const body = request.body as ReportRequest;
-  if (!body?.address || !body.category || !body.reporterId) {
-    return reply.status(400).send({ error: "address, category and reporterId are required" });
+    const intel = await createIntelAsync();
+    const body = request.body;
+    const tx = body.tx!; // TypeScript safe now after validation
+
+    try {
+      return await analyze(body, intel);
+    } catch (err) {
+      request.log.error(err);
+      return reply.status(400).send({
+        error: "Could not analyze transaction",
+        message: err instanceof Error ? err.message : "Unknown error",
+      });
+    }
   }
-  try {
-    return await intel.report(body);
-  } catch (err) {
-    request.log.error(err);
-    return reply.status(500).send({ error: "Failed to record report" });
+);
+
+// ============================================================================
+// POST /v1/report - Submit threat report (requires API key)
+// ============================================================================
+app.post<{ Body: ReportRequest }>("/v1/report", 
+  { 
+    onRequest: [
+      createRateLimitMiddleware(rateLimiter),
+      createApiKeyMiddleware(authorizedApiKeys),
+    ],
+  }, 
+  async (request, reply) => {
+    // Validate input
+    const validationErrors = validateReportRequest(request.body);
+    if (validationErrors.length > 0) {
+      return reply.status(400).send({
+        error: "Invalid request",
+        details: validationErrors,
+      });
+    }
+
+    const intel = await createIntelAsync();
+    const body = request.body as ReportRequest;
+
+    try {
+      const result = await intel.report(body);
+      
+      // Log who reported
+      const user = (request as any).user;
+      request.log.info({
+        action: "threat_reported",
+        address: body.address,
+        category: body.category,
+        reporterId: body.reporterId,
+        apiKey: user?.apiKey?.substring(0, 8) + "...", // Redact most of key
+      });
+
+      return result;
+    } catch (err) {
+      request.log.error(err);
+      return reply.status(500).send({
+        error: "Failed to record report",
+        message: err instanceof Error ? err.message : "Unknown error",
+      });
+    }
   }
-});
+);
 
 // Async startup with proper initialization.
 async function start(): Promise<void> {

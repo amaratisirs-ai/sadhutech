@@ -1,6 +1,18 @@
 node_modules
 dist
 .env
+.env.local
+.env.*.local
 *.log
 .DS_Store
 coverage
+
+# Security: Never commit
+*.pem
+*.key
+.ssh/
+secrets/
+docs/internal/
+packages/site/public/threat-feeds.json
+packages/site/public/*.apikey
+packages/site/public/*.secret
