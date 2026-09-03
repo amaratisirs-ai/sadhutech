@@ -170,7 +170,7 @@ app.post<{ Body: ReportRequest }>("/v1/report",
   }
 );
 
-// GET /v1/threats/latest - Recent threats for /news page feed
+// GET /v1/threats/latest - Recent threats for /news page feed (paginated)
 // ============================================================================
 app.get("/v1/threats/latest", async (request, reply) => {
   const intel = await createIntelAsync();
@@ -178,8 +178,8 @@ app.get("/v1/threats/latest", async (request, reply) => {
   try {
     // Parse optional query parameters
     const query = request.query as any;
-    // Increased from 500 to 10000 to return full dataset
-    const limit = Math.min(Number(query.limit) || 50, 10000);
+    const limit = Math.min(Number(query.limit) || 50, 1000); // Max 1000 per page
+    const offset = Math.max(Number(query.offset) || 0, 0); // Pagination offset
     const hours = Math.min(Number(query.hours) || 24 * 7, 24 * 365); // Default: 7 days, max: 1 year
 
     // Only PostgreSQL supports getRecentThreats
@@ -190,12 +190,14 @@ app.get("/v1/threats/latest", async (request, reply) => {
       });
     }
 
-    const threats = await (intel as any).getRecentThreats(limit, hours);
-    console.log(`[/v1/threats/latest] Query params - limit=${limit}, hours=${hours}. Returned ${threats.length} threats from DB`);
+    const threats = await (intel as any).getRecentThreats(limit, hours, offset);
+    const totalCount = await (intel as any).getThreatCount();
+    console.log(`[/v1/threats/latest] Query params - limit=${limit}, offset=${offset}, hours=${hours}. Returned ${threats.length}/${totalCount} threats`);
 
     // Group by category for stats
     const stats = {
-      total: threats.length,
+      total: totalCount,
+      returned: threats.length,
       byCategory: {} as Record<string, number>,
     };
 
@@ -207,7 +209,14 @@ app.get("/v1/threats/latest", async (request, reply) => {
       timestamp: new Date().toISOString(),
       parameters: {
         limit,
+        offset,
         hoursBack: hours,
+      },
+      pagination: {
+        offset,
+        limit,
+        total: totalCount,
+        hasMore: offset + threats.length < totalCount,
       },
       stats,
       threats: threats.map((t: any) => ({
@@ -231,7 +240,7 @@ app.get("/v1/threats/latest", async (request, reply) => {
   }
 });
 
-// GET /v1/contributors/leaderboard - Top community threat reporters (gamification)
+// GET /v1/contributors/leaderboard - Top community threat reporters (paginated gamification)
 // ============================================================================
 app.get("/v1/contributors/leaderboard", async (request, reply) => {
   if (!contributorsService) {
@@ -242,11 +251,20 @@ app.get("/v1/contributors/leaderboard", async (request, reply) => {
 
   try {
     const query = request.query as any;
-    const limit = Math.min(Number(query.limit) || 50, 500);
-    const leaderboard = await contributorsService.getLeaderboard(limit);
+    const limit = Math.min(Number(query.limit) || 50, 500); // Max 500 per page
+    const offset = Math.max(Number(query.offset) || 0, 0); // Pagination offset
+    
+    const leaderboard = await contributorsService.getLeaderboard(limit, offset);
+    const totalCount = await contributorsService.getContributorCount?.();
     
     return {
       timestamp: new Date().toISOString(),
+      pagination: {
+        offset,
+        limit,
+        total: totalCount || leaderboard.length,
+        hasMore: totalCount ? offset + leaderboard.length < totalCount : false,
+      },
       count: leaderboard.length,
       leaderboard,
     };

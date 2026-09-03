@@ -18,8 +18,9 @@ interface Threat {
 
 interface ThreatsLatestResponse {
   timestamp: string;
-  parameters: { limit: number; hoursBack: number };
-  stats: { total: number; byCategory: Record<string, number> };
+  parameters: { limit: number; offset: number; hoursBack: number };
+  pagination: { offset: number; limit: number; total: number; hasMore: boolean };
+  stats: { total: number; returned: number; byCategory: Record<string, number> };
   threats: Threat[];
 }
 
@@ -66,38 +67,71 @@ function truncateAddress(addr: string): string {
   return `${addr.slice(0, 6)}...${addr.slice(-4)}`;
 }
 
+const PAGE_SIZE = 25; // Load 25 threats per page
+
 export default function NewsPage() {
-  const [data, setData] = useState<ThreatsLatestResponse | null>(null);
+  const [allThreats, setAllThreats] = useState<Threat[]>([]); // Accumulated threats
+  const [stats, setStats] = useState<{ total: number; byCategory: Record<string, number> } | null>(null);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [filter, setFilter] = useState<string | null>(null);
   const [timeWindow, setTimeWindow] = useState<number>(168);
   const [activeTab, setActiveTab] = useState<Tab>("threats");
+  const [offset, setOffset] = useState(0);
+  const [hasMore, setHasMore] = useState(true);
 
-  useEffect(() => {
-    const fetchThreats = async () => {
-      try {
+  // Fetch threats with pagination
+  const fetchThreats = async (fetchOffset: number = 0) => {
+    try {
+      if (fetchOffset === 0) {
         setLoading(true);
-        setError(null);
-        const gateUrl = process.env.NEXT_PUBLIC_GATE_URL || "https://genesis-gate.onrender.com";
-        const url = new URL(`${gateUrl}/v1/threats/latest`);
-        url.searchParams.set("limit", "100");
-        url.searchParams.set("hours", timeWindow.toString());
-
-        const response = await fetch(url.toString());
-        if (!response.ok) throw new Error(`API error: ${response.status}`);
-
-        const json = await response.json();
-        setData(json);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : "Failed to load threats");
-      } finally {
-        setLoading(false);
+      } else {
+        setLoadingMore(true);
       }
-    };
+      setError(null);
 
-    fetchThreats();
+      const gateUrl = process.env.NEXT_PUBLIC_GATE_URL || "https://genesis-gate.onrender.com";
+      const url = new URL(`${gateUrl}/v1/threats/latest`);
+      url.searchParams.set("limit", PAGE_SIZE.toString());
+      url.searchParams.set("offset", fetchOffset.toString());
+      url.searchParams.set("hours", timeWindow.toString());
+
+      const response = await fetch(url.toString());
+      if (!response.ok) throw new Error(`API error: ${response.status}`);
+
+      const json: ThreatsLatestResponse = await response.json();
+
+      // On initial load, reset. On "Load More", append.
+      if (fetchOffset === 0) {
+        setAllThreats(json.threats);
+      } else {
+        setAllThreats((prev) => [...prev, ...json.threats]);
+      }
+
+      setStats(json.stats);
+      setOffset(fetchOffset + json.threats.length);
+      setHasMore(json.pagination.hasMore);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to load threats");
+    } finally {
+      setLoading(false);
+      setLoadingMore(false);
+    }
+  };
+
+  // Initial fetch when component mounts or timeWindow changes
+  useEffect(() => {
+    setOffset(0);
+    setAllThreats([]);
+    setHasMore(true);
+    fetchThreats(0);
   }, [timeWindow]);
+
+  // Load more handler
+  const handleLoadMore = () => {
+    fetchThreats(offset);
+  };
 
   if (loading)
     return (
@@ -128,14 +162,14 @@ export default function NewsPage() {
       </div>
     );
 
-  if (!data || !data.threats.length)
+  if (!allThreats.length && !loading)
     return (
       <div className="relative overflow-hidden rounded-xl backdrop-blur-xl bg-gradient-to-br from-slate-500/10 via-slate-500/5 to-slate-500/10 dark:from-slate-500/5 dark:via-slate-500/5 dark:to-slate-500/5 border border-slate-400/30 dark:border-slate-500/20 p-6">
         <p className="text-slate-700 dark:text-slate-300">No threats detected in the past {timeWindow / 24} days.</p>
       </div>
     );
 
-  const filteredThreats = filter ? data.threats.filter((t) => t.category === filter) : data.threats;
+  const filteredThreats = filter ? allThreats.filter((t) => t.category === filter) : allThreats;
 
   return (
     <div className="space-y-6 max-w-6xl">
@@ -148,7 +182,7 @@ export default function NewsPage() {
           <h1 className="text-4xl font-bold text-slate-900 dark:text-white">Breaking Threats</h1>
         </div>
         <p className="text-slate-600 dark:text-slate-400 mt-2">
-          Real-time threat intelligence powered by {data.stats.total} active malicious addresses
+          Real-time threat intelligence powered by {stats?.total || 0} active malicious addresses
         </p>
       </div>
 
@@ -199,41 +233,45 @@ export default function NewsPage() {
           </div>
 
           {/* Stats Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="bg-slate-50 dark:bg-slate-900/30 rounded-lg border border-slate-200 dark:border-slate-700 p-4">
-              <div className="text-sm text-slate-600 dark:text-slate-400 mb-1">Active Threats</div>
-              <div className="text-3xl font-bold text-slate-900 dark:text-white">{data.stats.total}</div>
+          {stats && (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="bg-slate-50 dark:bg-slate-900/30 rounded-lg border border-slate-200 dark:border-slate-700 p-4">
+                <div className="text-sm text-slate-600 dark:text-slate-400 mb-1">Total in Database</div>
+                <div className="text-3xl font-bold text-slate-900 dark:text-white">{stats.total}</div>
+              </div>
+              <div className="bg-slate-50 dark:bg-slate-900/30 rounded-lg border border-slate-200 dark:border-slate-700 p-4">
+                <div className="text-sm text-slate-600 dark:text-slate-400 mb-1">Loaded So Far</div>
+                <div className="text-3xl font-bold text-slate-900 dark:text-white">{allThreats.length}</div>
+              </div>
+              <div className="bg-slate-50 dark:bg-slate-900/30 rounded-lg border border-slate-200 dark:border-slate-700 p-4">
+                <div className="text-sm text-slate-600 dark:text-slate-400 mb-1">High Severity</div>
+                <div className="text-3xl font-bold text-red-600">{allThreats.filter((t) => t.severity === "high").length}</div>
+              </div>
             </div>
-            <div className="bg-slate-50 dark:bg-slate-900/30 rounded-lg border border-slate-200 dark:border-slate-700 p-4">
-              <div className="text-sm text-slate-600 dark:text-slate-400 mb-1">Categories</div>
-              <div className="text-3xl font-bold text-slate-900 dark:text-white">{Object.keys(data.stats.byCategory).length}</div>
-            </div>
-            <div className="bg-slate-50 dark:bg-slate-900/30 rounded-lg border border-slate-200 dark:border-slate-700 p-4">
-              <div className="text-sm text-slate-600 dark:text-slate-400 mb-1">High Severity</div>
-              <div className="text-3xl font-bold text-red-600">{data.threats.filter((t) => t.severity === "high").length}</div>
-            </div>
-          </div>
+          )}
 
           {/* Category Filter */}
-          <div className="bg-slate-50 dark:bg-slate-900/30 rounded-lg border border-slate-200 dark:border-slate-700 p-6">
-            <h2 className="font-semibold text-slate-900 dark:text-white mb-4">Filter by Category</h2>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-              {Object.entries(data.stats.byCategory).map(([category, count]) => (
-                <button
-                  key={category}
-                  onClick={() => setFilter(filter === category ? null : category)}
-                  className={`p-3 rounded-lg border transition-all text-left ${
-                    filter === category
-                      ? (categoryInfo[category as keyof typeof categoryInfo]?.color || "bg-slate-100 dark:bg-slate-700")
-                      : "bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600"
-                  }`}
-                >
-                  <div className="font-medium text-sm">{categoryInfo[category as keyof typeof categoryInfo]?.label || category}</div>
-                  <div className="text-xs opacity-70 mt-1">{count} threats</div>
-                </button>
-              ))}
+          {stats && (
+            <div className="bg-slate-50 dark:bg-slate-900/30 rounded-lg border border-slate-200 dark:border-slate-700 p-6">
+              <h2 className="font-semibold text-slate-900 dark:text-white mb-4">Filter by Category</h2>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                {Object.entries(stats.byCategory).map(([category, count]) => (
+                  <button
+                    key={category}
+                    onClick={() => setFilter(filter === category ? null : category)}
+                    className={`p-3 rounded-lg border transition-all text-left ${
+                      filter === category
+                        ? (categoryInfo[category as keyof typeof categoryInfo]?.color || "bg-slate-100 dark:bg-slate-700")
+                        : "bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600"
+                    }`}
+                  >
+                    <div className="font-medium text-sm">{categoryInfo[category as keyof typeof categoryInfo]?.label || category}</div>
+                    <div className="text-xs opacity-70 mt-1">{count} threats</div>
+                  </button>
+                ))}
+              </div>
             </div>
-          </div>
+          )}
 
           {/* Threat Cards */}
           <div className="space-y-2">
@@ -250,9 +288,14 @@ export default function NewsPage() {
                 </button>
               )}
             </div>
-            {filteredThreats.slice(0, 20).map((threat) => {
+            {filteredThreats.map((threat) => {
               const info = categoryInfo[threat.category as keyof typeof categoryInfo];
-              const severityColor = threat.severity === "high" ? "bg-red-500/20 text-red-700 dark:text-red-300" : threat.severity === "medium" ? "bg-yellow-500/20 text-yellow-700 dark:text-yellow-300" : "bg-green-500/20 text-green-700 dark:text-green-300";
+              const severityColor =
+                threat.severity === "high"
+                  ? "bg-red-500/20 text-red-700 dark:text-red-300"
+                  : threat.severity === "medium"
+                    ? "bg-yellow-500/20 text-yellow-700 dark:text-yellow-300"
+                    : "bg-green-500/20 text-green-700 dark:text-green-300";
               return (
                 <div key={threat.address} className="bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-lg p-4 hover:shadow-md transition-all">
                   <div className="flex items-start gap-4">
@@ -270,17 +313,57 @@ export default function NewsPage() {
                       </div>
                       <div className="text-xs text-slate-600 dark:text-slate-400 mb-2">{info?.label || threat.category}</div>
                       <div className="grid grid-cols-4 gap-2 text-xs">
-                        <div><span className="text-slate-500">Reports</span> <span className="font-semibold text-slate-900 dark:text-white">{threat.reports}</span></div>
-                        <div><span className="text-slate-500">Reporters</span> <span className="font-semibold text-slate-900 dark:text-white">{threat.reporters}</span></div>
-                        <div><span className="text-slate-500">First Seen</span> <span className="text-slate-700 dark:text-slate-300">{formatTime(threat.firstSeen)}</span></div>
-                        <div><span className="text-slate-500">Last Seen</span> <span className="text-slate-700 dark:text-slate-300">{formatTime(threat.lastSeen)}</span></div>
+                        <div>
+                          <span className="text-slate-500">Reports</span> <span className="font-semibold text-slate-900 dark:text-white">{threat.reports}</span>
+                        </div>
+                        <div>
+                          <span className="text-slate-500">Reporters</span> <span className="font-semibold text-slate-900 dark:text-white">{threat.reporters}</span>
+                        </div>
+                        <div>
+                          <span className="text-slate-500">First Seen</span> <span className="text-slate-700 dark:text-slate-300">{formatTime(threat.firstSeen)}</span>
+                        </div>
+                        <div>
+                          <span className="text-slate-500">Last Seen</span> <span className="text-slate-700 dark:text-slate-300">{formatTime(threat.lastSeen)}</span>
+                        </div>
                       </div>
-                      {threat.trusted && <div className="mt-2 inline-flex items-center gap-1 px-2 py-1 bg-green-500/20 text-green-700 dark:text-green-300 rounded text-xs font-medium">✓ Verified</div>}
+                      {threat.trusted && (
+                        <div className="mt-2 inline-flex items-center gap-1 px-2 py-1 bg-green-500/20 text-green-700 dark:text-green-300 rounded text-xs font-medium">
+                          ✓ Verified
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>
               );
             })}
+
+            {/* Load More Button */}
+            {hasMore && (
+              <div className="flex justify-center mt-8">
+                <button
+                  onClick={handleLoadMore}
+                  disabled={loadingMore}
+                  className="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 disabled:bg-slate-400 text-white font-semibold rounded-lg transition-colors disabled:cursor-not-allowed flex items-center gap-2"
+                >
+                  {loadingMore ? (
+                    <>
+                      <svg className="w-5 h-5 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                      Loading...
+                    </>
+                  ) : (
+                    `Load More (${allThreats.length}/${stats?.total || 0})`
+                  )}
+                </button>
+              </div>
+            )}
+
+            {!hasMore && allThreats.length > 0 && (
+              <div className="text-center py-4 text-slate-600 dark:text-slate-400">
+                ✓ All {allThreats.length} threats loaded
+              </div>
+            )}
           </div>
         </div>
       )}
@@ -301,7 +384,9 @@ export default function NewsPage() {
               <p className="text-sm text-slate-600 dark:text-slate-400 mb-3">{article.desc}</p>
               <div className="flex justify-between items-center">
                 <span className="text-xs font-medium text-slate-500">{article.source}</span>
-                <a href="#" className="text-indigo-600 dark:text-indigo-400 text-sm font-semibold hover:underline">Read →</a>
+                <a href="#" className="text-indigo-600 dark:text-indigo-400 text-sm font-semibold hover:underline">
+                  Read →
+                </a>
               </div>
             </div>
           ))}
@@ -333,7 +418,7 @@ export default function NewsPage() {
       )}
 
       {/* Tab: Statistics */}
-      {activeTab === "stats" && (
+      {activeTab === "stats" && stats && (
         <div className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div className="bg-slate-50 dark:bg-slate-900/30 rounded-lg p-4 border border-slate-200 dark:border-slate-700">
@@ -342,18 +427,18 @@ export default function NewsPage() {
               <div className="text-xs text-slate-500 mt-1">All time threats</div>
             </div>
             <div className="bg-slate-50 dark:bg-slate-900/30 rounded-lg p-4 border border-slate-200 dark:border-slate-700">
-              <div className="text-sm text-slate-600 dark:text-slate-400 mb-1">Recent 7 Days</div>
-              <div className="text-3xl font-bold text-slate-900 dark:text-white">{data.stats.total}</div>
-              <div className="text-xs text-slate-500 mt-1">Active threats</div>
+              <div className="text-sm text-slate-600 dark:text-slate-400 mb-1">Loaded</div>
+              <div className="text-3xl font-bold text-slate-900 dark:text-white">{allThreats.length}</div>
+              <div className="text-xs text-slate-500 mt-1">Recent threats</div>
             </div>
             <div className="bg-slate-50 dark:bg-slate-900/30 rounded-lg p-4 border border-slate-200 dark:border-slate-700">
               <div className="text-sm text-slate-600 dark:text-slate-400 mb-1">Categories</div>
-              <div className="text-3xl font-bold text-slate-900 dark:text-white">{Object.keys(data.stats.byCategory).length}</div>
+              <div className="text-3xl font-bold text-slate-900 dark:text-white">{Object.keys(stats.byCategory).length}</div>
               <div className="text-xs text-slate-500 mt-1">Types detected</div>
             </div>
             <div className="bg-slate-50 dark:bg-slate-900/30 rounded-lg p-4 border border-slate-200 dark:border-slate-700">
               <div className="text-sm text-slate-600 dark:text-slate-400 mb-1">High Risk</div>
-              <div className="text-3xl font-bold text-red-600">{data.threats.filter((t) => t.severity === "high").length}</div>
+              <div className="text-3xl font-bold text-red-600">{allThreats.filter((t) => t.severity === "high").length}</div>
               <div className="text-xs text-slate-500 mt-1">Verified exploits</div>
             </div>
           </div>
@@ -362,14 +447,23 @@ export default function NewsPage() {
           <div className="bg-slate-50 dark:bg-slate-900/30 border border-slate-200 dark:border-slate-700 rounded-lg p-6">
             <h3 className="font-semibold text-slate-900 dark:text-white mb-4">Breakdown by Category</h3>
             <div className="space-y-3">
-              {Object.entries(data.stats.byCategory).map(([category, count]) => {
-                const percentage = (count / data.stats.total) * 100;
-                const colors: Record<string, string> = { drainer: "bg-red-500", "malicious-contract": "bg-orange-500", "decoy-tripwire": "bg-indigo-500", phishing: "bg-cyan-500" };
+              {Object.entries(stats.byCategory).map(([category, count]) => {
+                const percentage = (count / stats.total) * 100;
+                const colors: Record<string, string> = {
+                  drainer: "bg-red-500",
+                  "malicious-contract": "bg-orange-500",
+                  "decoy-tripwire": "bg-indigo-500",
+                  phishing: "bg-cyan-500",
+                };
                 return (
                   <div key={category}>
                     <div className="flex justify-between mb-1">
-                      <span className="text-sm font-medium text-slate-700 dark:text-slate-300">{categoryInfo[category as keyof typeof categoryInfo]?.label || category}</span>
-                      <span className="text-sm font-semibold text-slate-900 dark:text-white">{count} ({percentage.toFixed(1)}%)</span>
+                      <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
+                        {categoryInfo[category as keyof typeof categoryInfo]?.label || category}
+                      </span>
+                      <span className="text-sm font-semibold text-slate-900 dark:text-white">
+                        {count} ({percentage.toFixed(1)}%)
+                      </span>
                     </div>
                     <div className="w-full bg-slate-300 dark:bg-slate-700 rounded-full h-2">
                       <div className={`h-full rounded-full transition-all ${colors[category] || "bg-slate-500"}`} style={{ width: `${percentage}%` }} />

@@ -137,13 +137,14 @@ export class ThreatIntelPostgres {
   }
 
   /**
-   * Get recent threats for news/feed display.
+   * Get recent threats for news/feed display with pagination.
    * Ordered by last_seen (most recent first), limited to specified count.
-   * Only returns threats with activity in the last N hours (default 7 days).
+   * Supports offset for incremental/paginated loading.
    */
   async getRecentThreats(
     limit: number = 50,
-    hoursBack: number = 24 * 7
+    hoursBack: number = 24 * 7,
+    offset: number = 0
   ): Promise<
     Array<{
       address: Address;
@@ -158,7 +159,7 @@ export class ThreatIntelPostgres {
   > {
     await this.initialize();
     try {
-      console.log(`[getRecentThreats] Querying with limit=${limit}, hoursBack=${hoursBack}`);
+      console.log(`[getRecentThreats] Querying with limit=${limit}, offset=${offset}, hoursBack=${hoursBack}`);
       
       const result = await this.pool.query(
         `SELECT 
@@ -171,8 +172,8 @@ export class ThreatIntelPostgres {
           metadata
          FROM threat_intel 
          ORDER BY last_seen DESC, array_length(reporters, 1) DESC
-         LIMIT $1`,
-        [limit]
+         LIMIT $1 OFFSET $2`,
+        [limit, offset]
       );
 
       console.log(`[getRecentThreats] Returned ${result.rows.length} rows`);
@@ -195,6 +196,18 @@ export class ThreatIntelPostgres {
     } catch (err) {
       console.error(`[threat-intel-postgres] getRecentThreats failed:`, err);
       return [];
+    }
+  }
+
+  /** Get total threat count for pagination. */
+  async getThreatCount(): Promise<number> {
+    await this.initialize();
+    try {
+      const result = await this.pool.query(`SELECT COUNT(*) as count FROM threat_intel`);
+      return parseInt(result.rows[0].count, 10);
+    } catch (err) {
+      console.error(`[threat-intel-postgres] getThreatCount failed:`, err);
+      return 0;
     }
   }
 

@@ -15,20 +15,75 @@ interface Contributor {
 export default function CommunityPage() {
   const [contributors, setContributors] = useState<Contributor[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [activeTab, setActiveTab] = useState<"leaderboard" | "contribute" | "rewards">("leaderboard");
+  const [offset, setOffset] = useState(0);
+  const [hasMore, setHasMore] = useState(true);
+  const [totalCount, setTotalCount] = useState(0);
+
+  const ITEMS_PER_PAGE = 20;
+
+  // Fetch contributors with pagination
+  const fetchContributors = async (fetchOffset: number = 0) => {
+    try {
+      if (fetchOffset === 0) {
+        setLoading(true);
+      } else {
+        setLoadingMore(true);
+      }
+
+      const gateUrl = process.env.NEXT_PUBLIC_GATE_URL || "https://genesis-gate.onrender.com";
+      const url = new URL(`${gateUrl}/v1/contributors/leaderboard`);
+      url.searchParams.set("limit", ITEMS_PER_PAGE.toString());
+      url.searchParams.set("offset", fetchOffset.toString());
+
+      const response = await fetch(url.toString());
+      if (!response.ok) throw new Error(`API error: ${response.status}`);
+
+      const json = await response.json();
+
+      // On initial load, reset. On "Load More", append.
+      if (fetchOffset === 0) {
+        setContributors(json.leaderboard || []);
+      } else {
+        setContributors((prev) => [...prev, ...(json.leaderboard || [])]);
+      }
+
+      setOffset(fetchOffset + (json.leaderboard?.length || 0));
+      setHasMore(json.pagination?.hasMore || false);
+      setTotalCount(json.pagination?.total || 0);
+    } catch (err) {
+      console.error("Failed to fetch contributors:", err);
+      // Fallback to mock data
+      const mockContributors: Contributor[] = [
+        { address: "0x1234...5678", username: "SecurityPro", reports: 156, threats: 412, verified: 89, score: 8940, joinedAt: "2024-01-15" },
+        { address: "0x2345...6789", username: "ThreatHunter", reports: 134, threats: 378, verified: 76, score: 7650, joinedAt: "2024-02-01" },
+        { address: "0x3456...7890", username: "PhishDetector", reports: 98, threats: 245, verified: 62, score: 5890, joinedAt: "2024-03-10" },
+        { address: "0x4567...8901", username: "BlockchainSafe", reports: 87, threats: 201, verified: 54, score: 4920, joinedAt: "2024-03-20" },
+        { address: "0x5678...9012", username: "CryptoGuard", reports: 76, threats: 189, verified: 48, score: 4100, joinedAt: "2024-04-05" },
+      ];
+      if (fetchOffset === 0) {
+        setContributors(mockContributors);
+      } else {
+        setContributors((prev) => [...prev, ...mockContributors]);
+      }
+      setHasMore(false);
+    } finally {
+      setLoading(false);
+      setLoadingMore(false);
+    }
+  };
 
   useEffect(() => {
-    // Mock data for now - in production this would fetch from /v1/contributors/leaderboard
-    const mockContributors: Contributor[] = [
-      { address: "0x1234...5678", username: "SecurityPro", reports: 156, threats: 412, verified: 89, score: 8940, joinedAt: "2024-01-15" },
-      { address: "0x2345...6789", username: "ThreatHunter", reports: 134, threats: 378, verified: 76, score: 7650, joinedAt: "2024-02-01" },
-      { address: "0x3456...7890", username: "PhishDetector", reports: 98, threats: 245, verified: 62, score: 5890, joinedAt: "2024-03-10" },
-      { address: "0x4567...8901", username: "BlockchainSafe", reports: 87, threats: 201, verified: 54, score: 4920, joinedAt: "2024-03-20" },
-      { address: "0x5678...9012", username: "CryptoGuard", reports: 76, threats: 189, verified: 48, score: 4100, joinedAt: "2024-04-05" },
-    ];
-    setContributors(mockContributors);
-    setLoading(false);
+    setOffset(0);
+    setContributors([]);
+    setHasMore(true);
+    fetchContributors(0);
   }, []);
+
+  const handleLoadMore = () => {
+    fetchContributors(offset);
+  };
 
   return (
     <div className="space-y-6 max-w-6xl">
@@ -136,6 +191,34 @@ export default function CommunityPage() {
                 </tbody>
               </table>
             </div>
+
+            {/* Load More Button */}
+            {hasMore && (
+              <div className="p-4 border-t border-slate-200 dark:border-slate-700 flex justify-center">
+                <button
+                  onClick={handleLoadMore}
+                  disabled={loadingMore}
+                  className="px-6 py-3 bg-emerald-600 hover:bg-emerald-700 disabled:bg-slate-400 text-white font-semibold rounded-lg transition-colors disabled:cursor-not-allowed flex items-center gap-2"
+                >
+                  {loadingMore ? (
+                    <>
+                      <svg className="w-5 h-5 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                      Loading...
+                    </>
+                  ) : (
+                    `Load More Contributors (${contributors.length}/${totalCount || "..."})`
+                  )}
+                </button>
+              </div>
+            )}
+
+            {!hasMore && contributors.length > 0 && (
+              <div className="p-4 border-t border-slate-200 dark:border-slate-700 text-center text-slate-600 dark:text-slate-400">
+                ✓ All {contributors.length} contributors loaded
+              </div>
+            )}
           </div>
         </div>
       )}
