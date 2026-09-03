@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { QRCodeCanvas } from "qrcode.react";
+import { SNAP_CONFIG } from "@/config/snap-config";
 
 declare global {
   interface Window {
@@ -54,7 +55,13 @@ export default function SnapInstallPage() {
 
     setState("installing");
     try {
-      const snapId = "npm:genesis-snap";
+      // Use environment-configurable snap ID
+      // NEXT_PUBLIC_USE_REGISTRY_SNAP=true → uses npm:genesis-snap (production after registry approval)
+      // NEXT_PUBLIC_USE_REGISTRY_SNAP=false/unset → uses direct bundle URL (testing)
+      const snapId = typeof window !== "undefined"
+        ? SNAP_CONFIG.getSnapId(window.location.origin)
+        : SNAP_CONFIG.bundleUrl();
+      
       await window.ethereum.request({
         method: "wallet_requestSnaps",
         params: {
@@ -86,6 +93,15 @@ export default function SnapInstallPage() {
           <p className="text-lg text-teal-200 max-w-2xl mx-auto">
             Install the MetaMask Snap to instantly check every transaction against our threat intelligence network before you sign.
           </p>
+          <div className="mt-4 p-3 bg-blue-900/40 border border-blue-500/40 rounded-lg max-w-2xl mx-auto">
+            <p className="text-xs text-blue-200">
+              {SNAP_CONFIG.getSnapMode() === "testing" ? (
+                <>🧪 <strong>Testing Mode:</strong> Direct bundle testing. Switch to <code>NEXT_PUBLIC_USE_REGISTRY_SNAP=true</code> when registry approved.</>
+              ) : (
+                <>✅ <strong>Production Mode:</strong> Using official MetaMask registry snap.</>
+              )}
+            </p>
+          </div>
         </div>
 
         {/* Main Two-Column Layout */}
