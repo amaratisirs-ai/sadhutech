@@ -1,5 +1,5 @@
 {
-  "name": "@genesis/snap",
+  "name": "genesis-snap",
   "version": "0.0.1",
   "description": "GENESIS pre-sign transaction firewall — analyzes crypto transactions in real-time against 4,100+ community-verified threats",
   "private": false,

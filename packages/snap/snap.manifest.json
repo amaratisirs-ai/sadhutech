@@ -8,12 +8,12 @@
     "directory": "packages/snap"
   },
   "source": {
-    "shasum": "0jZzlo4opYsf9bcVcvNNfFVaMvEmMXlwfrqH3JC+fDc=",
+    "shasum": "SRvxkcHS8LRcjKmuZhiiFzy6st5YB67EMSEPPYIdqU0=",
     "location": {
       "npm": {
         "filePath": "dist/bundle.js",
         "iconPath": "images/icon.svg",
-        "packageName": "@genesis/snap",
+        "packageName": "genesis-snap",
         "registry": "https://registry.npmjs.org/"
       }
     }
