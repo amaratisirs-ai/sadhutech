@@ -2,12 +2,20 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { QRCodeCanvas } from "qrcode.react";
 
 interface WalletOption {
   id: string;
   name: string;
   icon: string;
   chain: string;
+}
+
+interface ConnectionState {
+  uri: string | null;
+  connectionApproved: boolean;
+  error: string | null;
+  isInitialized: boolean;
 }
 
 /**
@@ -25,6 +33,12 @@ export default function WalletConnect() {
   const router = useRouter();
   const [isConnecting, setIsConnecting] = useState(false);
   const [selectedWallet, setSelectedWallet] = useState<WalletOption | null>(null);
+  const [connectionState, setConnectionState] = useState<ConnectionState>({
+    uri: null,
+    connectionApproved: false,
+    error: null,
+    isInitialized: false,
+  });
 
   // Popular WalletConnect-supported wallets
   const walletOptions: WalletOption[] = [
@@ -51,36 +65,69 @@ export default function WalletConnect() {
     { id: "coinomi", name: "Coinomi", icon: "🪙", chain: "Multi" },
   ];
 
+  // Initialize WalletConnect SDK (simplified for now, full SDK integration coming)
   useEffect(() => {
-    // TODO: Initialize WalletConnect SDK
-    // const projectId = process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID;
-    // if (!projectId) {
-    //   console.error("WalletConnect project ID not configured");
-    // }
+    const projectId = process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID;
+    if (!projectId) {
+      setConnectionState({
+        uri: null,
+        connectionApproved: false,
+        error: "WalletConnect Project ID not configured. Set NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID in .env.local",
+        isInitialized: false,
+      });
+    } else {
+      // SDK will be fully implemented in Phase 2
+      // For now, we show the UI and prepare for SDK integration
+      setConnectionState((prev) => ({
+        ...prev,
+        isInitialized: true,
+      }));
+    }
   }, []);
 
   const handleWalletSelect = async (wallet: WalletOption) => {
+    if (!connectionState.isInitialized) {
+      setConnectionState((prev) => ({
+        ...prev,
+        error: "WalletConnect not initialized. Set NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID",
+      }));
+      return;
+    }
+
     setSelectedWallet(wallet);
     setIsConnecting(true);
+    setConnectionState((prev) => ({ ...prev, uri: null, connectionApproved: false, error: null }));
 
     try {
-      // TODO: Implement WalletConnect connection
-      // 1. Create WalletConnect session
-      // 2. Generate URI
-      // 3. Show QR code or deep link
-      // 4. Wait for wallet approval
-      // 5. Install snap through connected wallet
+      // Phase 2: Full SDK integration will go here
+      // For now, generate a demo QR code URI showing the connection flow
+      const walletUri = `wc:${wallet.id}@2?relay-protocol=irn&symKey=...`;
       
-      console.log(`Connecting to ${wallet.name}...`);
-      
-      // Simulated connection flow
-      // In production, this would use @walletconnect/web3wallet SDK
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      // After successful connection, proceed to snap installation
-      // router.push(`/after-install?wallet=${wallet.id}`);
+      setConnectionState((prev) => ({
+        ...prev,
+        uri: walletUri,
+        connectionApproved: false,
+      }));
+
+      // Simulate connection approval after 3 seconds
+      setTimeout(() => {
+        setConnectionState((prev) => ({
+          ...prev,
+          connectionApproved: true,
+        }));
+        
+        // After connection, redirect to snap installation
+        setTimeout(() => {
+          router.push(`/snap-install?wallet=${wallet.id}`);
+        }, 1500);
+      }, 3000);
     } catch (error) {
-      console.error("Connection failed:", error);
+      const errorMessage = error instanceof Error ? error.message : "Connection failed";
+      console.error("Connection error:", error);
+      setConnectionState((prev) => ({
+        ...prev,
+        error: errorMessage,
+      }));
       setIsConnecting(false);
     }
   };
@@ -145,26 +192,43 @@ export default function WalletConnect() {
             </div>
           ) : (
             <div className="space-y-4">
-              {/* QR Code Placeholder */}
+              {/* Error Message */}
+              {connectionState.error && (
+                <div className="bg-red-900/40 border border-red-500/50 rounded-lg p-4">
+                  <p className="text-sm text-red-200">{connectionState.error}</p>
+                </div>
+              )}
+
+              {/* QR Code Display */}
               <div className="bg-white p-6 rounded-lg flex items-center justify-center h-72 border-2 border-teal-400">
                 <div className="text-center space-y-3">
-                  {isConnecting ? (
+                  {isConnecting && !connectionState.uri ? (
                     <>
                       <div className="inline-block">
                         <div className="animate-spin text-5xl">⏳</div>
                       </div>
                       <p className="text-slate-700 font-semibold">Connecting to {selectedWallet.name}...</p>
-                      <p className="text-xs text-slate-500">Scan the QR code with your wallet</p>
+                      <p className="text-xs text-slate-500">Generating QR code...</p>
+                    </>
+                  ) : connectionState.uri ? (
+                    <>
+                      <QRCodeCanvas
+                        value={connectionState.uri}
+                        size={200}
+                        level="H"
+                        includeMargin={true}
+                      />
+                      <p className="text-slate-700 text-sm font-medium">Scan with {selectedWallet.name}</p>
+                      <p className="text-xs text-slate-500">
+                        {connectionState.connectionApproved
+                          ? "✅ Connection approved!"
+                          : "Waiting for approval..."}
+                      </p>
                     </>
                   ) : (
                     <>
-                      <div className="bg-gradient-to-br from-slate-300 to-slate-200 p-4 rounded-lg inline-block w-48 h-48">
-                        {/* QR code would render here via qrcode.react */}
-                        <div className="text-slate-400 text-sm h-full flex items-center justify-center">
-                          QR Code<br />({selectedWallet.name})
-                        </div>
-                      </div>
-                      <p className="text-slate-700 text-sm">Scan with {selectedWallet.name}</p>
+                      <div className="text-slate-400 text-sm">No QR code generated</div>
+                      <p className="text-xs text-slate-500">Try selecting another wallet</p>
                     </>
                   )}
                 </div>
@@ -179,9 +243,14 @@ export default function WalletConnect() {
                     <p className="text-xs text-teal-300">{selectedWallet.chain} • WalletConnect</p>
                   </div>
                 </div>
-                {isConnecting && (
+                {isConnecting && !connectionState.connectionApproved && (
                   <p className="text-xs text-teal-200">
                     Waiting for wallet approval... Check your {selectedWallet.name} mobile app.
+                  </p>
+                )}
+                {connectionState.connectionApproved && (
+                  <p className="text-xs text-teal-200">
+                    ✅ Connected! Redirecting to snap installation...
                   </p>
                 )}
               </div>
@@ -191,6 +260,7 @@ export default function WalletConnect() {
                 onClick={() => {
                   setSelectedWallet(null);
                   setIsConnecting(false);
+                  setConnectionState((prev) => ({ ...prev, uri: null, connectionApproved: false, error: null }));
                 }}
                 disabled={isConnecting}
                 className="w-full py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg text-sm font-semibold transition disabled:opacity-50"
