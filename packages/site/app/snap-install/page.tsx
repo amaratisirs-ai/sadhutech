@@ -457,47 +457,40 @@ export default function SnapInstallPage() {
         <p className="text-sm text-teal-200">Install the MetaMask Snap for transaction safety</p>
       </div>
 
-      {/* Mobile Instructions - Always Visible */}
-      <div className="bg-gradient-to-r from-orange-500/20 to-red-500/20 border-2 border-orange-500 rounded-lg p-5 space-y-4">
+      {/* Mobile Info - Desktop Only */}
+      <div className="bg-gradient-to-r from-indigo-500/20 to-blue-500/20 border-2 border-indigo-500 rounded-lg p-5 space-y-4">
         <div className="flex gap-3 items-start">
-          <span className="text-3xl">📱</span>
+          <span className="text-3xl">💻</span>
           <div className="flex-1">
-            <h2 className="font-bold text-white text-lg">Open in MetaMask App</h2>
-            <p className="text-xs text-orange-100 mt-1">MetaMask Snaps only work in the app's browser</p>
+            <h2 className="font-bold text-white text-lg">Desktop Only: MetaMask Snaps</h2>
+            <p className="text-xs text-indigo-100 mt-1">Snaps require the browser extension (desktop only)</p>
 
             <div className="bg-slate-900/60 rounded-lg p-4 mt-3 space-y-3">
-              <div className="flex gap-3 text-xs">
-                <div className="flex-shrink-0 w-6 h-6 rounded-full bg-orange-500 text-slate-900 font-bold flex items-center justify-center text-xs">
-                  1
-                </div>
-                <div className="text-orange-100">
-                  Open the <strong>MetaMask mobile app</strong>
-                </div>
+              <div className="space-y-2 text-xs text-indigo-200">
+                <p><strong>✅ What Works:</strong></p>
+                <ul className="list-disc list-inside space-y-1">
+                  <li>Desktop browsers: Chrome, Firefox, Safari, Brave</li>
+                  <li>MetaMask browser extension installed</li>
+                  <li>Visit this site and click "Install GENESIS Snap"</li>
+                </ul>
               </div>
-              <div className="flex gap-3 text-xs">
-                <div className="flex-shrink-0 w-6 h-6 rounded-full bg-orange-500 text-slate-900 font-bold flex items-center justify-center text-xs">
-                  2
-                </div>
-                <div className="text-orange-100">
-                  Tap menu <strong>(≡)</strong> at <strong>bottom right</strong>
-                </div>
+
+              <div className="space-y-2 text-xs text-slate-400 pt-3 border-t border-slate-700">
+                <p><strong>❌ Doesn't Work on Mobile:</strong></p>
+                <ul className="list-disc list-inside space-y-1">
+                  <li>MetaMask mobile app (no Snap support yet)</li>
+                  <li>Safari / Chrome on iPhone or Android</li>
+                  <li>Any mobile browser</li>
+                </ul>
               </div>
-              <div className="flex gap-3 text-xs">
-                <div className="flex-shrink-0 w-6 h-6 rounded-full bg-orange-500 text-slate-900 font-bold flex items-center justify-center text-xs">
-                  3
-                </div>
-                <div className="text-orange-100">
-                  Select <strong>'Browser'</strong>
-                </div>
+
+              <div className="mt-3 p-3 bg-blue-900/50 rounded text-xs text-blue-200 border border-blue-500/30">
+                <strong>💡 Tip:</strong> Use the QR code on desktop to share this page. Then open on your computer with MetaMask extension installed.
               </div>
-              <div className="flex gap-3 text-xs">
-                <div className="flex-shrink-0 w-6 h-6 rounded-full bg-orange-500 text-slate-900 font-bold flex items-center justify-center text-xs">
-                  4
-                </div>
-                <div className="text-orange-100">
-                  Paste URL: <code className="bg-slate-800 px-1 py-0.5 rounded text-orange-300 text-xs font-mono block mt-1">sadhutech-site.vercel.app</code>
-                </div>
-              </div>
+            </div>
+          </div>
+        </div>
+      </div>
               <div className="flex gap-3 text-xs">
                 <div className="flex-shrink-0 w-6 h-6 rounded-full bg-orange-500 text-slate-900 font-bold flex items-center justify-center text-xs">
                   5

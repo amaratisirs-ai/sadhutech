@@ -1,8 +1,10 @@
 # GENESIS Firewall Snap
 
-**Real-time transaction security for your MetaMask wallet.**
+**By Bhusoft LLC** | Real-time transaction security for your MetaMask wallet.
 
 GENESIS is a MetaMask Snap that analyzes every transaction you sign against community-verified threats—instantly catching drainers, exploits, phishing, and rugpulls before they happen.
+
+A product of Bhusoft LLC, committed to building secure, community-powered crypto tools.
 
 ## What It Does
 

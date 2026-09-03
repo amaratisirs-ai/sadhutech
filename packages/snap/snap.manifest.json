@@ -1,7 +1,7 @@
 {
   "version": "0.0.2",
-  "description": "GENESIS pre-sign transaction firewall",
-  "proposedName": "GENESIS Firewall",
+  "description": "GENESIS pre-sign transaction firewall — A Bhusoft LLC product",
+  "proposedName": "GENESIS Firewall (Bhusoft)",
   "repository": {
     "type": "git",
     "url": "https://github.com/amaratisirs-ai/sadhutech.git",

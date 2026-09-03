@@ -34,7 +34,7 @@ export default function Home() {
   const faqItems = [
     {
       title: "What's an 'approval'?",
-      answer: "When you interact with a crypto app, you often give it permission to spend your tokens. GENESIS watches for suspicious permissions.",
+      answer: "When you sign a transaction, you often give it permission to spend your tokens. GENESIS watches for suspicious permissions.",
     },
     {
       title: "Why is this dangerous?",
@@ -42,7 +42,7 @@ export default function Home() {
     },
     {
       title: "How does GENESIS know about threats?",
-      answer: "The community reports dangerous addresses. GENESIS checks if you're about to interact with one of them.",
+      answer: "Community members report dangerous addresses and malicious contracts. GENESIS checks if you're about to interact with one of them.",
     },
     {
       title: "What's a 'permit' signature?",
@@ -99,7 +99,7 @@ export default function Home() {
               </h1>
 
               <p className="text-xl text-slate-200 leading-relaxed">
-                Crypto transactions happen in milliseconds. So should your security. <strong>GENESIS analyzes every transaction instantly</strong> against community-verified threats—right inside your wallet.
+                Transactions happen in milliseconds. So should your security. <strong>GENESIS analyzes every transaction instantly</strong> against community-verified threats—right inside your wallet.
               </p>
 
               <p className="text-lg text-slate-300">
@@ -161,7 +161,7 @@ export default function Home() {
       <section className="space-y-8">
         <div className="text-center">
           <h2 className="text-4xl md:text-5xl font-black text-white mb-4">The Risk Most People Don't See</h2>
-          <p className="text-slate-200 text-lg font-medium">You already own crypto. Here's what can go wrong.</p>
+          <p className="text-slate-200 text-lg font-medium">Every transaction carries risk. Here's what can go wrong.</p>
         </div>
 
         <div className="grid md:grid-cols-3 gap-6">

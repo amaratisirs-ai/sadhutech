@@ -158,8 +158,9 @@ export function LayoutClient({ children }: { children: ReactNode }) {
           <div className="border-t border-teal-500/20 pt-8 text-center text-sm text-teal-200">
             <p className="font-medium">GENESIS Firewall v0.1 — Community-powered pre-sign gate for crypto wallets</p>
             <p className="mt-2 text-xs text-teal-300">
-              Made for wallet security. <a href="https://github.com/amaratisirs-ai" className="text-teal-300 hover:text-teal-100 underline transition">Join us on GitHub</a>
+              Powered by <a href="https://bhusoft.com" className="text-teal-300 hover:text-teal-100 underline transition">Bhusoft LLC</a> • <a href="https://github.com/amaratisirs-ai" className="text-teal-300 hover:text-teal-100 underline transition">Open Source</a>
             </p>
+            <p className="mt-1 text-xs text-slate-400">&copy; 2026 Bhusoft LLC. GENESIS is a Bhusoft product.</p>
           </div>
         </div>
       </footer>

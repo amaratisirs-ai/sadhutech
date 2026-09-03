@@ -23,8 +23,9 @@
     "wallet-security"
   ],
   "author": {
-    "name": "GENESIS",
-    "url": "https://sadhutech-site.vercel.app"
+    "name": "GENESIS by Bhusoft LLC",
+    "email": "genesis@bhusoft.com",
+    "url": "https://bhusoft.com"
   },
   "scripts": {
     "build": "mm-snap build",
