@@ -30,33 +30,32 @@ export default function SnapInstallPage() {
   }, []);
 
   const handleInstallClick = async () => {
+    // Check if on mobile without MetaMask
+    if (isMobile && !window.ethereum) {
+      setInstallStep("intro");
+      alert(
+        "📱 MetaMask App Required\n\n" +
+        "To install GENESIS Snap on mobile:\n\n" +
+        "1️⃣  Open the MetaMask mobile app\n" +
+        "2️⃣  Tap the menu icon (≡) at the bottom right\n" +
+        "3️⃣  Select 'Browser'\n" +
+        "4️⃣  In the address bar, enter: sadhutech-site.vercel.app/snap-install\n" +
+        "5️⃣  Then tap 'Install GENESIS Snap'\n\n" +
+        "Don't have MetaMask? Get it free at metamask.io"
+      );
+      return;
+    }
+
     setInstallStep("installing");
 
     try {
-      // On mobile, try to open MetaMask app directly
-      if (isMobile && !window.ethereum) {
-        // Use MetaMask deep link to open our page in MetaMask app
-        const deepLink = `https://metamask.app.link/browse/https://sadhutech-site.vercel.app/snap-install`;
-        window.location.href = deepLink;
-        // Give the deep link a moment to open, then show fallback
-        setTimeout(() => {
-          alert(
-            "📱 Opening MetaMask...\n\n" +
-            "If MetaMask didn't open, you can:\n" +
-            "1. Install MetaMask: https://metamask.io\n" +
-            "2. Or open this page in MetaMask's browser manually"
-          );
-          setInstallStep("intro");
-        }, 1500);
-        return;
-      }
-
       // Check for MetaMask on desktop or if we're already in MetaMask app
       if (!window.ethereum) {
         alert(
           "🔧 MetaMask Required\n\n" +
-          "GENESIS runs as a MetaMask Snap. You need MetaMask browser extension.\n\n" +
-          "👉 Download MetaMask: https://metamask.io\n\n" +
+          "GENESIS runs as a MetaMask Snap.\n\n" +
+          "📥 Download MetaMask:\n" +
+          "https://metamask.io\n\n" +
           "Then come back and click 'Install GENESIS Snap' again!"
         );
         setInstallStep("intro");
@@ -97,21 +96,41 @@ export default function SnapInstallPage() {
 
       {/* Mobile Instructions Banner */}
       {isMobile && (
-        <div className="bg-indigo-950 border-2 border-indigo-500 rounded-lg p-6 space-y-3">
-          <div className="flex gap-2 items-start">
-            <span className="text-2xl">📱</span>
-            <div>
-              <h3 className="font-bold text-white">👋 iPhone/Android Users</h3>
-              <p className="text-sm text-indigo-200 mt-1">
-                For the best experience on mobile, open this page in the <strong>MetaMask app browser</strong>:
+        <div className="bg-gradient-to-r from-orange-500/20 to-red-500/20 border-2 border-orange-500 rounded-lg p-6 space-y-4">
+          <div className="flex gap-3 items-start">
+            <span className="text-3xl">📱</span>
+            <div className="flex-1">
+              <h3 className="font-bold text-white text-lg">Open in MetaMask Browser</h3>
+              <p className="text-sm text-orange-100 mt-2">
+                MetaMask Snaps only work in the MetaMask mobile app. Follow these steps:
               </p>
-              <ol className="text-sm text-indigo-200 mt-2 space-y-1 list-decimal list-inside">
-                <li>Open MetaMask app</li>
-                <li>Tap menu (≡) bottom right</li>
-                <li>Tap 'Browser'</li>
-                <li>Paste this URL: <code className="bg-slate-900 px-2 py-1 rounded text-teal-300">sadhutech-site.vercel.app</code></li>
-                <li>Tap "Install GENESIS Snap" button</li>
-              </ol>
+              
+              <div className="bg-slate-900/60 rounded-lg p-4 mt-3 space-y-3">
+                <div className="flex gap-3 text-sm">
+                  <div className="flex-shrink-0 w-6 h-6 rounded-full bg-orange-500 text-slate-900 font-bold flex items-center justify-center text-xs">1</div>
+                  <div className="text-orange-100">Open the <strong>MetaMask mobile app</strong></div>
+                </div>
+                <div className="flex gap-3 text-sm">
+                  <div className="flex-shrink-0 w-6 h-6 rounded-full bg-orange-500 text-slate-900 font-bold flex items-center justify-center text-xs">2</div>
+                  <div className="text-orange-100">Tap menu icon <strong>(≡)</strong> at <strong>bottom right</strong></div>
+                </div>
+                <div className="flex gap-3 text-sm">
+                  <div className="flex-shrink-0 w-6 h-6 rounded-full bg-orange-500 text-slate-900 font-bold flex items-center justify-center text-xs">3</div>
+                  <div className="text-orange-100">Select <strong>'Browser'</strong></div>
+                </div>
+                <div className="flex gap-3 text-sm">
+                  <div className="flex-shrink-0 w-6 h-6 rounded-full bg-orange-500 text-slate-900 font-bold flex items-center justify-center text-xs">4</div>
+                  <div className="text-orange-100">Paste in address bar: <code className="bg-slate-800 px-2 py-1 rounded text-orange-300 text-xs font-mono block mt-1 break-all">sadhutech-site.vercel.app/snap-install</code></div>
+                </div>
+                <div className="flex gap-3 text-sm">
+                  <div className="flex-shrink-0 w-6 h-6 rounded-full bg-orange-500 text-slate-900 font-bold flex items-center justify-center text-xs">5</div>
+                  <div className="text-orange-100">Come back and click <strong>'Install GENESIS Snap'</strong></div>
+                </div>
+              </div>
+
+              <div className="mt-3 p-3 bg-slate-800/50 rounded text-xs text-orange-200 border border-orange-500/30">
+                <strong>💡 Tip:</strong> After step 4, the button on this page will work because MetaMask's browser will inject the ethereum object.
+              </div>
             </div>
           </div>
         </div>
@@ -187,11 +206,13 @@ export default function SnapInstallPage() {
                 onClick={handleInstallClick}
                 className="w-full px-6 py-4 bg-gradient-to-r from-teal-500 to-teal-400 text-slate-950 font-bold rounded-xl hover:shadow-xl hover:shadow-teal-500/50 transition-all text-lg"
               >
-                + Install GENESIS Snap
+                {isMobile ? "📱 View Instructions" : "+ Install GENESIS Snap"}
               </button>
 
               <p className="text-xs text-slate-500 text-center">
-                You'll be prompted to approve the installation in MetaMask
+                {isMobile 
+                  ? "Need help? Tap the button above for step-by-step instructions"
+                  : "You'll be prompted to approve the installation in MetaMask"}
               </p>
             </div>
           )}
@@ -208,7 +229,9 @@ export default function SnapInstallPage() {
                 </div>
                 <h3 className="text-xl font-bold text-white">Installing...</h3>
                 <p className="text-slate-400">
-                  Check your MetaMask popup to confirm installation
+                  {isMobile 
+                    ? "Look for a popup or new screen in MetaMask to approve the installation"
+                    : "Check your MetaMask popup to confirm installation"}
                 </p>
               </div>
             </div>
