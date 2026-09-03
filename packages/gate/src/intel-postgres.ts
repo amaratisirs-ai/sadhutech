@@ -102,6 +102,63 @@ export class ThreatIntelPostgres {
     }
   }
 
+  /**
+   * Get recent threats for news/feed display.
+   * Ordered by last_seen (most recent first), limited to specified count.
+   * Only returns threats with activity in the last N hours (default 7 days).
+   */
+  async getRecentThreats(
+    limit: number = 50,
+    hoursBack: number = 24 * 7
+  ): Promise<
+    Array<{
+      address: Address;
+      category: string;
+      reports: number;
+      reporters: string[];
+      firstSeen: number;
+      lastSeen: number;
+      trusted: boolean;
+      metadata?: Record<string, any>;
+    }>
+  > {
+    await this.initialize();
+    try {
+      const result = await this.pool.query(
+        `SELECT 
+          address, 
+          category, 
+          reporters, 
+          trusted, 
+          first_seen, 
+          last_seen, 
+          metadata
+         FROM threat_intel 
+         WHERE last_seen > NOW() - INTERVAL '1 hour' * $1
+         ORDER BY last_seen DESC, array_length(reporters, 1) DESC
+         LIMIT $2`,
+        [hoursBack, Math.min(limit, 1000)]
+      );
+
+      return result.rows.map((row) => {
+        const distinctReporters = [...new Set(row.reporters)] as string[];
+        return {
+          address: row.address as Address,
+          category: row.category as string,
+          reports: row.trusted ? Math.max(this.quorum, distinctReporters.length) : distinctReporters.length,
+          reporters: distinctReporters,
+          firstSeen: row.first_seen.getTime(),
+          lastSeen: row.last_seen.getTime(),
+          trusted: row.trusted as boolean,
+          metadata: row.metadata,
+        };
+      });
+    } catch (err) {
+      console.error(`[threat-intel-postgres] getRecentThreats failed:`, err);
+      return [];
+    }
+  }
+
   /** Sync version for tests (not recommended for production). */
   lookupSync(address: Address): ThreatEntry | undefined {
     throw new Error("PostgreSQL adapter is async-only. Use await lookup(address)");

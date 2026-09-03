@@ -170,6 +170,65 @@ app.post<{ Body: ReportRequest }>("/v1/report",
   }
 );
 
+// GET /v1/threats/latest - Recent threats for /news page feed
+// ============================================================================
+app.get("/v1/threats/latest", async (request, reply) => {
+  const intel = await createIntelAsync();
+
+  try {
+    // Parse optional query parameters
+    const query = request.query as any;
+    const limit = Math.min(Number(query.limit) || 50, 500);
+    const hours = Math.min(Number(query.hours) || 24 * 7, 24 * 365); // Default: 7 days, max: 1 year
+
+    // Only PostgreSQL supports getRecentThreats
+    if (!("getRecentThreats" in intel)) {
+      return reply.status(503).send({
+        error: "Threats feed not available",
+        message: "PostgreSQL backend required",
+      });
+    }
+
+    const threats = await (intel as any).getRecentThreats(limit, hours);
+
+    // Group by category for stats
+    const stats = {
+      total: threats.length,
+      byCategory: {} as Record<string, number>,
+    };
+
+    for (const threat of threats) {
+      stats.byCategory[threat.category] = (stats.byCategory[threat.category] || 0) + 1;
+    }
+
+    return {
+      timestamp: new Date().toISOString(),
+      parameters: {
+        limit,
+        hoursBack: hours,
+      },
+      stats,
+      threats: threats.map((t: any) => ({
+        address: t.address,
+        category: t.category,
+        severity: t.trusted ? "high" : t.reports >= 3 ? "medium" : "low",
+        reports: t.reports,
+        reporters: t.reporters.length,
+        firstSeen: new Date(t.firstSeen).toISOString(),
+        lastSeen: new Date(t.lastSeen).toISOString(),
+        trusted: t.trusted,
+        hoursOld: Math.round((Date.now() - t.lastSeen) / (1000 * 60 * 60)),
+      })),
+    };
+  } catch (err) {
+    request.log.error(err);
+    return reply.status(500).send({
+      error: "Failed to fetch threats",
+      message: err instanceof Error ? err.message : "Unknown error",
+    });
+  }
+});
+
 // GET /v1/contributors/leaderboard - Top community threat reporters (gamification)
 // ============================================================================
 app.get("/v1/contributors/leaderboard", async (request, reply) => {
