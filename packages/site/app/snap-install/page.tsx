@@ -66,7 +66,7 @@ export default function SnapInstallPage() {
             <ul className="space-y-3">
               {[
                 { icon: "⚡", title: "Instant Analysis", desc: "Analyzed in milliseconds, right in your wallet" },
-                { icon: "🛡️", title: "Real Threats", desc: "4,100+ community-verified dangerous addresses" },
+                { icon: "🛡️", title: "Community Intelligence", desc: "Community-verified threat detection powered by collective security" },
                 { icon: "📊", title: "Risk Score", desc: "Clear verdict: ALLOW, WARN, or BLOCK" },
                 { icon: "🔄", title: "Always Updated", desc: "New threats added hourly from the community" },
                 { icon: "🤝", title: "Community Powered", desc: "Help protect others by reporting threats" },
@@ -195,7 +195,7 @@ export default function SnapInstallPage() {
         <div className="grid md:grid-cols-4 gap-8">
           {[
             { num: "1", emoji: "📝", title: "You Sign", desc: "You're about to sign a transaction" },
-            { num: "2", emoji: "🔍", title: "We Analyze", desc: "Checked against 4,100+ known threats in <200ms" },
+            { num: "2", emoji: "🔍", title: "We Analyze", desc: "Checked against community threat intelligence in <200ms" },
             { num: "3", emoji: "📊", title: "We Score", desc: "Risk computed from community intel" },
             { num: "4", emoji: "✅", title: "You Decide", desc: "Clear verdict before you confirm" },
           ].map((step, i) => (
@@ -251,7 +251,7 @@ export default function SnapInstallPage() {
               <div className="bg-slate-800/50 rounded p-3 text-sm text-slate-400 space-y-2">
                 <p><strong>Network access allows:</strong></p>
                 <ul className="list-disc list-inside space-y-1">
-                  <li>Download threat database (4,100+ addresses)</li>
+                  <li>Download threat database (community-verified threats)</li>
                   <li>Check latest community reports</li>
                   <li>Send threat analysis (no personal data)</li>
                 </ul>

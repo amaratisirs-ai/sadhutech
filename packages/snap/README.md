@@ -2,14 +2,14 @@
 
 **Real-time transaction security for your MetaMask wallet.**
 
-GENESIS is a MetaMask Snap that analyzes every transaction you sign against 4,100+ community-verified threats—instantly catching drainers, exploits, phishing, and rugpulls before they happen.
+GENESIS is a MetaMask Snap that analyzes every transaction you sign against community-verified threats—instantly catching drainers, exploits, phishing, and rugpulls before they happen.
 
 ## What It Does
 
 When you attempt to sign a transaction, GENESIS:
 
 1. **Intercepts** the transaction before you sign
-2. **Analyzes** against our threat database (4,100+ known bad actors)
+2. **Analyzes** against our community threat database
 3. **Scores** the risk level (0–100)
 4. **Returns** a verdict in plain English:
    - ✅ **ALLOW** — No risks detected
@@ -18,7 +18,7 @@ When you attempt to sign a transaction, GENESIS:
 
 ## Key Features
 
-- 🛡️ **Real Threats** — 4,100+ verified threats from community reports, incident databases, and trusted security researchers
+- 🛡️ **Community-Powered** — Threats verified by community reports, incident databases, and security researchers
 - ⚡ **Instant Analysis** — Millisecond response times, right inside MetaMask
 - 📊 **Risk Scoring** — Get a numerical score (0–100) for every transaction
 - 🔄 **Always Updated** — Threat database updates continuously with new community reports

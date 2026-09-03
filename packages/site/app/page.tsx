@@ -99,7 +99,7 @@ export default function Home() {
               </h1>
 
               <p className="text-xl text-slate-200 leading-relaxed">
-                Crypto transactions happen in milliseconds. So should your security. <strong>GENESIS analyzes every transaction instantly</strong> against 4,100+ community-verified threats—right inside your wallet.
+                Crypto transactions happen in milliseconds. So should your security. <strong>GENESIS analyzes every transaction instantly</strong> against community-verified threats—right inside your wallet.
               </p>
 
               <p className="text-lg text-slate-300">

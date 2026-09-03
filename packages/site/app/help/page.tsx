@@ -97,7 +97,7 @@ export default function HelpPage() {
         },
         {
           q: "What's in the threat database?",
-          a: "4,100+ known drainers, phishing contracts, honeypots, and exploit addresses. Community-verified via Sybil-resistant voting.",
+          a: "Known drainers, phishing contracts, honeypots, and exploit addresses. Community-verified via Sybil-resistant voting.",
         },
       ],
     },
