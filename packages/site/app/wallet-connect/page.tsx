@@ -2,7 +2,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 import { QRCodeCanvas } from "qrcode.react";
 
 interface WalletOption {
@@ -20,7 +19,6 @@ interface ConnectionState {
 }
 
 export default function WalletConnect() {
-  const router = useRouter();
   const [isConnecting, setIsConnecting] = useState(false);
   const [selectedWallet, setSelectedWallet] = useState<WalletOption | null>(null);
   const [connectionState, setConnectionState] = useState<ConnectionState>({
@@ -50,6 +48,26 @@ export default function WalletConnect() {
     { id: "alphawallet", name: "AlphaWallet", icon: "Ⓐ", chain: "EVM" },
     { id: "coinomi", name: "Coinomi", icon: "🪙", chain: "Multi" },
   ];
+
+  const getWalletLaunchUrl = (wallet: WalletOption, uri: string) => {
+    const encodedUri = encodeURIComponent(uri);
+
+    switch (wallet.id) {
+      case "trust":
+        return `https://link.trustwallet.com/wc?uri=${encodedUri}`;
+      case "rainbow":
+        return `rainbow://wc?uri=${encodedUri}`;
+      case "metamask":
+        return `https://metamask.app.link/wc?uri=${encodedUri}`;
+      case "coinbase":
+        return `cbwallet://wc?uri=${encodedUri}`;
+      default:
+        return uri;
+    }
+  };
+
+  const supportsWalletDeepLink = (wallet: WalletOption) =>
+    ["trust", "rainbow", "metamask", "coinbase"].includes(wallet.id);
 
   // Detect mobile on mount
   useEffect(() => {
@@ -141,8 +159,12 @@ export default function WalletConnect() {
       console.log(`Connecting with ${wallet.name}...`);
       const accounts = await provider.connect();
       console.log("Connected:", accounts);
-      
-      setTimeout(() => router.push(`/snap-install?wallet=${wallet.id}`), 1500);
+
+      setIsConnecting(false);
+      setConnectionState((prev) => ({
+        ...prev,
+        connectionApproved: true,
+      }));
     } catch (error) {
       console.error("Connect error:", error);
       const msg = error instanceof Error ? error.message : "Connection failed";
@@ -254,7 +276,7 @@ export default function WalletConnect() {
                   <p className="text-xs text-teal-200">Waiting for wallet approval... Check your {selectedWallet.name} mobile app.</p>
                 )}
                 {connectionState.connectionApproved && (
-                  <p className="text-xs text-teal-200">✅ Connected! Redirecting to snap installation...</p>
+                  <p className="text-xs text-teal-200">✅ Connected! GENESIS is ready to analyze transactions for this wallet.</p>
                 )}
               </div>
               <button
@@ -307,17 +329,21 @@ export default function WalletConnect() {
             <div className="space-y-4">
               <div className="bg-slate-800/50 border border-slate-600 rounded-lg p-4 space-y-3">
                 <p className="text-sm text-slate-200">
-                  Tap the button below to open {selectedWallet.name} and approve the connection.
+                  {supportsWalletDeepLink(selectedWallet)
+                    ? `Tap the button below to open ${selectedWallet.name} directly.`
+                    : `Tap the button below to open ${selectedWallet.name} and approve the connection.`}
                 </p>
                 <button
                   onClick={() => {
                     if (connectionState.uri) {
-                      window.location.href = connectionState.uri;
+                      window.location.href = getWalletLaunchUrl(selectedWallet, connectionState.uri);
                     }
                   }}
                   className="w-full py-3 bg-teal-600 hover:bg-teal-700 text-white rounded-lg font-semibold transition"
                 >
-                  Open {selectedWallet.name}
+                  {supportsWalletDeepLink(selectedWallet)
+                    ? `Open in ${selectedWallet.name}`
+                    : `Open ${selectedWallet.name}`}
                 </button>
               </div>
               <button
