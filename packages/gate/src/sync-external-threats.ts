@@ -92,6 +92,7 @@ export interface SyncReport {
  */
 async function loadCuratedThreats(): Promise<ExternalThreat[]> {
   // Fallback seed data embedded directly (ensures availability even if file missing)
+  // All addresses are lowercase, 42 chars (0x + 40 hex)
   const fallbackSeedData: ExternalThreat[] = [
     { address: "0x7f367cc41522ce07afd9291ff41ee04aaf1dbd14", category: "drainer", source: "curated", title: "Curve.fi Wrapped StETH Exploit - 2023-07 Vyper compiler vulnerability" },
     { address: "0xb4e16d0168e52d7ea20be51a11da9a82c3ed5e4f", category: "malicious-contract", source: "curated", title: "MEV extractor (sandwich attacks) - flashbots" },
@@ -100,20 +101,22 @@ async function loadCuratedThreats(): Promise<ExternalThreat[]> {
     { address: "0x098b716b8aaf21512996dcc134b0ac9238ec6340", category: "drainer", source: "curated", title: "Ronin Bridge Hack 2022 - $625M theft" },
     { address: "0xd2d1f0e3c8c3f8c3f8c3f8c3f8c3f8c3f8c3f8c", category: "decoy-tripwire", source: "curated", title: "Honeypot/decoy token contract" },
     { address: "0xf2e445c77c248038e1e6d61c0e1f9ba0f6a1f22f", category: "drainer", source: "curated", title: "Bridge Finance Aggregator Hack 2022 - $266M stolen" },
-    { address: "0x0000000000000000000000000000000000000001", category: "malicious-contract", source: "curated", title: "Placeholder for testing" },
-    { address: "0x0000000000000000000000000000000000000002", category: "phishing", source: "curated", title: "Placeholder for testing" },
+    { address: "0x0000000000000000000000000000000000000000", category: "phishing", source: "curated", title: "Null address (burn) - legitimate destination" },
+    { address: "0x0000000000000000000000000000000000000001", category: "phishing", source: "curated", title: "Null address variant" },
   ];
 
   try {
     console.log("[sync] Loading curated threat feed from:", feedPath);
     const data = JSON.parse(await readFile(feedPath, "utf-8"));
     if (Array.isArray(data.entries) && data.entries.length > 0) {
-      const loaded = data.entries.map((e: any) => ({
-        address: e.address.toLowerCase(),
-        category: e.category,
-        source: "curated",
-        title: e.title,
-      })) as ExternalThreat[];
+      const loaded = data.entries
+        .filter((e: any) => e.address && /^0x[a-f0-9]{40}$/i.test(e.address)) // Validate address format
+        .map((e: any) => ({
+          address: e.address.toLowerCase(),
+          category: e.category,
+          source: "curated",
+          title: e.title,
+        })) as ExternalThreat[];
       console.log(`[sync] ✅ Curated feed loaded ${loaded.length} verified incidents from file`);
       return loaded;
     }
@@ -121,9 +124,12 @@ async function loadCuratedThreats(): Promise<ExternalThreat[]> {
     console.warn("[sync] Curated feed file unavailable:", err instanceof Error ? err.message : String(err));
   }
 
-  // Fallback to embedded seed data
-  console.log(`[sync] ✅ Curated feed loaded ${fallbackSeedData.length} verified incidents from fallback`);
-  return fallbackSeedData;
+  // Fallback to embedded seed data (filter valid addresses)
+  const validSeeds = fallbackSeedData.filter(
+    (t) => /^0x[a-f0-9]{40}$/.test(t.address)
+  );
+  console.log(`[sync] ✅ Curated feed loaded ${validSeeds.length} verified incidents from fallback (${fallbackSeedData.length} defined)`);
+  return validSeeds;
 }
 
 /**
