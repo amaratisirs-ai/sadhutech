@@ -2,10 +2,10 @@ import type { OnTransactionHandler } from "@metamask/snaps-sdk";
 import { panel, heading, text, divider } from "@metamask/snaps-sdk";
 
 /**
- * URL of the GENESIS Chakravyuha pre-sign gate. Point this at your deployed gate;
- * defaults to a local dev instance.
+ * URL of the GENESIS Chakravyuha pre-sign gate.
+ * This is the production instance. For local dev, update this value.
  */
-const GATE_URL = "http://localhost:8787/v1/analyze";
+const GATE_URL = "https://genesis-gate.onrender.com/v1/analyze";
 
 interface GateFinding {
   id: string;

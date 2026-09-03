@@ -2,9 +2,8 @@
   "version": "0.0.1",
   "description": "GENESIS pre-sign transaction firewall",
   "proposedName": "GENESIS Firewall",
-  "repository": { "type": "git", "url": "" },
   "source": {
-    "shasum": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=",
+    "shasum": "E75GCxyIweMX+qMpRHc2YW4ygpITaFTGrvzBDHGMaik=",
     "location": {
       "npm": {
         "filePath": "dist/bundle.js",
@@ -15,8 +14,11 @@
     }
   },
   "initialPermissions": {
-    "endowment:transaction-insight": { "allowTransactionOrigin": true },
+    "endowment:transaction-insight": {
+      "allowTransactionOrigin": true
+    },
     "endowment:network-access": {}
   },
+  "platformVersion": "6.24.0",
   "manifestVersion": "0.1"
 }
