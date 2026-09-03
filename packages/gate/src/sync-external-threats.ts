@@ -92,18 +92,23 @@ export interface SyncReport {
  */
 async function loadCuratedThreats(): Promise<ExternalThreat[]> {
   try {
-    console.log("[sync] Loading curated threat feed...");
+    console.log("[sync] Loading curated threat feed from:", feedPath);
     const data = JSON.parse(await readFile(feedPath, "utf-8"));
-    if (!Array.isArray(data.entries)) return [];
+    if (!Array.isArray(data.entries)) {
+      console.log("[sync] Curated feed has no entries array");
+      return [];
+    }
 
-    return data.entries.map((e: any) => ({
+    const threats = data.entries.map((e: any) => ({
       address: e.address.toLowerCase(),
       category: e.category,
       source: "curated",
       title: e.title,
     })) as ExternalThreat[];
+    console.log(`[sync] ✅ Curated seed loaded ${threats.length} verified incidents`);
+    return threats;
   } catch (err) {
-    console.error("[sync] Curated feed load failed:", err);
+    console.error("[sync] Curated feed load failed from", feedPath, ":", err instanceof Error ? err.message : String(err));
     return [];
   }
 }
