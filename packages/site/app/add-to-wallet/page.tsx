@@ -44,7 +44,7 @@ export default function AddToWallet() {
       <div className="text-center space-y-4">
         <h1 className="text-5xl md:text-6xl font-black text-white">🛡️ Choose Your GENESIS Onboarding Path</h1>
         <p className="text-xl text-teal-200 max-w-2xl mx-auto">
-          Pick the path that matches your wallet: MetaMask Snap for MetaMask, or Trust Wallet via WalletConnect for the production mobile flow.
+          Pick the path that matches your wallet: MetaMask Snap for MetaMask, or WalletConnect onboarding for supported mobile wallets starting with Trust Wallet.
         </p>
       </div>
 

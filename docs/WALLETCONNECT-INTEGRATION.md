@@ -1,14 +1,14 @@
 # GENESIS WalletConnect Middleware
 
-HTTP-based pre-sign transaction firewall for WalletConnect onboarding, with Trust Wallet as the first production path.
+HTTP-based pre-sign transaction firewall for WalletConnect onboarding, starting with Trust Wallet in the first production flow.
 
 ## Overview
 
-The WalletConnect middleware adapter lets wallets analyze transactions via GENESIS gate before users sign them. In the current product flow, Trust Wallet is the primary onboarding target, and the same gate/API can later be adopted by additional WalletConnect-compatible wallets.
+The WalletConnect middleware adapter lets wallets analyze transactions via GENESIS gate before users sign them. In the current product flow, Trust Wallet is the first onboarding example, and the same gate/API can later be adopted by additional WalletConnect-compatible wallets.
 
 **Key features:**
 - ✅ Works with WalletConnect wallets that adopt the GENESIS flow
-- ✅ Trust Wallet is the first production onboarding path
+- ✅ Trust Wallet is the first production example in the flow
 - ✅ Simple HTTP API (no WalletConnect SDK required for wallets)
 - ✅ Real-time risk scoring (allow/warn/block)
 - ✅ Plain-English verdict explanations

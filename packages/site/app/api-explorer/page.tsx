@@ -1,9 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useSearchParams } from "next/navigation";
+import { Suspense, useEffect, useState } from "react";
 
-export default function APIExplorerPage() {
+function APIExplorerContent() {
+  const searchParams = useSearchParams();
   const [gateUrl, setGateUrl] = useState("http://localhost:8787");
+  const [connectedWallet, setConnectedWallet] = useState<{ wallet: string; account: string; chainId: number } | null>(null);
   const [request, setRequest] = useState(
     JSON.stringify(
       {
@@ -22,6 +25,39 @@ export default function APIExplorerPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string>("");
   const [activeTab, setActiveTab] = useState<"editor" | "docs">("editor");
+
+  useEffect(() => {
+    const wallet = searchParams.get("wallet");
+    const account = searchParams.get("account");
+    const chainId = Number(searchParams.get("chainId") ?? "1");
+
+    const stored = typeof window !== "undefined" ? localStorage.getItem("genesis_wallet_session") : null;
+    const parsedStored = stored ? JSON.parse(stored) : null;
+
+    const finalWallet = wallet || parsedStored?.wallet || "WalletConnect";
+    const finalAccount = account || parsedStored?.account || "";
+    const finalChainId = Number(chainId || parsedStored?.chainId || 1);
+
+    if (finalAccount) {
+      setConnectedWallet({ wallet: finalWallet, account: finalAccount, chainId: finalChainId });
+      setRequest(
+        JSON.stringify(
+          {
+            tx: {
+              chainId: finalChainId,
+              from: finalAccount,
+              to: "0x2222222222222222222222222222222222222222",
+              data: "0x095ea7b30000000000000000000000003333333333333333333333333333333333333333ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+            },
+          },
+          null,
+          2
+        )
+      );
+      setResponse("");
+      setError("");
+    }
+  }, [searchParams]);
 
   const send = async () => {
     setLoading(true);
@@ -79,6 +115,50 @@ export default function APIExplorerPage() {
           Production: <code className="bg-slate-800 px-2 py-1 rounded text-teal-400">https://genesis-gate.onrender.com</code>
         </p>
       </div>
+
+      <div className="bg-gradient-to-r from-emerald-900/40 to-slate-900 border-2 border-emerald-500/50 rounded-xl p-5 space-y-3">
+        <div className="flex items-center justify-between gap-4 flex-wrap">
+          <div>
+            <p className="text-xs uppercase tracking-wide text-emerald-300 font-semibold">Connected wallet</p>
+            <h2 className="text-2xl font-bold text-white">{connectedWallet ? connectedWallet.wallet : "No wallet connected"}</h2>
+          </div>
+          {connectedWallet ? (
+            <a href="/wallet-connect" className="px-4 py-2 rounded-lg border border-emerald-500/50 text-emerald-100 bg-emerald-500/10 hover:bg-emerald-500/20 transition text-sm font-semibold">
+              Change wallet
+            </a>
+          ) : (
+            <a href="/wallet-connect" className="px-4 py-2 rounded-lg border border-slate-500 text-slate-100 bg-slate-800 hover:bg-slate-700 transition text-sm font-semibold">
+              Connect wallet
+            </a>
+          )}
+        </div>
+
+        {connectedWallet ? (
+          <div className="grid md:grid-cols-3 gap-3 text-sm text-emerald-100">
+            <div className="bg-black/10 border border-emerald-500/30 rounded-lg p-3">
+              <p className="text-emerald-300 text-xs uppercase">Account</p>
+              <p className="font-mono break-all mt-1">{connectedWallet.account}</p>
+            </div>
+            <div className="bg-black/10 border border-emerald-500/30 rounded-lg p-3">
+              <p className="text-emerald-300 text-xs uppercase">Chain</p>
+              <p className="mt-1">{connectedWallet.chainId === 1 ? "Ethereum" : `Chain ${connectedWallet.chainId}`}</p>
+            </div>
+            <div className="bg-black/10 border border-emerald-500/30 rounded-lg p-3">
+              <p className="text-emerald-300 text-xs uppercase">Next step</p>
+              <p className="mt-1">Analyze the transaction before signing</p>
+            </div>
+          </div>
+        ) : (
+          <p className="text-sm text-slate-300">Connect a wallet to prefill the request and test a real transaction against GENESIS.</p>
+        )}
+      </div>
+
+      {connectedWallet && (
+        <div className="bg-teal-900/20 border border-teal-500/40 rounded-xl p-4 text-sm text-teal-100">
+          <p className="font-semibold text-white">Wallet ready for a transaction check.</p>
+          <p className="mt-1 text-teal-200">The request has been prefilled with your connected account so you can test a real transaction in one step.</p>
+        </div>
+      )}
 
       {/* Tabs */}
       <div className="flex gap-4 border-b-2 border-slate-700">
@@ -356,5 +436,13 @@ const verdict = await res.json();`}</pre>
         </div>
       )}
     </div>
+  );
+}
+
+export default function APIExplorerPage() {
+  return (
+    <Suspense fallback={<div className="p-8 text-slate-300">Loading API Explorer…</div>}>
+      <APIExplorerContent />
+    </Suspense>
   );
 }

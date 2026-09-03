@@ -1,6 +1,7 @@
 // @ts-nocheck
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { QRCodeCanvas } from "qrcode.react";
 
@@ -19,6 +20,7 @@ interface ConnectionState {
 }
 
 export default function WalletConnect() {
+  const router = useRouter();
   const [isConnecting, setIsConnecting] = useState(false);
   const [selectedWallet, setSelectedWallet] = useState<WalletOption | null>(null);
   const [connectionState, setConnectionState] = useState<ConnectionState>({
@@ -75,6 +77,26 @@ export default function WalletConnect() {
     }
 
     return getWalletLaunchUrl(wallet, uri);
+  };
+
+  const persistWalletSession = (wallet: WalletOption, account: string | null, chainId: number = 1) => {
+    if (!account) return;
+
+    localStorage.setItem(
+      "genesis_wallet_session",
+      JSON.stringify({
+        wallet: wallet.name,
+        account,
+        chainId,
+        connectedAt: Date.now(),
+      })
+    );
+  };
+
+  const continueToExplorer = (wallet: WalletOption, account: string | null) => {
+    const connectedAccount = account ?? "";
+    const target = `/api-explorer?wallet=${encodeURIComponent(wallet.name)}&account=${encodeURIComponent(connectedAccount)}&chainId=1`;
+    router.push(target);
   };
 
   // Detect mobile on mount
@@ -166,13 +188,20 @@ export default function WalletConnect() {
     try {
       console.log(`Connecting with ${wallet.name}...`);
       const accounts = await provider.connect();
+      const connectedAccount = Array.isArray(accounts) ? accounts[0] : accounts?.[0] ?? null;
       console.log("Connected:", accounts);
+
+      persistWalletSession(wallet, connectedAccount, 1);
 
       setIsConnecting(false);
       setConnectionState((prev) => ({
         ...prev,
         connectionApproved: true,
       }));
+
+      setTimeout(() => {
+        continueToExplorer(wallet, connectedAccount);
+      }, 1100);
     } catch (error) {
       console.error("Connect error:", error);
       const msg = error instanceof Error ? error.message : "Connection failed";
@@ -184,18 +213,18 @@ export default function WalletConnect() {
   return (
     <div className="space-y-12">
       <div className="text-center space-y-4">
-        <h1 className="text-5xl md:text-6xl font-black text-white">🔗 Trust Wallet Onboarding</h1>
+        <h1 className="text-5xl md:text-6xl font-black text-white">🔗 WalletConnect Onboarding</h1>
         <p className="text-xl text-teal-200 max-w-2xl mx-auto">
           {isMobile
-            ? "Start with Trust Wallet, then test real transactions in the API Explorer." 
-            : "Start with Trust Wallet via WalletConnect, then test real transactions in the API Explorer."}
+            ? "Start with Trust Wallet, one of the supported WalletConnect wallets, then test real transactions in the API Explorer." 
+            : "Start with Trust Wallet first, then test real transactions in the API Explorer."}
         </p>
       </div>
 
       <section className="bg-gradient-to-br from-slate-900 to-indigo-950 border-2 border-indigo-500/30 rounded-2xl p-6 max-w-4xl mx-auto space-y-3">
         <h2 className="text-2xl font-bold text-white">What this page does</h2>
         <p className="text-sm text-slate-200">
-          This path starts with Trust Wallet over WalletConnect. It does <strong>not</strong> install the MetaMask Snap. If you use MetaMask, go to the Snap install path instead.
+          This path starts with Trust Wallet over WalletConnect, but it is part of a broader WalletConnect flow for supported wallets. It does <strong>not</strong> install the MetaMask Snap. If you use MetaMask, go to the Snap install path instead.
         </p>
         <div className="flex flex-wrap gap-3">
           <a href="/snap-install" className="px-4 py-2 rounded-lg bg-slate-800 text-slate-100 border border-slate-600 hover:border-teal-400 transition text-sm font-semibold">
@@ -211,8 +240,8 @@ export default function WalletConnect() {
         <div className="space-y-4">
           <h2 className="text-2xl font-bold text-white mb-4">📱 Available Wallets</h2>
           <div className="mb-3 rounded-xl border border-teal-500/30 bg-teal-500/10 p-4 text-sm text-slate-100">
-            <p className="font-semibold text-white">Recommended: Trust Wallet</p>
-            <p>Start with Trust Wallet first. Other supported wallets remain available below for later expansion.</p>
+            <p className="font-semibold text-white">Recommended starting wallet: Trust Wallet</p>
+            <p>Use Trust Wallet first, then choose from the other supported WalletConnect wallets below if you want to expand the path.</p>
           </div>
           <div className="grid grid-cols-2 gap-3 max-h-96 overflow-y-auto pr-2">
             {walletOptions.map((wallet) => (
@@ -304,11 +333,15 @@ export default function WalletConnect() {
                 )}
                 {connectionState.connectionApproved && (
                     <div className="space-y-3">
-                      <p className="text-xs text-teal-200">✅ Connected. Next step: analyze a real transaction in the API Explorer.</p>
+                      <p className="text-xs text-teal-200">✅ Wallet connected. Your next step is to test a real transaction in the API Explorer.</p>
                       <div className="flex flex-col sm:flex-row gap-3">
-                        <a href="/api-explorer" className="flex-1 text-center px-4 py-2 rounded-lg border border-slate-500 text-white font-semibold hover:border-teal-400 transition">
-                          Open API Explorer
-                        </a>
+                        <button
+                          type="button"
+                          onClick={() => continueToExplorer(selectedWallet, localStorage.getItem("genesis_wallet_session") ? JSON.parse(localStorage.getItem("genesis_wallet_session") ?? "{}").account : null)}
+                          className="flex-1 text-center px-4 py-2 rounded-lg bg-teal-600 text-white font-semibold hover:bg-teal-500 transition"
+                        >
+                          Continue to transaction check
+                        </button>
                       </div>
                     </div>
                 )}

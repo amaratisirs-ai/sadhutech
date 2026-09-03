@@ -359,7 +359,7 @@ npm publish @genesis/sdk
 
 ### Product Rollout Sequence
 
-1. **Trust Wallet onboarding via WalletConnect** for the first production mobile flow.
+1. **WalletConnect onboarding, starting with Trust Wallet** as the first production mobile flow.
 2. **MetaMask Snap** for users who want direct in-wallet protection in MetaMask.
 3. **API Explorer / SDK** for developers and partner wallets to test and integrate the firewall.
 
