@@ -20,7 +20,7 @@ export default function SnapInstallPage() {
 
     try {
       if (!window.ethereum) {
-        alert("MetaMask not found. Please install MetaMask first: https://metamask.io");
+        alert("🔧 MetaMask Required\n\nGENESIS runs as a MetaMask Snap. You'll need to install MetaMask first (it's free).\n\n👉 Download MetaMask: https://metamask.io\n\nThen come back here and click \"Install GENESIS Snap\" again!");
         setInstallStep("intro");
         return;
       }
