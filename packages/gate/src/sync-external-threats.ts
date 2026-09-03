@@ -158,6 +158,140 @@ async function fetchScamSnifferThreats(): Promise<ExternalThreat[]> {
 }
 
 /**
+ * Fetch scam addresses from CryptoScamDB (open-source GitHub repository).
+ * Extracts Ethereum addresses from their YAML-based blacklist.
+ * Source: https://github.com/CryptoScamDB/blacklist
+ */
+async function fetchCryptoScamDBThreats(): Promise<ExternalThreat[]> {
+  try {
+    console.log("[sync] Fetching CryptoScamDB from GitHub...");
+
+    // CryptoScamDB stores YAML files with embedded Ethereum addresses
+    // We fetch the main index and parse addresses from each entry
+    const res = await fetch(
+      "https://raw.githubusercontent.com/CryptoScamDB/blacklist/master/data/urls.yaml",
+      { headers: { "User-Agent": "GENESIS-Gate/1.0" } }
+    );
+
+    if (!res.ok) {
+      console.log(`[sync] CryptoScamDB (GitHub) unavailable (${res.status}) (non-fatal)`);
+      return [];
+    }
+
+    const yaml = await res.text();
+    
+    // Simple YAML parser for addresses in format:
+    // - "0xaddress" under "addresses:" → "ETH:" → array of hex strings
+    const addressMatches = yaml.match(/0x[a-f0-9]{40}/gi) || [];
+    
+    // Deduplicate and build threat objects
+    const uniqueAddrs = new Set(addressMatches.map(a => a.toLowerCase()));
+    const threats: ExternalThreat[] = Array.from(uniqueAddrs)
+      .filter((addr) => /^0x[a-f0-9]{40}$/.test(addr as string))
+      .map((address) => ({
+        address: address as string,
+        category: "phishing" as ThreatCategory,
+        source: "cryptoscamdb",
+        title: "CryptoScamDB: Scam/Phishing Address",
+      }));
+
+    console.log(`[sync] ✅ CryptoScamDB loaded ${threats.length} scam addresses`);
+    return threats;
+  } catch (err) {
+    console.log(`[sync] CryptoScamDB fetch error: ${err instanceof Error ? err.message : String(err)} (non-fatal)`);
+    return [];
+  }
+}
+
+/**
+ * Fetch scam reports from Chainabuse (TRM Labs).
+ * Requires free API key from https://chainabuse.com
+ * Environment variable: CHAINABUSE_API_KEY
+ */
+async function fetchChainAbuseThreats(): Promise<ExternalThreat[]> {
+  const apiKey = process.env.CHAINABUSE_API_KEY;
+  
+  if (!apiKey) {
+    console.log("[sync] Chainabuse API key not set (CHAINABUSE_API_KEY env var). Skipping.");
+    return [];
+  }
+
+  try {
+    console.log("[sync] Fetching Chainabuse scam reports...");
+
+    // Chainabuse /reports endpoint returns paginated results
+    // We fetch the first page with high limit to get bulk data
+    const res = await fetch(
+      "https://api.chainabuse.com/v1/reports?limit=5000&offset=0",
+      {
+        headers: {
+          Authorization: `Bearer ${apiKey}`,
+          "User-Agent": "GENESIS-Gate/1.0",
+        },
+      }
+    );
+
+    if (!res.ok) {
+      if (res.status === 401) {
+        console.log("[sync] Chainabuse API key invalid (401) (non-fatal)");
+      } else {
+        console.log(`[sync] Chainabuse API error ${res.status} (non-fatal)`);
+      }
+      return [];
+    }
+
+    interface ChainAbuseReport {
+      addresses?: string[];
+      urls?: string[];
+      category?: string;
+      confirmed?: boolean;
+    }
+
+    const data = (await res.json()) as { reports?: ChainAbuseReport[] };
+    const reports = data.reports || [];
+
+    const threats: ExternalThreat[] = [];
+    const seen = new Set<string>();
+
+    for (const report of reports) {
+      // Extract Ethereum addresses from each report
+      if (report.addresses && Array.isArray(report.addresses)) {
+        for (const addr of report.addresses) {
+          const normalized = (addr || "").toString().toLowerCase().trim();
+          if (normalized && /^0x[a-f0-9]{40}$/.test(normalized) && !seen.has(normalized)) {
+            seen.add(normalized);
+
+            // Map Chainabuse category to GENESIS category
+            let category: ThreatCategory = "phishing";
+            const chainabuseCat = (report.category || "").toLowerCase();
+            if (chainabuseCat.includes("rug")) {
+              category = "drainer";
+            } else if (chainabuseCat.includes("exploit") || chainabuseCat.includes("hack")) {
+              category = "malicious-contract";
+            } else if (chainabuseCat.includes("sextortion") || chainabuseCat.includes("blackmail")) {
+              category = "decoy-tripwire";
+            }
+
+            threats.push({
+              address: normalized,
+              category,
+              source: "chainabuse",
+              title: `Chainabuse: ${report.category || "Scam"} Address`,
+            });
+          }
+        }
+      }
+    }
+
+    console.log(`[sync] ✅ Chainabuse loaded ${threats.length} scam addresses`);
+    return threats;
+  } catch (err) {
+    console.log(`[sync] Chainabuse fetch error: ${err instanceof Error ? err.message : String(err)} (non-fatal)`);
+    return [];
+  }
+}
+
+/**
  * Fetch rug pull database from Rugdoc (free community source).
  * Returns known rug pull token contracts.
  */
@@ -347,6 +481,8 @@ export async function syncExternalThreats(
       { name: "blockaid", fn: fetchBlockaidThreats },
       { name: "curated", fn: loadCuratedThreats },
       { name: "scam-sniffer", fn: fetchScamSnifferThreats },
+      { name: "cryptoscamdb", fn: fetchCryptoScamDBThreats },
+      { name: "chainabuse", fn: fetchChainAbuseThreats },
       { name: "rugdoc", fn: fetchRugdocThreats },
       { name: "slowmist", fn: fetchSlowMistThreats },
     ];
