@@ -56,7 +56,7 @@ GENESIS uses Sybil-resistant quorum voting:
 
 ## Installation
 
-1. Visit [GENESIS Firewall](https://sadhutech-site.vercel.app/snap-install)
+1. Visit [GENESIS Firewall](https://sadhutech.com/snap-install)
 2. Click "Add to MetaMask"
 3. Review permissions (transaction insight + network access)
 4. Sign the Snap installation approval
@@ -124,8 +124,8 @@ A: Only on MetaMask Mobile if it supports Snaps (expanding support in 2026).
 
 ## Links
 
-- 🌐 [Website](https://sadhutech-site.vercel.app)
-- 📖 [Docs](https://sadhutech-site.vercel.app)
+- 🌐 [Website](https://sadhutech.com)
+- 📖 [Docs](https://sadhutech.com)
 - 🐛 [Report Issues](https://github.com/amaratisirs-ai/sadhutech/issues)
 - 🔐 [Security](https://github.com/amaratisirs-ai/sadhutech#security)
 

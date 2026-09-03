@@ -13,7 +13,7 @@ export const SNAP_CONFIG = {
 
   // Direct bundle URL (testing mode)
   bundleUrl: (origin?: string) =>
-    `${origin || "https://sadhutech-site.vercel.app"}/snap-bundle.js`,
+    `${origin || "https://sadhutech.com"}/snap-bundle.js`,
 
   // npm registry snap ID (production mode - after approval)
   registrySnapId: "npm:genesis-snap",

@@ -43,7 +43,8 @@ app.addHook("onRequest", async (req, reply) => {
   const allowedOrigins = [
     "http://localhost:3000",
     "http://localhost:8787",
-    "https://sadhutech-site.vercel.app",
+    "https://sadhutech-site.vercel.app", // Legacy (during transition)
+    "https://sadhutech.com", // Production
     "https://genesis-gate.onrender.com",
   ];
 

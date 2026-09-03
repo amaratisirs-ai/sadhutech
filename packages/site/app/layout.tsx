@@ -11,7 +11,7 @@ export const metadata: Metadata = {
     type: "website",
     title: "GENESIS Firewall — Pre-sign Gate Dashboard",
     description: "Community-powered transaction risk intelligence for crypto wallets. By Bhusoft LLC.",
-    url: "https://sadhutech-site.vercel.app",
+    url: "https://sadhutech.com",
   },
 };
 

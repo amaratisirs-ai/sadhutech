@@ -11,7 +11,7 @@ export default function HelpPage() {
       questions: [
         {
           q: "Where do I install GENESIS Snap?",
-          a: "Visit sadhutech-site.vercel.app/snap-install and click '+ Install GENESIS Snap'. MetaMask will open with installation details.",
+          a: "Visit sadhutech.com/snap-install and click '+ Install GENESIS Snap'. MetaMask will open with installation details.",
         },
         {
           q: "What are the system requirements?",
@@ -135,7 +135,7 @@ export default function HelpPage() {
       questions: [
         {
           q: "I found a false positive (safe address flagged as dangerous)",
-          a: "Thank you! Report it at sadhutech-site.vercel.app/report with: (1) Address, (2) Screenshot, (3) Your reasoning. Community votes to remove it.",
+          a: "Thank you! Report it at sadhutech.com/report with: (1) Address, (2) Screenshot, (3) Your reasoning. Community votes to remove it.",
         },
         {
           q: "I found a false negative (dangerous address not flagged)",

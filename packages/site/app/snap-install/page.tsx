@@ -338,7 +338,7 @@ export default function SnapInstallPage() {
                   <p className="text-xs text-slate-400">Scan with your phone camera</p>
                   <div className="bg-white p-3 rounded-lg">
                     <QRCodeCanvas
-                      value={typeof window !== "undefined" ? window.location.href : "https://sadhutech-site.vercel.app/snap-install"}
+                      value={typeof window !== "undefined" ? window.location.href : "https://sadhutech.com/snap-install"}
                       size={160}
                       level="H"
                       includeMargin={false}
