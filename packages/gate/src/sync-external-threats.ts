@@ -219,72 +219,89 @@ async function fetchChainAbuseThreats(): Promise<ExternalThreat[]> {
   try {
     console.log("[sync] Fetching Chainabuse scam reports...");
 
+    // Chainabuse API v0 uses Basic Auth (apiKey as username, empty password)
+    const basicAuth = Buffer.from(`${apiKey}:`).toString("base64");
+
     // Chainabuse /reports endpoint returns paginated results
-    // We fetch the first page with high limit to get bulk data
-    const res = await fetch(
-      "https://api.chainabuse.com/v1/reports?limit=5000&offset=0",
-      {
-        headers: {
-          Authorization: `Bearer ${apiKey}`,
-          "User-Agent": "GENESIS-Gate/1.0",
-        },
+    // Fetch multiple pages to get bulk data (max 50 per page, so 5 pages = 250 reports)
+    const allThreats: ExternalThreat[] = [];
+    for (let page = 1; page <= 5; page++) {
+      const res = await fetch(
+        `https://api.chainabuse.com/v0/reports?perPage=50&page=${page}&trusted=true`,
+        {
+          headers: {
+            Authorization: `Basic ${basicAuth}`,
+            "User-Agent": "GENESIS-Gate/1.0",
+          },
+        }
+      );
+
+      if (!res.ok) {
+        if (res.status === 401) {
+          console.log("[sync] Chainabuse API key invalid (401) (non-fatal)");
+        } else {
+          console.log(`[sync] Chainabuse API error ${res.status} (non-fatal)`);
+        }
+        break; // Stop pagination on error
       }
-    );
 
-    if (!res.ok) {
-      if (res.status === 401) {
-        console.log("[sync] Chainabuse API key invalid (401) (non-fatal)");
-      } else {
-        console.log(`[sync] Chainabuse API error ${res.status} (non-fatal)`);
+      interface ReportAddress {
+        address?: string;
+        chain?: string;
       }
-      return [];
-    }
 
-    interface ChainAbuseReport {
-      addresses?: string[];
-      urls?: string[];
-      category?: string;
-      confirmed?: boolean;
-    }
+      interface ChainAbuseReport {
+        addresses?: ReportAddress[];
+        scamCategory?: string;
+        trusted?: boolean;
+      }
 
-    const data = (await res.json()) as { reports?: ChainAbuseReport[] };
-    const reports = data.reports || [];
+      const data = (await res.json()) as { reports?: ChainAbuseReport[]; count?: number };
+      const reports = data.reports || [];
+      
+      if (reports.length === 0) break; // No more pages
 
-    const threats: ExternalThreat[] = [];
-    const seen = new Set<string>();
+      const seen = new Set<string>();
 
-    for (const report of reports) {
-      // Extract Ethereum addresses from each report
-      if (report.addresses && Array.isArray(report.addresses)) {
-        for (const addr of report.addresses) {
-          const normalized = (addr || "").toString().toLowerCase().trim();
-          if (normalized && /^0x[a-f0-9]{40}$/.test(normalized) && !seen.has(normalized)) {
-            seen.add(normalized);
+      for (const report of reports) {
+        // Extract addresses from each report
+        if (report.addresses && Array.isArray(report.addresses)) {
+          for (const addrObj of report.addresses) {
+            const addr = addrObj.address || "";
+            const chain = addrObj.chain || "";
+            const normalized = addr.toLowerCase().trim();
+            
+            // Only process Ethereum and EVM-compatible chains
+            if (normalized && /^0x[a-f0-9]{40}$/.test(normalized) && 
+                (chain === "ETH" || chain === "POLYGON" || chain === "ARBITRUM" || chain === "BASE" || chain === "") && 
+                !seen.has(normalized)) {
+              seen.add(normalized);
 
-            // Map Chainabuse category to GENESIS category
-            let category: ThreatCategory = "phishing";
-            const chainabuseCat = (report.category || "").toLowerCase();
-            if (chainabuseCat.includes("rug")) {
-              category = "drainer";
-            } else if (chainabuseCat.includes("exploit") || chainabuseCat.includes("hack")) {
-              category = "malicious-contract";
-            } else if (chainabuseCat.includes("sextortion") || chainabuseCat.includes("blackmail")) {
-              category = "decoy-tripwire";
+              // Map Chainabuse category to GENESIS category
+              let category: ThreatCategory = "phishing";
+              const chainabuseCat = (report.scamCategory || "").toLowerCase();
+              if (chainabuseCat.includes("rug")) {
+                category = "drainer";
+              } else if (chainabuseCat.includes("exploit") || chainabuseCat.includes("hack") || chainabuseCat.includes("contract")) {
+                category = "malicious-contract";
+              } else if (chainabuseCat.includes("sextortion") || chainabuseCat.includes("blackmail")) {
+                category = "decoy-tripwire";
+              }
+
+              allThreats.push({
+                address: normalized,
+                category,
+                source: "chainabuse",
+                title: `Chainabuse: ${report.scamCategory || "Scam"} Address`,
+              });
             }
-
-            threats.push({
-              address: normalized,
-              category,
-              source: "chainabuse",
-              title: `Chainabuse: ${report.category || "Scam"} Address`,
-            });
           }
         }
       }
     }
 
-    console.log(`[sync] ✅ Chainabuse loaded ${threats.length} scam addresses`);
-    return threats;
+    console.log(`[sync] ✅ Chainabuse loaded ${allThreats.length} scam addresses`);
+    return allThreats;
   } catch (err) {
     console.log(`[sync] Chainabuse fetch error: ${err instanceof Error ? err.message : String(err)} (non-fatal)`);
     return [];
