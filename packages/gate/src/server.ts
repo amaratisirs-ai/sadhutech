@@ -397,32 +397,45 @@ app.get("/v1/admin/raw-threats", async (request, reply) => {
     const postgresIntel = intel as any;
     const query = request.query as any;
     const limit = Math.min(Number(query.limit) || 50, 1000);
+    const hoursBack = Math.min(Number(query.hours) || 24 * 7, 24 * 365);
 
-    const result = await postgresIntel.pool.query(
+    // Get all threats regardless of time
+    const allResult = await postgresIntel.pool.query(
+      `SELECT COUNT(*) as total FROM threat_intel`
+    );
+
+    // Get threats matching the time filter used by getRecentThreats
+    const filteredResult = await postgresIntel.pool.query(
+      `SELECT COUNT(*) as total FROM threat_intel WHERE last_seen > NOW() - INTERVAL '1 hour' * $1`,
+      [hoursBack]
+    );
+
+    // Get raw sample of first 10 threats
+    const sampleResult = await postgresIntel.pool.query(
       `SELECT 
         address, 
         category, 
-        reporters, 
+        array_length(reporters, 1) as reporter_count,
         trusted, 
         first_seen, 
-        last_seen, 
-        metadata
+        last_seen
        FROM threat_intel 
        ORDER BY last_seen DESC
-       LIMIT $1`,
-      [limit]
+       LIMIT 10`
     );
 
-    console.log(`[/admin/raw-threats] Raw query returned ${result.rows.length} rows`);
+    console.log(`[/admin/raw-threats] All: ${allResult.rows[0].total}, Filtered (${hoursBack}h): ${filteredResult.rows[0].total}`);
 
     return {
-      count: result.rows.length,
-      threats: result.rows.map((row) => ({
-        address: row.address,
-        category: row.category,
-        trusted: row.trusted,
-        reporters_count: (row.reporters || []).length,
-        last_seen: row.last_seen,
+      all_threats: allResult.rows[0].total,
+      filtered_threats: filteredResult.rows[0].total,
+      hours_back: hoursBack,
+      sample: sampleResult.rows.map((r) => ({
+        address: r.address.slice(0, 10) + "...",
+        category: r.category,
+        reporter_count: r.reporter_count,
+        trusted: r.trusted,
+        last_seen: r.last_seen,
       })),
     };
   } catch (err) {
