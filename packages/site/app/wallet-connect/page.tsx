@@ -88,7 +88,7 @@ export default function WalletConnect() {
           metadata: {
             name: "GENESIS Firewall",
             description: "Community-powered transaction security firewall",
-            url: "https://sadhutech.com",
+            url: typeof window !== "undefined" ? window.location.origin : "https://sadhutech.com",
             icons: ["https://sadhutech.com/images/genesis-icon.png"],
           },
         });
@@ -108,13 +108,7 @@ export default function WalletConnect() {
         ethereumProvider.on("display_uri", (uri: string) => {
           console.log("📱 QR URI:", uri);
           setConnectionState((prev) => ({ ...prev, uri }));
-          
-          // On mobile, automatically try to open wallet deep link
-          if (isMobile && uri) {
-            setTimeout(() => {
-              window.location.href = uri;
-            }, 500);
-          }
+          // On mobile, don't auto-open - let user tap button to control which wallet opens
         });
 
         setConnectionState((prev) => ({ ...prev, isInitialized: true }));
@@ -313,7 +307,7 @@ export default function WalletConnect() {
             <div className="space-y-4">
               <div className="bg-slate-800/50 border border-slate-600 rounded-lg p-4 space-y-3">
                 <p className="text-sm text-slate-200">
-                  Your {selectedWallet.name} app should open automatically. If it doesn't, tap the button below.
+                  Tap the button below to open {selectedWallet.name} and approve the connection.
                 </p>
                 <button
                   onClick={() => {
