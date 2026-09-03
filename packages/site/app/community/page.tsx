@@ -20,6 +20,7 @@ export default function CommunityPage() {
   const [offset, setOffset] = useState(0);
   const [hasMore, setHasMore] = useState(true);
   const [totalCount, setTotalCount] = useState(0);
+  const [sortBy, setSortBy] = useState<"score" | "reports" | "verified" | "latest">("score");
 
   const ITEMS_PER_PAGE = 20;
 
@@ -146,8 +147,31 @@ export default function CommunityPage() {
 
           {/* Leaderboard Table */}
           <div className="bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-lg overflow-hidden">
-            <div className="p-6 border-b border-slate-200 dark:border-slate-700">
+            <div className="p-6 border-b border-slate-200 dark:border-slate-700 space-y-4">
               <h2 className="font-semibold text-slate-900 dark:text-white">Top Contributors This Month</h2>
+              
+              {/* Sort Controls */}
+              <div className="flex flex-wrap gap-2">
+                <span className="text-sm font-medium text-slate-600 dark:text-slate-400 py-2">Sort by:</span>
+                {[
+                  { id: "score", label: "📊 Top Score" },
+                  { id: "reports", label: "📝 Most Reports" },
+                  { id: "verified", label: "✓ Most Verified" },
+                  { id: "latest", label: "⏱️ Latest Join" },
+                ].map((sort) => (
+                  <button
+                    key={sort.id}
+                    onClick={() => setSortBy(sort.id as typeof sortBy)}
+                    className={`px-3 py-1.5 rounded text-sm font-medium transition-colors ${
+                      sortBy === sort.id
+                        ? "bg-emerald-600 text-white"
+                        : "bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700"
+                    }`}
+                  >
+                    {sort.label}
+                  </button>
+                ))}
+              </div>
             </div>
 
             <div className="overflow-x-auto">
@@ -163,7 +187,15 @@ export default function CommunityPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-200 dark:divide-slate-700">
-                  {contributors.map((c, i) => (
+                  {contributors
+                    .sort((a, b) => {
+                      if (sortBy === "score") return b.score - a.score;
+                      if (sortBy === "reports") return b.reports - a.reports;
+                      if (sortBy === "verified") return b.verified - a.verified;
+                      if (sortBy === "latest") return new Date(b.joinedAt).getTime() - new Date(a.joinedAt).getTime();
+                      return 0;
+                    })
+                    .map((c, i) => (
                     <tr key={i} className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-2">
