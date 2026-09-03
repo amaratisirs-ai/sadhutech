@@ -190,6 +190,7 @@ app.get("/v1/threats/latest", async (request, reply) => {
     }
 
     const threats = await (intel as any).getRecentThreats(limit, hours);
+    console.log(`[/v1/threats/latest] Query params - limit=${limit}, hours=${hours}. Returned ${threats.length} threats`);
 
     // Group by category for stats
     const stats = {

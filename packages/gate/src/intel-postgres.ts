@@ -158,6 +158,7 @@ export class ThreatIntelPostgres {
   > {
     await this.initialize();
     try {
+      console.log(`[getRecentThreats] Querying with limit=${limit}, hoursBack=${hoursBack}`);
       const result = await this.pool.query(
         `SELECT 
           address, 
@@ -174,7 +175,9 @@ export class ThreatIntelPostgres {
         [hoursBack, Math.min(limit, 1000)]
       );
 
-      return result.rows.map((row) => {
+      console.log(`[getRecentThreats] Raw query returned ${result.rows.length} rows`);
+
+      const mapped = result.rows.map((row) => {
         const distinctReporters = [...new Set(row.reporters)] as string[];
         return {
           address: row.address as Address,
@@ -187,6 +190,9 @@ export class ThreatIntelPostgres {
           metadata: row.metadata,
         };
       });
+
+      console.log(`[getRecentThreats] After mapping: ${mapped.length} threats`);
+      return mapped;
     } catch (err) {
       console.error(`[threat-intel-postgres] getRecentThreats failed:`, err);
       return [];
