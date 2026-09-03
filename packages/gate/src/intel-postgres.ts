@@ -159,6 +159,13 @@ export class ThreatIntelPostgres {
     await this.initialize();
     try {
       console.log(`[getRecentThreats] Querying with limit=${limit}, hoursBack=${hoursBack}`);
+      
+      // DEBUG: Test query without time filter
+      const allResult = await this.pool.query(
+        `SELECT COUNT(*) as total FROM threat_intel`
+      );
+      console.log(`[getRecentThreats] DEBUG: Total records in DB = ${allResult.rows[0].total}`);
+
       const result = await this.pool.query(
         `SELECT 
           address, 
@@ -175,7 +182,7 @@ export class ThreatIntelPostgres {
         [hoursBack, limit]  // Removed Math.min cap - allow full dataset
       );
 
-      console.log(`[getRecentThreats] Raw query returned ${result.rows.length} rows`);
+      console.log(`[getRecentThreats] Raw query returned ${result.rows.length} rows (hoursBack=${hoursBack})`);
 
       const mapped = result.rows.map((row) => {
         const distinctReporters = [...new Set(row.reporters)] as string[];
