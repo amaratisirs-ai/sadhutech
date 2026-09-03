@@ -172,7 +172,7 @@ export class ThreatIntelPostgres {
          WHERE last_seen > NOW() - INTERVAL '1 hour' * $1
          ORDER BY last_seen DESC, array_length(reporters, 1) DESC
          LIMIT $2`,
-        [hoursBack, Math.min(limit, 1000)]
+        [hoursBack, limit]  // Removed Math.min cap - allow full dataset
       );
 
       console.log(`[getRecentThreats] Raw query returned ${result.rows.length} rows`);
