@@ -491,22 +491,6 @@ export default function SnapInstallPage() {
           </div>
         </div>
       </div>
-              <div className="flex gap-3 text-xs">
-                <div className="flex-shrink-0 w-6 h-6 rounded-full bg-orange-500 text-slate-900 font-bold flex items-center justify-center text-xs">
-                  5
-                </div>
-                <div className="text-orange-100">
-                  Refresh & tap <strong>'Install GENESIS Snap'</strong>
-                </div>
-              </div>
-            </div>
-
-            <div className="mt-3 p-3 bg-slate-800/50 rounded text-xs text-orange-200 border border-orange-500/30">
-              <strong>💡 Tip:</strong> After opening in MetaMask Browser, the install button will work because MetaMask injects ethereum object.
-            </div>
-          </div>
-        </div>
-      </div>
 
       {/* Install Button - Shows when in MetaMask app */}
       {hasMetaMask && (
