@@ -178,7 +178,8 @@ app.get("/v1/threats/latest", async (request, reply) => {
   try {
     // Parse optional query parameters
     const query = request.query as any;
-    const limit = Math.min(Number(query.limit) || 50, 500);
+    // Increased from 500 to 10000 to return full dataset
+    const limit = Math.min(Number(query.limit) || 50, 10000);
     const hours = Math.min(Number(query.hours) || 24 * 7, 24 * 365); // Default: 7 days, max: 1 year
 
     // Only PostgreSQL supports getRecentThreats
@@ -190,7 +191,7 @@ app.get("/v1/threats/latest", async (request, reply) => {
     }
 
     const threats = await (intel as any).getRecentThreats(limit, hours);
-    console.log(`[/v1/threats/latest] Query params - limit=${limit}, hours=${hours}. Returned ${threats.length} threats`);
+    console.log(`[/v1/threats/latest] Query params - limit=${limit}, hours=${hours}. Returned ${threats.length} threats from DB`);
 
     // Group by category for stats
     const stats = {
