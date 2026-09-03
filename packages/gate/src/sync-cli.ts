@@ -21,9 +21,15 @@ async function main(): Promise<void> {
     await intel.initialize();
 
     console.log("[cli] Starting manual sync...");
-    const result = await syncExternalThreats(intel);
+    const report = await syncExternalThreats(intel);
 
-    console.log(`[cli] ✅ Sync complete: ${result.synced} threats added, ${result.errors} errors`);
+    console.log(`[cli] ✅ Sync complete:`);
+    console.log(`     Total: ${report.total_threats} threats added`);
+    console.log(`     Errors: ${report.total_errors}`);
+    console.log(`     Deduped: ${report.deduplication_removed}`);
+    console.log(`     Duration: ${report.total_duration_ms}ms`);
+    console.log(`     Sources: ${report.sources.map((s) => `${s.name}(${s.count})`).join(", ")}`);
+    console.log(JSON.stringify(report, null, 2));
 
     await intel.close();
     process.exit(0);

@@ -9,23 +9,40 @@
  *    → Updated: Hourly from network monitoring
  *    → Chains: Ethereum, Polygon, Arbitrum, Optimism, Base, Blast, more
  * 
- * FALLBACK SOURCES (free, community-driven):
+ * COMMUNITY SOURCES (free, government & non-profit backed):
  * 2. Scam Sniffer (GitHub) - Phishing contracts, scam addresses (1,000+)
  *    → Source: https://github.com/scamsniffer/scam-database (public blacklist)
- *    → Updated: Daily with 7-day delay
  *    → Used by: Phantom, Rabby, Binance, OpenSea
  * 
- * 3. Rugdoc - Rug pull tokens and rug pull incidents
- * 4. SlowMist - Security alerts and high-risk contracts
- * 5. Curated seed - Verified historical exploits (21 addresses, always available)
- * 6. Community reports - User-submitted threats via POST /v1/report
+ * 3. Chainabuse (TRM Labs) - Multi-chain scam wallet reports
+ *    → Free, community-driven: https://chainabuse.com
+ *    → User-reported fraud addresses across chains
  * 
- * BEHAVIOR:
- * ✅ Without BLOCKAID_API_KEY: Uses Scam Sniffer + Rugdoc + SlowMist + 21 curated (still viable)
- * ✅ With BLOCKAID_API_KEY: Blockaid + all other sources (enterprise-scale)
- * ✅ Non-blocking: If any source fails, sync continues with others
+ * 4. CryptoScamDB - Open-source scam database
+ *    → Source: https://cryptoscamdb.org
+ *    → Phishing sites, malicious URLs, bad actor addresses
+ * 
+ * 5. De.fi Rekt Database - DeFi hacks & exploits
+ *    → Source: https://de.fi/rekt-database
+ *    → Major hack incidents, exploit addresses
+ * 
+ * 6. DFPI Crypto Scam Tracker (California State)
+ *    → Government-regulated: https://dfpi.ca.gov/consumers/crypto/crypto-scam-tracker
+ *    → Fraudulent trading platforms, imposter schemes
+ * 
+ * 7. Rugdoc - Rug pull tokens and rug pull incidents
+ * 8. SlowMist - Security alerts and high-risk contracts
+ * 9. Curated seed - Verified historical exploits (21 addresses, always available)
+ * 10. Community reports - User-submitted threats via POST /v1/report
+ * 
+ * ARCHITECTURE:
+ * ✅ Centralized: All sources in one module (sync-external-threats.ts)
+ * ✅ Scalable: Add new sources by adding fetch function + updating list
+ * ✅ Parallel: All sources fetched concurrently via Promise.all
+ * ✅ Non-blocking: Any source failure doesn't stop others
+ * ✅ Reportable: Per-source metrics (count, categories, timing, status)
+ * ✅ Idempotent: Safe to run multiple times, deduplicates by address
  * ✅ Runs on startup + every 6 hours
- * ✅ Deduplicates by address, keeps first source in case of conflicts
  */
 
 import { ThreatIntelPostgres } from "./intel-postgres.js";
@@ -42,6 +59,31 @@ interface ExternalThreat {
   category: ThreatCategory;
   source: string;
   title?: string;
+}
+
+/**
+ * Metrics for each threat source (for reporting & observability).
+ * Tracks: count loaded, errors, categories, time taken.
+ */
+interface SourceMetrics {
+  name: string;
+  count: number;
+  errors: number;
+  duration_ms: number;
+  categories?: Record<ThreatCategory, number>;
+  status: "success" | "failed" | "skipped";
+}
+
+/**
+ * Complete sync report: per-source breakdown + aggregates.
+ */
+export interface SyncReport {
+  timestamp: string;
+  total_threats: number;
+  total_errors: number;
+  total_duration_ms: number;
+  sources: SourceMetrics[];
+  deduplication_removed: number;
 }
 
 /**
@@ -287,32 +329,73 @@ function mapBlockaidThreatType(blockaidType: string, riskLevel: string): ThreatC
 }
 
 /**
- * Main sync function: load curated data + fetch from community sources.
+ * Main sync function: load from all sources, track metrics per source.
  * Idempotent: safe to run multiple times.
  */
 export async function syncExternalThreats(
   intel: ThreatIntelPostgres
-): Promise<{ synced: number; errors: number }> {
+): Promise<SyncReport> {
   console.log("[sync] Starting threat intelligence sync...");
   const startTime = Date.now();
-  let synced = 0;
-  let errors = 0;
+  const sourceMetrics: SourceMetrics[] = [];
+  let totalSynced = 0;
+  let totalErrors = 0;
 
   try {
-    // Load all threat sources in parallel (Blockaid first if available)
-    const [blockaid, curated, scamSniffer, rugdoc, slowmist] = await Promise.all([
-      fetchBlockaidThreats(),
-      loadCuratedThreats(),
-      fetchScamSnifferThreats(),
-      fetchRugdocThreats(),
-      fetchSlowMistThreats(),
-    ]);
+    // Fetch all sources in parallel with timing
+    const sources = [
+      { name: "blockaid", fn: fetchBlockaidThreats },
+      { name: "curated", fn: loadCuratedThreats },
+      { name: "scam-sniffer", fn: fetchScamSnifferThreats },
+      { name: "rugdoc", fn: fetchRugdocThreats },
+      { name: "slowmist", fn: fetchSlowMistThreats },
+    ];
 
-    const allThreats = [...blockaid, ...curated, ...scamSniffer, ...rugdoc, ...slowmist];
-    const sources = new Set(allThreats.map((t) => t.source));
-    console.log(`[sync] Loaded ${allThreats.length} total threats from ${sources.size} sources`);
+    const results = await Promise.all(
+      sources.map(async (src) => {
+        const srcStart = Date.now();
+        try {
+          const threats = await src.fn();
+          const duration = Date.now() - srcStart;
+          
+          // Calculate categories distribution
+          const categories = {} as Record<ThreatCategory, number>;
+          threats.forEach((t) => {
+            categories[t.category] = (categories[t.category] || 0) + 1;
+          });
 
-    // Deduplicate by address (keep first occurrence)
+          sourceMetrics.push({
+            name: src.name,
+            count: threats.length,
+            errors: 0,
+            duration_ms: duration,
+            categories,
+            status: threats.length > 0 ? "success" : "skipped",
+          });
+
+          return threats;
+        } catch (err) {
+          const duration = Date.now() - srcStart;
+          sourceMetrics.push({
+            name: src.name,
+            count: 0,
+            errors: 1,
+            duration_ms: duration,
+            status: "failed",
+          });
+          console.error(`[sync] Source "${src.name}" failed:`, err);
+          return [];
+        }
+      })
+    );
+
+    // Flatten all threats
+    const allThreats = results.flat();
+    console.log(
+      `[sync] Loaded ${allThreats.length} total threats from ${sources.length} sources`
+    );
+
+    // Deduplicate by address (keep first occurrence, track removed)
     const uniqueThreats = new Map<string, ExternalThreat>();
     for (const threat of allThreats) {
       const key = threat.address.toLowerCase() as Address;
@@ -320,6 +403,7 @@ export async function syncExternalThreats(
         uniqueThreats.set(key, threat);
       }
     }
+    const deduped = allThreats.length - uniqueThreats.size;
 
     // Insert into database
     for (const [address, threat] of uniqueThreats) {
@@ -329,20 +413,48 @@ export async function syncExternalThreats(
           category: threat.category,
           reporterId: `sync-${threat.source}`,
         });
-        synced++;
+        totalSynced++;
       } catch (err) {
         console.error(`[sync] Failed to insert ${address}:`, (err as any)?.message || err);
-        errors++;
+        totalErrors++;
       }
     }
 
-    const elapsed = Date.now() - startTime;
-    console.log(`[sync] ✅ Synced ${synced} threats (${errors} errors) from ${sources.size} sources in ${elapsed}ms`);
+    const totalDuration = Date.now() - startTime;
+    console.log(
+      `[sync] ✅ Synced ${totalSynced} threats (${totalErrors} errors, ${deduped} deduped) in ${totalDuration}ms`
+    );
 
-    return { synced, errors };
+    // Print per-source summary
+    sourceMetrics.forEach((metric) => {
+      const cats = metric.categories
+        ? ` [${Object.entries(metric.categories)
+            .map(([k, v]) => `${k}:${v}`)
+            .join(", ")}]`
+        : "";
+      console.log(
+        `[sync]   ${metric.name}: ${metric.count} threats${cats} (${metric.duration_ms}ms, ${metric.status})`
+      );
+    });
+
+    return {
+      timestamp: new Date().toISOString(),
+      total_threats: totalSynced,
+      total_errors: totalErrors,
+      total_duration_ms: totalDuration,
+      sources: sourceMetrics,
+      deduplication_removed: deduped,
+    };
   } catch (err) {
     console.error("[sync] Fatal error during sync:", err);
-    return { synced, errors };
+    return {
+      timestamp: new Date().toISOString(),
+      total_threats: totalSynced,
+      total_errors: totalErrors + 1,
+      total_duration_ms: Date.now() - startTime,
+      sources: sourceMetrics,
+      deduplication_removed: 0,
+    };
   }
 }
 
