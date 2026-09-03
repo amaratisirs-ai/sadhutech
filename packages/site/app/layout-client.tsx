@@ -41,10 +41,10 @@ export function LayoutClient({ children }: { children: ReactNode }) {
                 Live
               </div>
               <a
-                href="/snap-install"
+                href="/add-to-wallet"
                 className="hidden sm:inline px-3 py-1.5 text-xs font-bold text-slate-950 bg-teal-400 hover:bg-teal-300 rounded-lg transition-all hover:shadow-lg hover:shadow-teal-500/50"
               >
-                + Add to MetaMask
+                + Get Started
               </a>
               <a
                 href="https://github.com/amaratisirs-ai/sadhutech"
@@ -93,7 +93,7 @@ export function LayoutClient({ children }: { children: ReactNode }) {
                   className="block w-full px-4 py-2.5 text-sm font-bold text-slate-950 bg-teal-400 hover:bg-teal-300 rounded-lg transition-all text-center mt-4"
                   onClick={() => setMobileMenuOpen(false)}
                 >
-                  + Install Snap
+                  + Get Started
                 </a>
               </div>
             </div>
@@ -124,7 +124,7 @@ export function LayoutClient({ children }: { children: ReactNode }) {
             <div>
               <h4 className="font-bold text-white mb-4">Product</h4>
               <ul className="space-y-2 text-sm text-teal-300">
-                <li><a href="/add-to-wallet" className="hover:text-white transition">Add to Wallet</a></li>
+                <li><a href="/add-to-wallet" className="hover:text-white transition">Get Started</a></li>
                 <li><a href="/after-install" className="hover:text-white transition">Getting Started</a></li>
                 <li><a href="/threats" className="hover:text-white transition">Threats Hub</a></li>
               </ul>

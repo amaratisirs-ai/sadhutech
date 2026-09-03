@@ -8,45 +8,47 @@ export default function AddToWallet() {
   const wallets = [
     {
       id: "metamask",
-      name: "MetaMask",
-      description: "Browser extension (Chrome, Firefox, Safari, Brave)",
+      name: "MetaMask Snap",
+      description: "Install GENESIS inside MetaMask on desktop so verdicts appear before signing.",
       icon: "🦊",
-      badge: "Most Popular",
+      badge: "MetaMask only",
       status: "ready",
       action: () => router.push("/snap-install"),
       details: [
-        "Desktop browsers only",
-        "Browser extension required",
-        "Instant installation",
-        "Auto-protection on every transaction",
-      ],
-    },
-    {
-      id: "coinbase",
-      name: "Coinbase Wallet",
-      description: "Browser extension & mobile app",
-      icon: "◇",
-      badge: "Coming Soon",
-      status: "coming",
-      details: [
-        "Desktop & mobile support",
-        "Native dapp browser",
-        "Enhanced security",
+        "Best for desktop MetaMask users",
+        "Shows verdicts inside the wallet",
+        "No wallet switching required",
+        "Fastest way to get protected",
       ],
     },
     {
       id: "wallet-connect",
-      name: "WalletConnect Compatible",
-      description: "Trust Wallet, Argent, Rainbow, and 50+ others",
+      name: "WalletConnect Wallets",
+      description: "Trust Wallet, Argent, Rainbow, and 50+ supported wallets.",
       icon: "🔗",
-      badge: "Ready",
+      badge: "Supported",
       status: "ready",
       action: () => router.push("/wallet-connect"),
       details: [
-        "50+ supported wallets",
-        "Mobile-first experience",
-        "Scan QR code to connect",
-        "All EVM chains supported",
+        "Mobile-friendly flow",
+        "Connect supported wallets directly",
+        "Use the demo or API Explorer next",
+        "No MetaMask required",
+      ],
+    },
+    {
+      id: "demo",
+      name: "Try the Demo First",
+      description: "See ALLOW, WARN, and BLOCK before you connect anything.",
+      icon: "🧪",
+      badge: "No install",
+      status: "ready",
+      action: () => router.push("/demo"),
+      details: [
+        "Great for first-time users",
+        "No wallet connection needed",
+        "See a live transaction analysis",
+        "Understand the product before onboarding",
       ],
     },
   ];
@@ -55,11 +57,29 @@ export default function AddToWallet() {
     <div className="space-y-12">
       {/* Header */}
       <div className="text-center space-y-4">
-        <h1 className="text-5xl md:text-6xl font-black text-white">🛡️ Add GENESIS to Your Wallet</h1>
+        <h1 className="text-5xl md:text-6xl font-black text-white">🛡️ Choose Your GENESIS Onboarding Path</h1>
         <p className="text-xl text-teal-200 max-w-2xl mx-auto">
-          Select your wallet to get transaction security. Real-time threat detection, one-click installation.
+          Pick the path that matches your wallet: MetaMask Snap, WalletConnect wallets, or demo-first if you want to learn before installing.
         </p>
       </div>
+
+      <section className="bg-gradient-to-br from-indigo-900/30 to-slate-900 border-2 border-indigo-500/40 rounded-2xl p-6 max-w-4xl mx-auto space-y-3">
+        <h2 className="text-2xl font-bold text-white">Start here</h2>
+        <div className="grid md:grid-cols-3 gap-4 text-sm text-slate-200">
+          <div className="rounded-xl border border-slate-700 bg-slate-950/40 p-4 space-y-2">
+            <p className="font-bold text-white">1. MetaMask Snap</p>
+            <p>Use this if you sign in MetaMask and want GENESIS inside the wallet.</p>
+          </div>
+          <div className="rounded-xl border border-slate-700 bg-slate-950/40 p-4 space-y-2">
+            <p className="font-bold text-white">2. WalletConnect</p>
+            <p>Use this for Trust Wallet, Rainbow, Argent, and other supported wallets.</p>
+          </div>
+          <div className="rounded-xl border border-slate-700 bg-slate-950/40 p-4 space-y-2">
+            <p className="font-bold text-white">3. Demo first</p>
+            <p>Try a sample analysis if you want to see how verdicts look before connecting anything.</p>
+          </div>
+        </div>
+      </section>
 
       {/* Wallet Cards */}
       <div className="grid md:grid-cols-3 gap-6 max-w-6xl mx-auto w-full">
@@ -126,7 +146,7 @@ export default function AddToWallet() {
 
       {/* Info Section */}
       <section className="bg-gradient-to-br from-slate-900 to-slate-950 border-2 border-slate-700 rounded-2xl p-8 max-w-3xl mx-auto w-full space-y-4">
-        <h2 className="text-2xl font-bold text-white">Why add GENESIS?</h2>
+        <h2 className="text-2xl font-bold text-white">What you get after onboarding</h2>
         <div className="grid md:grid-cols-2 gap-4">
           <div className="flex gap-3">
             <span className="text-2xl text-teal-400">⚡</span>
@@ -158,17 +178,6 @@ export default function AddToWallet() {
           </div>
         </div>
       </section>
-
-      {/* Alternative: Just Test */}
-      <div className="text-center space-y-4">
-        <p className="text-slate-400">Want to test first without installing?</p>
-        <a
-          href="/post"
-          className="inline-block px-6 py-2 bg-slate-800 hover:bg-slate-700 text-slate-100 rounded-lg font-semibold transition border border-slate-700"
-        >
-          Try the Demo →
-        </a>
-      </div>
     </div>
   );
 }

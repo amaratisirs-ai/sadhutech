@@ -111,7 +111,7 @@ export default function Home() {
                   href="/add-to-wallet"
                   className="px-8 py-4 bg-gradient-to-r from-teal-500 to-teal-400 text-slate-950 rounded-lg font-bold hover:shadow-xl transition-all hover:shadow-teal-500/50 text-lg"
                 >
-                  🔐 Add to Your Wallet
+                  🔐 Choose Your Path
                 </a>
                 <a
                   href="/demo"

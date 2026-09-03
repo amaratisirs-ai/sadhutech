@@ -178,11 +178,29 @@ export default function WalletConnect() {
       <div className="text-center space-y-4">
         <h1 className="text-5xl md:text-6xl font-black text-white">🔗 Connect Your Wallet</h1>
         <p className="text-xl text-teal-200 max-w-2xl mx-auto">
-          {isMobile 
-            ? "Tap your wallet to connect instantly" 
-            : "Choose from 50+ wallets. Scan QR code or add wallet."}
+          {isMobile
+            ? "Use Trust Wallet, Argent, Rainbow, and other supported wallets." 
+            : "Connect a supported wallet, then analyze transactions in the demo or API Explorer."}
         </p>
       </div>
+
+      <section className="bg-gradient-to-br from-slate-900 to-indigo-950 border-2 border-indigo-500/30 rounded-2xl p-6 max-w-4xl mx-auto space-y-3">
+        <h2 className="text-2xl font-bold text-white">What this page does</h2>
+        <p className="text-sm text-slate-200">
+          This path connects WalletConnect-supported wallets. It does <strong>not</strong> install the MetaMask Snap. If you use MetaMask, go to the Snap install path instead.
+        </p>
+        <div className="flex flex-wrap gap-3">
+          <a href="/snap-install" className="px-4 py-2 rounded-lg bg-slate-800 text-slate-100 border border-slate-600 hover:border-teal-400 transition text-sm font-semibold">
+            MetaMask Snap →
+          </a>
+          <a href="/demo" className="px-4 py-2 rounded-lg bg-teal-500 text-slate-950 hover:bg-teal-400 transition text-sm font-semibold">
+            Try the Demo →
+          </a>
+          <a href="/api-explorer" className="px-4 py-2 rounded-lg bg-slate-800 text-slate-100 border border-slate-600 hover:border-teal-400 transition text-sm font-semibold">
+            API Explorer →
+          </a>
+        </div>
+      </section>
 
       <div className={`grid ${isMobile ? "grid-cols-1" : "md:grid-cols-2"} gap-8 max-w-5xl mx-auto`}>
         <div className="space-y-4">
@@ -209,16 +227,16 @@ export default function WalletConnect() {
               {isMobile ? (
                 <>
                   <li>1. Tap your wallet above</li>
-                  <li>2. App opens automatically</li>
+                  <li>2. Tap the open button to launch the wallet</li>
                   <li>3. Approve connection in wallet</li>
-                  <li>4. GENESIS installs automatically</li>
+                  <li>4. Use the demo or API Explorer next</li>
                 </>
               ) : (
                 <>
                   <li>1. Tap a wallet or scan QR</li>
                   <li>2. {selectedWallet ? "Scan QR with your phone" : "Select a wallet to see options"}</li>
                   <li>3. Approve connection in wallet</li>
-                  <li>4. GENESIS installs automatically</li>
+                  <li>4. Use the demo or API Explorer next</li>
                 </>
               )}
             </ol>
@@ -269,14 +287,24 @@ export default function WalletConnect() {
                   <div className="text-3xl">{selectedWallet.icon}</div>
                   <div>
                     <p className="font-bold text-white">{selectedWallet.name}</p>
-                    <p className="text-xs text-teal-300">{selectedWallet.chain} • WalletConnect</p>
+                    <p className="text-xs text-teal-300">{selectedWallet.chain} • Connected via WalletConnect</p>
                   </div>
                 </div>
                 {isConnecting && !connectionState.connectionApproved && (
                   <p className="text-xs text-teal-200">Waiting for wallet approval... Check your {selectedWallet.name} mobile app.</p>
                 )}
                 {connectionState.connectionApproved && (
-                  <p className="text-xs text-teal-200">✅ Connected! GENESIS is ready to analyze transactions for this wallet.</p>
+                    <div className="space-y-3">
+                      <p className="text-xs text-teal-200">✅ Connected. Next step: analyze a transaction in the demo or API Explorer.</p>
+                      <div className="flex flex-col sm:flex-row gap-3">
+                        <a href="/demo" className="flex-1 text-center px-4 py-2 rounded-lg bg-teal-500 text-slate-950 font-bold hover:bg-teal-400 transition">
+                          Open Demo
+                        </a>
+                        <a href="/api-explorer" className="flex-1 text-center px-4 py-2 rounded-lg border border-slate-500 text-white font-semibold hover:border-teal-400 transition">
+                          Open API Explorer
+                        </a>
+                      </div>
+                    </div>
                 )}
               </div>
               <button
@@ -323,7 +351,7 @@ export default function WalletConnect() {
           ) : connectionState.connectionApproved ? (
             <div className="bg-green-900/40 border border-green-500/50 rounded-lg p-4 text-center space-y-2">
               <p className="text-green-200 font-semibold">✅ Connection Approved!</p>
-              <p className="text-xs text-green-300">Installing GENESIS snap...</p>
+              <p className="text-xs text-green-300">Wallet connected. Try the demo or API Explorer next.</p>
             </div>
           ) : (
             <div className="space-y-4">
@@ -341,9 +369,7 @@ export default function WalletConnect() {
                   }}
                   className="w-full py-3 bg-teal-600 hover:bg-teal-700 text-white rounded-lg font-semibold transition"
                 >
-                  {supportsWalletDeepLink(selectedWallet)
-                    ? `Open in ${selectedWallet.name}`
-                    : `Open ${selectedWallet.name}`}
+                  {supportsWalletDeepLink(selectedWallet) ? `Open in ${selectedWallet.name}` : `Open ${selectedWallet.name}`}
                 </button>
               </div>
               <button

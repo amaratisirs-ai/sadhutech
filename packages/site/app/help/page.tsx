@@ -11,11 +11,15 @@ export default function HelpPage() {
       questions: [
         {
           q: "Where do I install GENESIS Snap?",
-          a: "Visit sadhutech.com/add-to-wallet and select your wallet. Choose MetaMask, Coinbase Wallet, or other supported options for one-click installation.",
+          a: "If you use MetaMask, go to /snap-install. If you use Trust Wallet, Rainbow, Argent, or another supported wallet, go to /wallet-connect. If you want to learn first, try /demo.",
+        },
+        {
+          q: "Which onboarding path should I use?",
+          a: "MetaMask users should install the Snap. WalletConnect users should connect their supported wallet. New users should try the demo first to see how verdicts look.",
         },
         {
           q: "What are the system requirements?",
-          a: "You need MetaMask v11.0+ and any EVM-compatible wallet. Works on Chrome, Firefox, and Brave browsers.",
+          a: "For the MetaMask Snap, you need MetaMask on a desktop browser. For WalletConnect, you need a supported wallet such as Trust Wallet, Rainbow, or Argent on a compatible device.",
         },
         {
           q: "Is GENESIS Snap free?",
@@ -60,7 +64,7 @@ export default function HelpPage() {
         },
         {
           q: "Does GENESIS work on all blockchains?",
-          a: "Yes! GENESIS works on any EVM-compatible chain: Ethereum, Polygon, Arbitrum, Optimism, Base, Avalanche, etc. Plus non-EVM via its API.",
+          a: "Yes! GENESIS supports EVM chains in the Snap and WalletConnect flows, and the API/demo can analyze transactions directly as well.",
         },
         {
           q: "Can I disable GENESIS for certain transactions?",

@@ -89,9 +89,9 @@ export default function SnapInstallPage() {
       <div className="space-y-12">
         {/* Header */}
         <div className="text-center space-y-4">
-          <h1 className="text-5xl font-black text-white">🔐 Get GENESIS Protection</h1>
+          <h1 className="text-5xl font-black text-white">🔐 Get GENESIS Protection in MetaMask</h1>
           <p className="text-lg text-teal-200 max-w-2xl mx-auto">
-            Install the MetaMask Snap to instantly check every transaction against our threat intelligence network before you sign.
+            This path installs the MetaMask Snap. If you use Trust Wallet, Rainbow, Argent, or another WalletConnect wallet, use the WalletConnect path instead.
           </p>
           <div className="mt-4 p-3 bg-blue-900/40 border border-blue-500/40 rounded-lg max-w-2xl mx-auto">
             <p className="text-xs text-blue-200">
@@ -155,6 +155,11 @@ export default function SnapInstallPage() {
                   <div className="text-6xl">🦊</div>
                   <h3 className="text-xl font-bold text-white">Ready to Install</h3>
                   <p className="text-sm text-teal-300">MetaMask detected ✓</p>
+                </div>
+
+                <div className="bg-slate-900/50 rounded-lg p-4 text-sm text-slate-200 border border-slate-700">
+                  <p className="font-semibold text-white mb-1">This is the MetaMask path.</p>
+                  <p>Use this if you want GENESIS inside MetaMask. WalletConnect wallets should use the connect flow instead.</p>
                 </div>
 
                 <div className="bg-slate-900/50 rounded-lg p-4 space-y-2 text-sm">
@@ -252,7 +257,7 @@ export default function SnapInstallPage() {
                 <div className="text-center space-y-2">
                   <div className="text-5xl">🦊</div>
                   <h3 className="text-xl font-bold text-white">MetaMask Not Found</h3>
-                  <p className="text-sm text-orange-300">Install the extension first</p>
+                  <p className="text-sm text-orange-300">Install the extension first or use WalletConnect if you already have another wallet</p>
                 </div>
 
                 <div className="bg-slate-900/50 rounded-lg p-4 space-y-3">
@@ -291,6 +296,21 @@ export default function SnapInstallPage() {
                 >
                   Download MetaMask →
                 </a>
+
+                <div className="flex flex-col sm:flex-row gap-3">
+                  <a
+                    href="/wallet-connect"
+                    className="flex-1 px-6 py-3 bg-teal-500 text-slate-950 font-bold rounded-xl hover:bg-teal-400 transition-all text-center"
+                  >
+                    Use WalletConnect Instead
+                  </a>
+                  <a
+                    href="/demo"
+                    className="flex-1 px-6 py-3 border border-slate-600 text-slate-100 font-semibold rounded-xl hover:bg-slate-800 transition-all text-center"
+                  >
+                    Try the Demo
+                  </a>
+                </div>
 
                 <button
                   onClick={() => window.location.reload()}
@@ -454,7 +474,7 @@ export default function SnapInstallPage() {
       {/* Header */}
       <div className="text-center space-y-3">
         <h1 className="text-3xl font-black text-white">🔐 GENESIS Protection</h1>
-        <p className="text-sm text-teal-200">Install the MetaMask Snap for transaction safety</p>
+        <p className="text-sm text-teal-200">MetaMask Snap for MetaMask users. WalletConnect users should use the connect flow instead.</p>
       </div>
 
       {/* Mobile Info - Desktop Only */}
@@ -463,7 +483,7 @@ export default function SnapInstallPage() {
           <span className="text-3xl">💻</span>
           <div className="flex-1">
             <h2 className="font-bold text-white text-lg">Desktop Only: MetaMask Snaps</h2>
-            <p className="text-xs text-indigo-100 mt-1">Snaps require the browser extension (desktop only)</p>
+            <p className="text-xs text-indigo-100 mt-1">Snaps require the MetaMask browser extension on desktop</p>
 
             <div className="bg-slate-900/60 rounded-lg p-4 mt-3 space-y-3">
               <div className="space-y-2 text-xs text-indigo-200">
@@ -486,6 +506,21 @@ export default function SnapInstallPage() {
 
               <div className="mt-3 p-3 bg-blue-900/50 rounded text-xs text-blue-200 border border-blue-500/30">
                 <strong>💡 Tip:</strong> Use the QR code on desktop to share this page. Then open on your computer with MetaMask extension installed.
+              </div>
+
+              <div className="flex flex-col sm:flex-row gap-3 mt-3">
+                <a
+                  href="/wallet-connect"
+                  className="flex-1 px-4 py-2 bg-teal-500 text-slate-950 font-bold rounded-lg text-center text-sm"
+                >
+                  Use WalletConnect Instead
+                </a>
+                <a
+                  href="/demo"
+                  className="flex-1 px-4 py-2 border border-slate-600 text-slate-100 font-semibold rounded-lg text-center text-sm"
+                >
+                  Try the Demo
+                </a>
               </div>
             </div>
           </div>
@@ -555,7 +590,7 @@ export default function SnapInstallPage() {
       {/* Don't Have MetaMask */}
       {!hasMetaMask && (
         <div className="bg-red-500/10 border-2 border-red-500/30 rounded-lg p-5">
-          <p className="text-sm text-red-300 mb-3">Don't have MetaMask? Get it free:</p>
+          <p className="text-sm text-red-300 mb-3">Don't have MetaMask? Get it free, or use WalletConnect if you already use another wallet:</p>
           <a
             href="https://metamask.io"
             target="_blank"
@@ -563,6 +598,12 @@ export default function SnapInstallPage() {
             className="block w-full px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-bold rounded-lg text-center text-sm"
           >
             Download MetaMask App
+          </a>
+          <a
+            href="/wallet-connect"
+            className="block w-full mt-3 px-4 py-2 bg-teal-500 text-slate-950 font-bold rounded-lg text-center text-sm"
+          >
+            Use WalletConnect Instead
           </a>
         </div>
       )}
