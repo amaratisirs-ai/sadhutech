@@ -236,20 +236,24 @@ async function fetchChainAbuseThreats(): Promise<ExternalThreat[]> {
   const apiKey = process.env.CHAINABUSE_API_KEY;
   
   if (!apiKey) {
-    console.log("[sync] Chainabuse API key not set (CHAINABUSE_API_KEY env var). Skipping.");
+    console.log("[sync] ⏭️  Chainabuse: API key not set (CHAINABUSE_API_KEY env var). Skipping.");
     return [];
   }
 
-  try {
-    console.log("[sync] Fetching Chainabuse scam reports...");
+  console.log(`[sync] Chainabuse: API key detected, fetching reports...`);
 
+  try {
     // Chainabuse API v0 uses Basic Auth (apiKey as username, empty password)
     const basicAuth = Buffer.from(`${apiKey}:`).toString("base64");
 
     // Chainabuse /reports endpoint returns paginated results
     // Fetch multiple pages to get bulk data (max 50 per page, so 5 pages = 250 reports)
     const allThreats: ExternalThreat[] = [];
+    let pagesRead = 0;
+    
     for (let page = 1; page <= 5; page++) {
+      console.log(`[sync] Chainabuse: Fetching page ${page}...`);
+      
       const res = await fetch(
         `https://api.chainabuse.com/v0/reports?perPage=50&page=${page}&trusted=true`,
         {
@@ -262,9 +266,9 @@ async function fetchChainAbuseThreats(): Promise<ExternalThreat[]> {
 
       if (!res.ok) {
         if (res.status === 401) {
-          console.log("[sync] Chainabuse API key invalid (401) (non-fatal)");
+          console.log("[sync] ❌ Chainabuse: API key invalid (401)");
         } else {
-          console.log(`[sync] Chainabuse API error ${res.status} (non-fatal)`);
+          console.log(`[sync] ❌ Chainabuse: API error ${res.status} ${res.statusText}`);
         }
         break; // Stop pagination on error
       }
@@ -283,9 +287,12 @@ async function fetchChainAbuseThreats(): Promise<ExternalThreat[]> {
       const data = (await res.json()) as { reports?: ChainAbuseReport[]; count?: number };
       const reports = data.reports || [];
       
+      console.log(`[sync] Chainabuse: Page ${page} returned ${reports.length} reports`);
+      
       if (reports.length === 0) break; // No more pages
 
       const seen = new Set<string>();
+      pagesRead++;
 
       for (const report of reports) {
         // Extract addresses from each report
@@ -324,10 +331,10 @@ async function fetchChainAbuseThreats(): Promise<ExternalThreat[]> {
       }
     }
 
-    console.log(`[sync] ✅ Chainabuse loaded ${allThreats.length} scam addresses`);
+    console.log(`[sync] ✅ Chainabuse: Loaded ${allThreats.length} addresses from ${pagesRead} pages`);
     return allThreats;
   } catch (err) {
-    console.log(`[sync] Chainabuse fetch error: ${err instanceof Error ? err.message : String(err)} (non-fatal)`);
+    console.error(`[sync] ❌ Chainabuse fetch error: ${err instanceof Error ? err.message : String(err)}`);
     return [];
   }
 }
@@ -585,25 +592,18 @@ export async function syncExternalThreats(
     }
     const deduped = allThreats.length - uniqueThreats.size;
 
-    // Batch insert into database (100x faster than individual inserts)
-    const threatsList = Array.from(uniqueThreats.values());
-    const batchSize = 100;
-    
-    for (let i = 0; i < threatsList.length; i += batchSize) {
-      const batch = threatsList.slice(i, i + batchSize);
+    // Insert into database (individual inserts for reliability)
+    for (const threat of uniqueThreats.values()) {
       try {
-        const requests = batch.map((threat) => ({
+        await intel.report({
           address: threat.address as Address,
           category: threat.category,
           reporterId: `sync-${threat.source}`,
-        }));
-        await intel.batchReport(requests);
-        totalSynced += requests.length;
-        console.log(`[sync] Batch insert: ${totalSynced}/${threatsList.length} threats`);
+        });
+        totalSynced++;
       } catch (err) {
-        const batchErrors = batch.length;
-        totalErrors += batchErrors;
-        console.error(`[sync] Batch insert failed (${batchErrors} threats):`, err);
+        console.error(`[sync] Failed to insert ${threat.address}:`, err instanceof Error ? err.message : String(err));
+        totalErrors++;
       }
     }
 
