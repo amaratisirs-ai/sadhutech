@@ -1,5 +1,5 @@
 {
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "GENESIS pre-sign transaction firewall",
   "proposedName": "GENESIS Firewall",
   "repository": {
@@ -8,7 +8,7 @@
     "directory": "packages/snap"
   },
   "source": {
-    "shasum": "SRvxkcHS8LRcjKmuZhiiFzy6st5YB67EMSEPPYIdqU0=",
+    "shasum": "S8Hm3p61O2BNGUZQIzLSDLTGn7zvyBokovuDlwpPcS4=",
     "location": {
       "npm": {
         "filePath": "dist/bundle.js",
