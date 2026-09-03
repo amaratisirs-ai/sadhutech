@@ -94,27 +94,30 @@ export default function Home() {
         <div className="relative px-8 py-20">
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div className="space-y-6">
-              <h1 className="text-6xl md:text-7xl font-black text-white">
-                Your Personal Crypto Bodyguard
+              <h1 className="text-6xl md:text-7xl font-black text-white leading-tight">
+                Milliseconds Matter
               </h1>
 
-              <p className="text-xl text-white leading-relaxed">
-              Before you sign any crypto transaction, let GENESIS check if it's safe. Get instant verdicts on approvals,
-              transfers, and complex deals.
-            </p>
+              <p className="text-xl text-slate-200 leading-relaxed">
+                Crypto transactions happen in milliseconds. So should your security. <strong>GENESIS analyzes every transaction instantly</strong> against 4,100+ community-verified threats—right inside your wallet.
+              </p>
 
-              <div className="flex gap-4 flex-wrap">
+              <p className="text-lg text-slate-300">
+                Get a clear verdict before you sign: <span className="font-bold text-green-400">✅ ALLOW</span>, <span className="font-bold text-yellow-400">⚠️ WARN</span>, or <span className="font-bold text-red-400">🚫 BLOCK</span>
+              </p>
+
+              <div className="flex gap-4 flex-wrap pt-2">
                 <a
-                  href="/demo"
-                  className="px-8 py-4 bg-teal-500 text-white rounded-lg font-bold hover:shadow-xl transition-all hover:shadow-teal-500/50 hover:bg-teal-600"
+                  href="/snap-install"
+                  className="px-8 py-4 bg-gradient-to-r from-teal-500 to-teal-400 text-slate-950 rounded-lg font-bold hover:shadow-xl transition-all hover:shadow-teal-500/50 text-lg"
                 >
-                  Try Interactive Demo →
+                  🦊 Add to MetaMask
                 </a>
                 <a
-                  href="/threats"
+                  href="/demo"
                   className="px-8 py-4 bg-slate-800 text-white rounded-lg font-bold border-2 border-teal-500 hover:border-teal-400 hover:shadow-lg transition-all"
                 >
-                  See Threat Feed
+                  Try Demo
                 </a>
               </div>
             </div>
@@ -122,6 +125,35 @@ export default function Home() {
               <img src="/images/hero-shield.svg" alt="Protection shield" className="w-96 h-auto drop-shadow-2xl" />
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* ===== HOW GENESIS WORKS ===== */}
+      <section id="how-it-works" className="space-y-8">
+        <div className="text-center">
+          <h2 className="text-4xl md:text-5xl font-black text-white mb-4">How GENESIS Works</h2>
+          <p className="text-slate-200 text-lg">3 simple steps between you and a scam</p>
+        </div>
+
+        <div className="grid md:grid-cols-3 gap-8">
+          {flowSteps.map((step, i) => (
+            <div key={i} className="relative">
+              <div className="bg-gradient-to-br from-teal-500/10 to-indigo-500/10 border-2 border-teal-500/30 rounded-2xl p-8 h-full space-y-4">
+                <div className="text-center">
+                  {step.icon}
+                  <h3 className="text-xl font-bold text-white mt-3">{step.label}</h3>
+                </div>
+                <p className="text-slate-300 text-sm text-center">
+                  {i === 0 && "Click 'send' or 'approve' in any app. Uniswap, OpenSea, etc."}
+                  {i === 1 && "GENESIS checks against community threat data in real-time. <200ms analysis."}
+                  {i === 2 && "Clear verdict: is it safe to sign? Yes, maybe, or absolutely not."}
+                </p>
+              </div>
+              {i < 2 && (
+                <div className="hidden md:flex absolute top-1/2 -right-4 transform -translate-y-1/2 text-3xl text-teal-500">→</div>
+              )}
+            </div>
+          ))}
         </div>
       </section>
 
