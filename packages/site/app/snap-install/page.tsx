@@ -1,12 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 // Type declaration for MetaMask's window.ethereum
 declare global {
   interface Window {
     ethereum?: {
       request: (args: { method: string; params?: any }) => Promise<any>;
+      isMetaMask?: boolean;
     };
   }
 }
@@ -14,13 +15,50 @@ declare global {
 export default function SnapInstallPage() {
   const [installStep, setInstallStep] = useState<"intro" | "installing" | "confirm" | "done">("intro");
   const [isInstalled, setIsInstalled] = useState(false);
+  const [isMobileMetaMask, setIsMobileMetaMask] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    // Detect if on mobile
+    const userAgent = navigator.userAgent;
+    const mobile = /iPhone|iPad|Android/i.test(userAgent);
+    setIsMobile(mobile);
+
+    // Detect if MetaMask mobile app is installed
+    const hasMetaMaskMobile = /MetaMask/i.test(userAgent);
+    setIsMobileMetaMask(hasMetaMaskMobile);
+  }, []);
 
   const handleInstallClick = async () => {
     setInstallStep("installing");
 
     try {
+      // On mobile, try to open MetaMask app directly
+      if (isMobile && !window.ethereum) {
+        // Use MetaMask deep link to open our page in MetaMask app
+        const deepLink = `https://metamask.app.link/browse/https://sadhutech-site.vercel.app/snap-install`;
+        window.location.href = deepLink;
+        // Give the deep link a moment to open, then show fallback
+        setTimeout(() => {
+          alert(
+            "📱 Opening MetaMask...\n\n" +
+            "If MetaMask didn't open, you can:\n" +
+            "1. Install MetaMask: https://metamask.io\n" +
+            "2. Or open this page in MetaMask's browser manually"
+          );
+          setInstallStep("intro");
+        }, 1500);
+        return;
+      }
+
+      // Check for MetaMask on desktop or if we're already in MetaMask app
       if (!window.ethereum) {
-        alert("🔧 MetaMask Required\n\nGENESIS runs as a MetaMask Snap. You'll need to install MetaMask first (it's free).\n\n👉 Download MetaMask: https://metamask.io\n\nThen come back here and click \"Install GENESIS Snap\" again!");
+        alert(
+          "🔧 MetaMask Required\n\n" +
+          "GENESIS runs as a MetaMask Snap. You need MetaMask browser extension.\n\n" +
+          "👉 Download MetaMask: https://metamask.io\n\n" +
+          "Then come back and click 'Install GENESIS Snap' again!"
+        );
         setInstallStep("intro");
         return;
       }
@@ -56,6 +94,28 @@ export default function SnapInstallPage() {
           Install the MetaMask Snap to instantly check every transaction against our threat intelligence network before you sign.
         </p>
       </div>
+
+      {/* Mobile Instructions Banner */}
+      {isMobile && (
+        <div className="bg-indigo-950 border-2 border-indigo-500 rounded-lg p-6 space-y-3">
+          <div className="flex gap-2 items-start">
+            <span className="text-2xl">📱</span>
+            <div>
+              <h3 className="font-bold text-white">👋 iPhone/Android Users</h3>
+              <p className="text-sm text-indigo-200 mt-1">
+                For the best experience on mobile, open this page in the <strong>MetaMask app browser</strong>:
+              </p>
+              <ol className="text-sm text-indigo-200 mt-2 space-y-1 list-decimal list-inside">
+                <li>Open MetaMask app</li>
+                <li>Tap menu (≡) bottom right</li>
+                <li>Tap 'Browser'</li>
+                <li>Paste this URL: <code className="bg-slate-900 px-2 py-1 rounded text-teal-300">sadhutech-site.vercel.app</code></li>
+                <li>Tap "Install GENESIS Snap" button</li>
+              </ol>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Main Content */}
       <div className="grid md:grid-cols-2 gap-12 items-center">
