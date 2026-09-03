@@ -1,21 +1,31 @@
 /**
- * External Threat Intelligence Sync (Enterprise Version)
+ * External Threat Intelligence Sync (Enterprise + Community Hybrid)
  * 
- * PRODUCTION SOURCES (in priority order):
- * 1. Blockaid.io (PAID API) - Real-time malicious address detection
+ * THREAT SOURCES (loaded in parallel, deduplicated by address):
+ * 
+ * PRIMARY SOURCES:
+ * 1. Blockaid.io Threat Intelligence (PAID) - 10,000+ real-time drainers, scams, exploits
  *    → Requires: BLOCKAID_API_KEY environment variable
- *    → Provides: 10,000+ active threats, updated hourly
- *    → Chains: Ethereum, Polygon, Arbitrum, Optimism, Base, Blast
+ *    → Updated: Hourly from network monitoring
+ *    → Chains: Ethereum, Polygon, Arbitrum, Optimism, Base, Blast, more
  * 
- * 2. Curated seed data - Verified historical exploits (21 addresses)
- * 3. Community reports - User-submitted threats via POST /v1/report
+ * FALLBACK SOURCES (free, community-driven):
+ * 2. Scam Sniffer (GitHub) - Phishing contracts, scam addresses (1,000+)
+ *    → Source: https://github.com/scamsniffer/scam-database (public blacklist)
+ *    → Updated: Daily with 7-day delay
+ *    → Used by: Phantom, Rabby, Binance, OpenSea
  * 
- * ENABLE ENTERPRISE THREATS:
- * Set environment variable: BLOCKAID_API_KEY=sk_xxx
- * Get API key at: https://blockaid.io/dapp-scanning
+ * 3. Rugdoc - Rug pull tokens and rug pull incidents
+ * 4. SlowMist - Security alerts and high-risk contracts
+ * 5. Curated seed - Verified historical exploits (21 addresses, always available)
+ * 6. Community reports - User-submitted threats via POST /v1/report
  * 
- * Without API key, falls back to 21 curated threats (demo mode).
- * With API key, scales to 10,000+ real-time threats (production ready).
+ * BEHAVIOR:
+ * ✅ Without BLOCKAID_API_KEY: Uses Scam Sniffer + Rugdoc + SlowMist + 21 curated (still viable)
+ * ✅ With BLOCKAID_API_KEY: Blockaid + all other sources (enterprise-scale)
+ * ✅ Non-blocking: If any source fails, sync continues with others
+ * ✅ Runs on startup + every 6 hours
+ * ✅ Deduplicates by address, keeps first source in case of conflicts
  */
 
 import { ThreatIntelPostgres } from "./intel-postgres.js";
@@ -57,36 +67,50 @@ async function loadCuratedThreats(): Promise<ExternalThreat[]> {
 }
 
 /**
- * Fetch phishing/scam database from Scam Sniffer (free community source).
- * Returns known phishing contract addresses.
+ * Fetch phishing/scam addresses from Scam Sniffer GitHub (free community source).
+ * Pulls from their open-source blacklist: https://github.com/scamsniffer/scam-database
+ * 
+ * DATA PROVIDED:
+ * - Phishing domains blacklist (updated every 24 hours with 7-day delay)
+ * - Phishing addresses blacklist (scammer wallets and contracts)
+ * - Used by Phantom, Rabby, Binance, OpenSea
+ * 
+ * Note: Uses GitHub-hosted JSON for reliability (API can have rate limits).
  */
 async function fetchScamSnifferThreats(): Promise<ExternalThreat[]> {
   try {
-    console.log("[sync] Fetching Scam Sniffer database...");
-    // Scam Sniffer provides free API for phishing scams
-    const res = await fetch("https://api.scamsniffer.io/api/v2/scams", {
-      headers: { "User-Agent": "GENESIS-Gate/1.0" },
-    });
+    console.log("[sync] Fetching Scam Sniffer database from GitHub...");
+    
+    // Use GitHub raw content for reliability (no rate limiting like API)
+    // Scam Sniffer database: https://github.com/scamsniffer/scam-database/blob/main/blacklist/address.json
+    const res = await fetch(
+      "https://raw.githubusercontent.com/scamsniffer/scam-database/main/blacklist/address.json",
+      { headers: { "User-Agent": "GENESIS-Gate/1.0" } }
+    );
 
     if (!res.ok) {
-      console.log(`[sync] Scam Sniffer unavailable (${res.status}) (non-fatal)`);
+      console.log(`[sync] Scam Sniffer (GitHub) unavailable (${res.status}) (non-fatal)`);
       return [];
     }
 
-    const data = (await res.json()) as any;
-    if (!Array.isArray(data?.data)) return [];
+    // Scam Sniffer returns array of hex addresses
+    const addresses = (await res.json()) as any;
+    if (!Array.isArray(addresses)) return [];
 
-    return data.data
-      .slice(0, 500) // Limit to prevent overload
-      .map((scam: any) => ({
-        address: scam.address?.toLowerCase() || scam.contract?.toLowerCase(),
+    const threats = addresses
+      .slice(0, 1000) // Limit to prevent overload
+      .map((addr: string) => ({
+        address: (addr || "").toString().toLowerCase().trim(),
         category: "phishing" as ThreatCategory,
         source: "scam-sniffer",
-        title: scam.name,
+        title: "Scam Sniffer: Phishing/Scam Address",
       }))
       .filter((t: ExternalThreat) => t.address && /^0x[a-f0-9]{40}$/.test(t.address)) as ExternalThreat[];
+
+    console.log(`[sync] ✅ Scam Sniffer loaded ${threats.length} phishing addresses`);
+    return threats;
   } catch (err) {
-    console.log(`[sync] Scam Sniffer fetch error: ${err instanceof Error ? err.message : String(err)}`);
+    console.log(`[sync] Scam Sniffer fetch error: ${err instanceof Error ? err.message : String(err)} (non-fatal)`);
     return [];
   }
 }
