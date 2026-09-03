@@ -2,6 +2,7 @@
 
 import { useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
+import { resolveDecisionOutcome } from "../../src/decision";
 
 function APIExplorerContent() {
   const searchParams = useSearchParams();
@@ -22,6 +23,8 @@ function APIExplorerContent() {
     )
   );
   const [response, setResponse] = useState<string>("");
+  const [decision, setDecision] = useState<ReturnType<typeof resolveDecisionOutcome> | null>(null);
+  const [signatureState, setSignatureState] = useState<"idle" | "ready" | "signed">("idle");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string>("");
   const [activeTab, setActiveTab] = useState<"editor" | "docs">("editor");
@@ -37,8 +40,9 @@ function APIExplorerContent() {
     const finalWallet = wallet || parsedStored?.wallet || "WalletConnect";
     const finalAccount = account || parsedStored?.account || "";
     const finalChainId = Number(chainId || parsedStored?.chainId || 1);
+    const finalStatus = parsedStored?.status || "connected";
 
-    if (finalAccount) {
+    if (finalAccount && finalStatus === "connected") {
       setConnectedWallet({ wallet: finalWallet, account: finalAccount, chainId: finalChainId });
       setRequest(
         JSON.stringify(
@@ -56,8 +60,42 @@ function APIExplorerContent() {
       );
       setResponse("");
       setError("");
+      return;
     }
+
+    if (parsedStored && parsedStored.status === "pending") {
+      setConnectedWallet(null);
+      setError("Wallet approval is still pending. Please return to Trust Wallet and approve the connection, then come back here.");
+      return;
+    }
+
+    setConnectedWallet(null);
+    setError("No wallet session detected. Connect a wallet first to continue to the transaction check.");
   }, [searchParams]);
+
+  const applyConnectedWalletToRequest = () => {
+    if (!connectedWallet) {
+      setError("Connect a wallet before sending a transaction for review.");
+      return;
+    }
+
+    try {
+      const parsed = JSON.parse(request);
+      const nextRequest = {
+        ...parsed,
+        tx: {
+          ...(parsed.tx ?? {}),
+          chainId: connectedWallet.chainId,
+          from: connectedWallet.account,
+        },
+      };
+      setRequest(JSON.stringify(nextRequest, null, 2));
+      setError("");
+      setResponse("");
+    } catch {
+      setError("The current request JSON is invalid. Fix the transaction payload and try again.");
+    }
+  };
 
   const send = async () => {
     setLoading(true);
@@ -65,6 +103,9 @@ function APIExplorerContent() {
     setResponse("");
     try {
       const body = JSON.parse(request);
+      if (!body?.tx?.from && connectedWallet) {
+        body.tx = { ...(body.tx ?? {}), from: connectedWallet.account, chainId: connectedWallet.chainId };
+      }
       const res = await fetch(`${gateUrl}/v1/analyze`, {
         method: "POST",
         headers: { "content-type": "application/json" },
@@ -78,26 +119,59 @@ function APIExplorerContent() {
 
       const data = await res.json();
       setResponse(JSON.stringify(data, null, 2));
+      const nextDecision = resolveDecisionOutcome(data);
+      setDecision(nextDecision);
+      setSignatureState(nextDecision.canContinue ? "ready" : "idle");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Unknown error");
+      setDecision(null);
+      setSignatureState("idle");
     } finally {
       setLoading(false);
     }
   };
 
   const loadScenario = (scenario: any) => {
-    setRequest(JSON.stringify(scenario, null, 2));
+    const scenarioWithWallet = connectedWallet
+      ? {
+          ...scenario,
+          tx: {
+            ...(scenario.tx ?? {}),
+            chainId: connectedWallet.chainId,
+            from: connectedWallet.account,
+          },
+        }
+      : scenario;
+    setRequest(JSON.stringify(scenarioWithWallet, null, 2));
     setResponse("");
+    setDecision(null);
+    setSignatureState("idle");
+    setError("");
   };
 
   return (
     <div className="space-y-8 max-w-7xl">
       {/* Header */}
-      <div>
-        <h1 className="text-5xl font-black text-white mb-4">🔌 API Explorer</h1>
-        <p className="text-slate-400 text-lg">
-          Interactive HTTP client to test GENESIS Gate endpoints. Perfect for developers and integrations.
+      <div className="space-y-4">
+        <h1 className="text-5xl font-black text-white mb-4">🔒 Transaction Review</h1>
+        <p className="text-slate-300 text-lg">
+          Connect your wallet, review the transaction, and let GENESIS check it before signing.
         </p>
+      </div>
+
+      <div className="bg-gradient-to-r from-indigo-900/40 to-slate-900 border-2 border-indigo-500/40 rounded-xl p-5 space-y-3">
+        <p className="text-xs uppercase tracking-wide text-indigo-300 font-semibold">Real flow</p>
+        <div className="grid md:grid-cols-3 gap-3 text-sm text-slate-200">
+          <div className="rounded-lg border border-slate-700 bg-slate-950/40 p-3">
+            <span className="font-bold text-white">1. Connect wallet</span>
+          </div>
+          <div className="rounded-lg border border-slate-700 bg-slate-950/40 p-3">
+            <span className="font-bold text-white">2. Send tx to GENESIS</span>
+          </div>
+          <div className="rounded-lg border border-slate-700 bg-slate-950/40 p-3">
+            <span className="font-bold text-white">3. Sign only after the verdict</span>
+          </div>
+        </div>
       </div>
 
       {/* Gate URL Config */}
@@ -156,7 +230,72 @@ function APIExplorerContent() {
       {connectedWallet && (
         <div className="bg-teal-900/20 border border-teal-500/40 rounded-xl p-4 text-sm text-teal-100">
           <p className="font-semibold text-white">Wallet ready for a transaction check.</p>
-          <p className="mt-1 text-teal-200">The request has been prefilled with your connected account so you can test a real transaction in one step.</p>
+          <p className="mt-1 text-teal-200">The connected account is being used as the sender for transaction review, so you can test a real wallet-to-signing flow without leaving the browser.</p>
+        </div>
+      )}
+
+      {decision && (
+        <div
+          className={`rounded-xl border p-5 ${
+            decision.verdict === "allow"
+              ? "border-emerald-500/50 bg-emerald-900/20"
+              : decision.verdict === "block"
+                ? "border-rose-500/50 bg-rose-900/20"
+                : "border-amber-500/50 bg-amber-900/20"
+          }`}
+        >
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <p className="text-xs uppercase tracking-wide text-slate-300">Current verdict</p>
+              <h3 className="text-2xl font-black text-white">{decision.label}</h3>
+            </div>
+            <div className="rounded-full border border-white/10 bg-black/10 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-slate-100">
+              {decision.verdict}
+            </div>
+          </div>
+          <p className="mt-3 text-sm text-slate-200">{decision.reason}</p>
+
+          <div className="mt-4 flex flex-wrap gap-3">
+            {decision.canContinue ? (
+              <button
+                onClick={() => setSignatureState("signed")}
+                className="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-bold text-white hover:bg-emerald-500 transition"
+              >
+                {signatureState === "signed" ? "Transaction approved" : "Continue to sign"}
+              </button>
+            ) : (
+              <button
+                disabled
+                className="cursor-not-allowed rounded-lg bg-slate-700 px-4 py-2 text-sm font-bold text-slate-300"
+              >
+                Review before signing
+              </button>
+            )}
+            <button
+              onClick={() => setResponse("")}
+              className="rounded-lg border border-slate-500 bg-slate-800 px-4 py-2 text-sm font-bold text-slate-100 hover:bg-slate-700 transition"
+            >
+              Hide result
+            </button>
+          </div>
+
+          {signatureState === "signed" && (
+            <div className="mt-4 rounded-lg border border-emerald-500/40 bg-emerald-500/10 p-3 text-sm text-emerald-100">
+              GENESIS verdict approved the transaction. The wallet can proceed to the final sign step when the user confirms in the wallet.
+            </div>
+          )}
+        </div>
+      )}
+
+      {!connectedWallet && (
+        <div className="bg-amber-900/20 border border-amber-500/40 rounded-xl p-4 text-sm text-amber-100">
+          <p className="font-semibold text-white">Wallet connection still pending.</p>
+          <p className="mt-1 text-amber-200">If you just approved Trust Wallet, return to this tab and continue. If not, connect a wallet first to begin the transaction check.</p>
+          <div className="mt-3">
+            <a href="/wallet-connect" className="inline-block px-4 py-2 rounded-lg bg-amber-500 text-slate-900 font-semibold hover:bg-amber-400 transition">
+              Go back to wallet connection
+            </a>
+          </div>
         </div>
       )}
 
@@ -295,7 +434,15 @@ function APIExplorerContent() {
           </div>
 
           {/* Action Buttons */}
-          <div className="flex gap-3">
+          <div className="flex flex-wrap gap-3">
+            {connectedWallet && (
+              <button
+                onClick={applyConnectedWalletToRequest}
+                className="px-6 py-3 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg font-semibold transition"
+              >
+                Use connected wallet as sender
+              </button>
+            )}
             <button
               onClick={send}
               disabled={loading}
@@ -308,12 +455,14 @@ function APIExplorerContent() {
                 setRequest(JSON.stringify({
                   tx: {
                     chainId: 1,
-                    from: "",
+                    from: connectedWallet?.account ?? "",
                     to: "",
                     data: "0x",
                   },
                 }, null, 2));
                 setResponse("");
+                setDecision(null);
+                setSignatureState("idle");
                 setError("");
               }}
               className="px-8 py-3 bg-slate-200 hover:bg-slate-300 text-slate-900 rounded-lg font-semibold transition"

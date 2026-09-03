@@ -79,15 +79,14 @@ export default function WalletConnect() {
     return getWalletLaunchUrl(wallet, uri);
   };
 
-  const persistWalletSession = (wallet: WalletOption, account: string | null, chainId: number = 1) => {
-    if (!account) return;
-
+  const persistWalletSession = (wallet: WalletOption, account: string | null, chainId: number = 1, status: "pending" | "connected" = "connected") => {
     localStorage.setItem(
       "genesis_wallet_session",
       JSON.stringify({
         wallet: wallet.name,
-        account,
+        account: account ?? null,
         chainId,
+        status,
         connectedAt: Date.now(),
       })
     );
@@ -184,6 +183,7 @@ export default function WalletConnect() {
     setSelectedWallet(wallet);
     setIsConnecting(true);
     setConnectionState((prev) => ({ ...prev, uri: null, connectionApproved: false, error: null }));
+    persistWalletSession(wallet, null, 1, "pending");
 
     try {
       console.log(`Connecting with ${wallet.name}...`);
@@ -191,7 +191,7 @@ export default function WalletConnect() {
       const connectedAccount = Array.isArray(accounts) ? accounts[0] : accounts?.[0] ?? null;
       console.log("Connected:", accounts);
 
-      persistWalletSession(wallet, connectedAccount, 1);
+      persistWalletSession(wallet, connectedAccount, 1, "connected");
 
       setIsConnecting(false);
       setConnectionState((prev) => ({
@@ -213,20 +213,35 @@ export default function WalletConnect() {
   return (
     <div className="space-y-12">
       <div className="text-center space-y-4">
-        <h1 className="text-5xl md:text-6xl font-black text-white">🔗 WalletConnect Onboarding</h1>
+        <h1 className="text-5xl md:text-6xl font-black text-white">🔗 Connect your wallet</h1>
         <p className="text-xl text-teal-200 max-w-2xl mx-auto">
           {isMobile
-            ? "Start with Trust Wallet, one of the supported WalletConnect wallets, then test real transactions in the API Explorer." 
-            : "Start with Trust Wallet first, then test real transactions in the API Explorer."}
+            ? "Step 1: connect your wallet. Step 2: review a transaction. Step 3: GENESIS checks it before you sign." 
+            : "Step 1: connect your wallet. Step 2: review the transaction. Step 3: GENESIS checks it before you sign."}
         </p>
       </div>
 
-      <section className="bg-gradient-to-br from-slate-900 to-indigo-950 border-2 border-indigo-500/30 rounded-2xl p-6 max-w-4xl mx-auto space-y-3">
-        <h2 className="text-2xl font-bold text-white">What this page does</h2>
-        <p className="text-sm text-slate-200">
-          This path starts with Trust Wallet over WalletConnect, but it is part of a broader WalletConnect flow for supported wallets. It does <strong>not</strong> install the MetaMask Snap. If you use MetaMask, go to the Snap install path instead.
-        </p>
+      <section className="bg-gradient-to-br from-slate-900 to-indigo-950 border-2 border-indigo-500/30 rounded-2xl p-6 max-w-4xl mx-auto space-y-4">
+        <h2 className="text-2xl font-bold text-white">How the real flow works</h2>
+        <div className="grid md:grid-cols-3 gap-3 text-sm text-slate-200">
+          <div className="rounded-xl border border-slate-700 bg-slate-950/40 p-4">
+            <div className="text-xs uppercase tracking-wide text-teal-300 font-semibold mb-2">Step 1</div>
+            <p className="font-bold text-white">Connect wallet</p>
+            <p className="mt-1 text-slate-300">Establish the wallet session.</p>
+          </div>
+          <div className="rounded-xl border border-slate-700 bg-slate-950/40 p-4">
+            <div className="text-xs uppercase tracking-wide text-teal-300 font-semibold mb-2">Step 2</div>
+            <p className="font-bold text-white">Review transaction</p>
+            <p className="mt-1 text-slate-300">Prepare the tx you want to sign.</p>
+          </div>
+          <div className="rounded-xl border border-slate-700 bg-slate-950/40 p-4">
+            <div className="text-xs uppercase tracking-wide text-teal-300 font-semibold mb-2">Step 3</div>
+            <p className="font-bold text-white">GENESIS checks it</p>
+            <p className="mt-1 text-slate-300">Allow, warn, or block before signing.</p>
+          </div>
+        </div>
         <div className="flex flex-wrap gap-3">
+
           <a href="/snap-install" className="px-4 py-2 rounded-lg bg-slate-800 text-slate-100 border border-slate-600 hover:border-teal-400 transition text-sm font-semibold">
             MetaMask Snap →
           </a>
@@ -265,16 +280,16 @@ export default function WalletConnect() {
               {isMobile ? (
                 <>
                   <li>1. Tap your wallet above</li>
-                  <li>2. Tap the open button to launch the wallet</li>
-                  <li>3. Approve connection in wallet</li>
-                  <li>4. Use the API Explorer to test a real transaction</li>
+                  <li>2. Tap Open in {selectedWallet?.name ?? "wallet"} to launch the wallet</li>
+                  <li>3. Approve the connection in the wallet</li>
+                  <li>4. Return to this browser tab and continue to the transaction check</li>
                 </>
               ) : (
                 <>
                   <li>1. Tap a wallet or scan QR</li>
                   <li>2. {selectedWallet ? "Scan QR with your phone" : "Select a wallet to see options"}</li>
-                  <li>3. Approve connection in wallet</li>
-                  <li>4. Use the API Explorer to test a real transaction</li>
+                  <li>3. Approve the connection in the wallet</li>
+                  <li>4. Return here and continue to the transaction check</li>
                 </>
               )}
             </ol>
@@ -329,7 +344,7 @@ export default function WalletConnect() {
                   </div>
                 </div>
                 {isConnecting && !connectionState.connectionApproved && (
-                  <p className="text-xs text-teal-200">Waiting for wallet approval... Check your {selectedWallet.name} mobile app.</p>
+                  <p className="text-xs text-teal-200">Waiting for wallet approval... Return to this browser tab after approving in {selectedWallet.name}.</p>
                 )}
                 {connectionState.connectionApproved && (
                     <div className="space-y-3">
@@ -337,7 +352,11 @@ export default function WalletConnect() {
                       <div className="flex flex-col sm:flex-row gap-3">
                         <button
                           type="button"
-                          onClick={() => continueToExplorer(selectedWallet, localStorage.getItem("genesis_wallet_session") ? JSON.parse(localStorage.getItem("genesis_wallet_session") ?? "{}").account : null)}
+                          onClick={() => {
+                            const saved = localStorage.getItem("genesis_wallet_session");
+                            const parsed = saved ? JSON.parse(saved) : null;
+                            continueToExplorer(selectedWallet, parsed?.account ?? null);
+                          }}
                           className="flex-1 text-center px-4 py-2 rounded-lg bg-teal-600 text-white font-semibold hover:bg-teal-500 transition"
                         >
                           Continue to transaction check
@@ -403,6 +422,7 @@ export default function WalletConnect() {
                 <button
                   onClick={() => {
                     if (connectionState.uri) {
+                      persistWalletSession(selectedWallet, null, 1, "pending");
                       window.location.href = getWalletLaunchUrl(selectedWallet, connectionState.uri);
                     }
                   }}
@@ -410,6 +430,7 @@ export default function WalletConnect() {
                 >
                   {supportsWalletDeepLink(selectedWallet) ? `Open in ${selectedWallet.name}` : `Open ${selectedWallet.name}`}
                 </button>
+                <p className="text-xs text-slate-300 text-center">After approving in the wallet, return to this browser tab and continue to the transaction check.</p>
               </div>
               <button
                 onClick={() => {
