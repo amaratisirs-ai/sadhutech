@@ -16,3 +16,5 @@ docs/internal/
 packages/site/public/threat-feeds.json
 packages/site/public/*.apikey
 packages/site/public/*.secret
+.vercel
+.env*
