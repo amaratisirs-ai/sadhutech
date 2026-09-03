@@ -101,15 +101,16 @@ export class ThreatIntelPostgres {
         values.push(req.address.toLowerCase(), req.category, req.reporterId);
       });
 
-      await this.pool.query(
-        `INSERT INTO threat_intel (address, category, reporters)
+      const sql = `INSERT INTO threat_intel (address, category, reporters)
          VALUES ${placeholders.join(",")}
          ON CONFLICT (address) DO UPDATE
          SET reporters = ARRAY(SELECT DISTINCT * FROM UNNEST(threat_intel.reporters || EXCLUDED.reporters)),
              category = COALESCE(EXCLUDED.category, threat_intel.category),
-             last_seen = NOW()`,
-        values
-      );
+             last_seen = NOW()`;
+
+      console.log(`[batchReport] Inserting ${requests.length} threats...`);
+      const result = await this.pool.query(sql, values);
+      console.log(`[batchReport] ✅ Inserted ${requests.length} threats (rowCount: ${result.rowCount})`);
 
       return requests.length;
     } catch (err) {
