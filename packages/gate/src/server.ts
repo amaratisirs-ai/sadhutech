@@ -323,6 +323,33 @@ app.get("/v1/contributors/stats", async (request, reply) => {
   }
 });
 
+// POST /v1/admin/sync - Manually trigger threat sync (debugging only)
+app.post("/v1/admin/sync", async (request, reply) => {
+  try {
+    const intel = await createIntelAsync();
+    if (!(intel instanceof (await import("./intel-postgres.js")).ThreatIntelPostgres)) {
+      return reply.status(400).send({
+        error: "Sync only available with PostgreSQL backend",
+      });
+    }
+
+    const { syncExternalThreats } = await import("./sync-external-threats.js");
+    const postgresIntel = intel as any;
+    const report = await syncExternalThreats(postgresIntel);
+
+    return {
+      message: "Manual sync completed",
+      report,
+    };
+  } catch (err) {
+    reply.status(500);
+    return {
+      error: "Sync failed",
+      message: err instanceof Error ? err.message : String(err),
+    };
+  }
+});
+
 // Async startup with proper initialization.
 async function start(): Promise<void> {
   try {
