@@ -384,6 +384,56 @@ app.get("/v1/admin/db-count", async (request, reply) => {
   }
 });
 
+// GET /v1/admin/raw-threats - Raw query without time filtering (debugging only)
+app.get("/v1/admin/raw-threats", async (request, reply) => {
+  try {
+    const intel = await createIntelAsync();
+    if (!(intel instanceof (await import("./intel-postgres.js")).ThreatIntelPostgres)) {
+      return reply.status(400).send({
+        error: "Database endpoint only available with PostgreSQL backend",
+      });
+    }
+
+    const postgresIntel = intel as any;
+    const query = request.query as any;
+    const limit = Math.min(Number(query.limit) || 50, 1000);
+
+    const result = await postgresIntel.pool.query(
+      `SELECT 
+        address, 
+        category, 
+        reporters, 
+        trusted, 
+        first_seen, 
+        last_seen, 
+        metadata
+       FROM threat_intel 
+       ORDER BY last_seen DESC
+       LIMIT $1`,
+      [limit]
+    );
+
+    console.log(`[/admin/raw-threats] Raw query returned ${result.rows.length} rows`);
+
+    return {
+      count: result.rows.length,
+      threats: result.rows.map((row) => ({
+        address: row.address,
+        category: row.category,
+        trusted: row.trusted,
+        reporters_count: (row.reporters || []).length,
+        last_seen: row.last_seen,
+      })),
+    };
+  } catch (err) {
+    reply.status(500);
+    return {
+      error: "Query failed",
+      message: err instanceof Error ? err.message : String(err),
+    };
+  }
+});
+
 // Async startup with proper initialization.
 async function start(): Promise<void> {
   try {
