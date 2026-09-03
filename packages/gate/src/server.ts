@@ -371,10 +371,17 @@ app.get("/v1/admin/db-count", async (request, reply) => {
       `SELECT category, COUNT(*) as count FROM threat_intel GROUP BY category ORDER BY count DESC`
     );
 
+    // Debug: Check exactly what getRecentThreats returns
+    const threats = await (postgresIntel as any).getRecentThreats(10000, 999999);
+    
+    console.log(`[/admin/db-count] Database has ${result.rows[0].total} threats, getRecentThreats returned ${threats.length}`);
+
     return {
       total_in_db: result.rows[0].total,
       category_count: result.rows[0].categories,
       breakdown: categoryBreakdown.rows,
+      getRecentThreats_returned: threats.length,
+      sample_addresses: threats.slice(0, 5).map((t: any) => ({ address: t.address.slice(0, 10) + "...", category: t.category })),
     };
   } catch (err) {
     reply.status(500);

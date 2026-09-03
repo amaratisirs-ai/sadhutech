@@ -2,6 +2,15 @@
 
 import { useState } from "react";
 
+// Type declaration for MetaMask's window.ethereum
+declare global {
+  interface Window {
+    ethereum?: {
+      request: (args: { method: string; params?: any }) => Promise<any>;
+    };
+  }
+}
+
 export default function SnapInstallPage() {
   const [installStep, setInstallStep] = useState<"intro" | "installing" | "confirm" | "done">("intro");
   const [isInstalled, setIsInstalled] = useState(false);
@@ -20,7 +29,6 @@ export default function SnapInstallPage() {
       const snapId = "npm:@genesis/snap"; // Or use local://...
       
       // Attempt to install the snap
-      // @ts-ignore
       await window.ethereum.request({
         method: "wallet_requestSnaps",
         params: {
