@@ -16,6 +16,7 @@ export default function CommunityPage() {
   const [contributors, setContributors] = useState<Contributor[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<"leaderboard" | "contribute" | "rewards">("leaderboard");
   const [offset, setOffset] = useState(0);
   const [hasMore, setHasMore] = useState(true);
@@ -29,6 +30,7 @@ export default function CommunityPage() {
     try {
       if (fetchOffset === 0) {
         setLoading(true);
+        setError(null);
       } else {
         setLoadingMore(true);
       }
@@ -54,7 +56,9 @@ export default function CommunityPage() {
       setHasMore(json.pagination?.hasMore || false);
       setTotalCount(json.pagination?.total || 0);
     } catch (err) {
+      const errorMsg = err instanceof Error ? err.message : "Failed to load leaderboard";
       console.error("Failed to fetch contributors:", err);
+      setError(errorMsg);
       // Fallback to mock data
       const mockContributors: Contributor[] = [
         { address: "0x1234...5678", username: "SecurityPro", reports: 156, threats: 412, verified: 89, score: 8940, joinedAt: "2024-01-15" },

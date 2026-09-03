@@ -73,6 +73,7 @@ export default function ThreatsPage() {
   const [stats, setStats] = useState<{ total: number; byCategory: Record<string, number> } | null>(null);
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [filter, setFilter] = useState<string | null>(null);
   const [sortBy, setSortBy] = useState<SortBy>("latest");
   const [offset, setOffset] = useState(0);
@@ -83,6 +84,7 @@ export default function ThreatsPage() {
     try {
       if (fetchOffset === 0) {
         setLoading(true);
+        setError(null);
       } else {
         setLoadingMore(true);
       }
@@ -97,6 +99,17 @@ export default function ThreatsPage() {
 
       const json: ThreatsLatestResponse = await response.json();
 
+      // Handle missing pagination (backend compatibility)
+      if (!json.pagination) {
+        console.warn("API response missing pagination object. Using hasMore=false");
+        json.pagination = {
+          offset: fetchOffset,
+          limit: PAGE_SIZE,
+          total: json.stats.total,
+          hasMore: false,
+        };
+      }
+
       if (fetchOffset === 0) {
         setAllThreats(json.threats);
       } else {
@@ -107,7 +120,9 @@ export default function ThreatsPage() {
       setOffset(fetchOffset + json.threats.length);
       setHasMore(json.pagination.hasMore);
     } catch (err) {
+      const errorMsg = err instanceof Error ? err.message : "Failed to load threats";
       console.error("Failed to fetch threats:", err);
+      setError(errorMsg);
     } finally {
       setLoading(false);
       setLoadingMore(false);
@@ -151,6 +166,26 @@ export default function ThreatsPage() {
             </svg>
           </div>
           <p className="text-slate-600 dark:text-slate-400 font-medium">Loading threat intelligence...</p>
+        </div>
+      </div>
+    );
+
+  if (error)
+    return (
+      <div className="space-y-6 max-w-6xl">
+        <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-6">
+          <h2 className="font-bold text-red-900 dark:text-red-200 mb-2">Error Loading Threats</h2>
+          <p className="text-red-800 dark:text-red-300 mb-4">{error}</p>
+          <p className="text-sm text-red-700 dark:text-red-400 mb-4">The threat database is temporarily unavailable. Please try again in a few moments.</p>
+          <button
+            onClick={() => {
+              setError(null);
+              fetchThreats(0);
+            }}
+            className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-medium"
+          >
+            ↻ Retry
+          </button>
         </div>
       </div>
     );
