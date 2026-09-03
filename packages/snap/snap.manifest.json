@@ -2,8 +2,13 @@
   "version": "0.0.1",
   "description": "GENESIS pre-sign transaction firewall",
   "proposedName": "GENESIS Firewall",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sadhutech/genesis.git",
+    "directory": "packages/snap"
+  },
   "source": {
-    "shasum": "E75GCxyIweMX+qMpRHc2YW4ygpITaFTGrvzBDHGMaik=",
+    "shasum": "0jZzlo4opYsf9bcVcvNNfFVaMvEmMXlwfrqH3JC+fDc=",
     "location": {
       "npm": {
         "filePath": "dist/bundle.js",

@@ -1,10 +1,31 @@
 {
   "name": "@genesis/snap",
   "version": "0.0.1",
-  "private": true,
-  "description": "GENESIS transaction-insight Snap — routes pre-sign txs through the Chakravyuha gate",
+  "description": "GENESIS pre-sign transaction firewall — analyzes crypto transactions in real-time against 4,100+ community-verified threats",
+  "private": false,
+  "license": "MIT",
   "type": "module",
   "main": "./dist/bundle.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sadhutech/genesis.git",
+    "directory": "packages/snap"
+  },
+  "homepage": "https://sadhutech-site.vercel.app",
+  "keywords": [
+    "metamask",
+    "snap",
+    "security",
+    "crypto",
+    "transactions",
+    "threat-detection",
+    "pre-sign",
+    "wallet-security"
+  ],
+  "author": {
+    "name": "GENESIS",
+    "url": "https://sadhutech-site.vercel.app"
+  },
   "scripts": {
     "build": "mm-snap build",
     "serve": "mm-snap serve"
