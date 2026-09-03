@@ -69,6 +69,14 @@ export default function WalletConnect() {
   const supportsWalletDeepLink = (wallet: WalletOption) =>
     ["trust", "rainbow", "metamask", "coinbase"].includes(wallet.id);
 
+  const getQrValue = (wallet: WalletOption | null, uri: string | null) => {
+    if (!wallet || !uri) {
+      return uri;
+    }
+
+    return getWalletLaunchUrl(wallet, uri);
+  };
+
   // Detect mobile on mount
   useEffect(() => {
     const checkMobile = () => {
@@ -270,8 +278,8 @@ export default function WalletConnect() {
                     </>
                   ) : connectionState.uri ? (
                     <>
-                      <QRCodeCanvas value={connectionState.uri} size={200} level="H" includeMargin={true} />
-                      <p className="text-slate-700 text-sm font-medium">Scan with {selectedWallet.name}</p>
+                      <QRCodeCanvas value={getQrValue(selectedWallet, connectionState.uri) || ""} size={200} level="H" includeMargin={true} />
+                      <p className="text-slate-700 text-sm font-medium">Scan to open {selectedWallet.name}</p>
                       <p className="text-xs text-slate-500">{connectionState.connectionApproved ? "✅ Connection approved!" : "Waiting for approval..."}</p>
                     </>
                   ) : (
