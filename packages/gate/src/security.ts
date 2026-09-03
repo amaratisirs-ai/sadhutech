@@ -226,6 +226,80 @@ export function validateReportRequest(body: unknown): ValidationError[] {
     }
   }
 
+  // Validate optional evidenceUrl
+  if (req.evidenceUrl !== undefined && req.evidenceUrl !== null) {
+    if (typeof req.evidenceUrl !== "string") {
+      errors.push({
+        field: "evidenceUrl",
+        error: `Invalid evidenceUrl: must be a string`,
+      });
+    } else if (!req.evidenceUrl.startsWith("http://") && !req.evidenceUrl.startsWith("https://")) {
+      errors.push({
+        field: "evidenceUrl",
+        error: `Invalid evidenceUrl: must start with http:// or https://`,
+      });
+    }
+  }
+
+  // Validate optional victimCount
+  if (req.victimCount !== undefined && req.victimCount !== null) {
+    if (!Number.isInteger(req.victimCount) || req.victimCount < 0) {
+      errors.push({
+        field: "victimCount",
+        error: `Invalid victimCount: must be a non-negative integer`,
+      });
+    }
+  }
+
+  // Validate optional impactedChains
+  if (req.impactedChains !== undefined && req.impactedChains !== null) {
+    if (!Array.isArray(req.impactedChains)) {
+      errors.push({
+        field: "impactedChains",
+        error: `Invalid impactedChains: must be an array of strings`,
+      });
+    } else {
+      for (let i = 0; i < req.impactedChains.length; i++) {
+        if (typeof req.impactedChains[i] !== "string") {
+          errors.push({
+            field: `impactedChains[${i}]`,
+            error: `must be a string`,
+          });
+        }
+      }
+    }
+  }
+
+  // Validate optional reporterEmail
+  if (req.reporterEmail !== undefined && req.reporterEmail !== null) {
+    if (typeof req.reporterEmail !== "string") {
+      errors.push({
+        field: "reporterEmail",
+        error: `Invalid reporterEmail: must be a string`,
+      });
+    } else if (!req.reporterEmail.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
+      errors.push({
+        field: "reporterEmail",
+        error: `Invalid reporterEmail: must be a valid email address`,
+      });
+    }
+  }
+
+  // Validate optional reporterName
+  if (req.reporterName !== undefined && req.reporterName !== null) {
+    if (typeof req.reporterName !== "string") {
+      errors.push({
+        field: "reporterName",
+        error: `Invalid reporterName: must be a string`,
+      });
+    } else if (req.reporterName.length > 100) {
+      errors.push({
+        field: "reporterName",
+        error: `reporterName too long: max 100 chars`,
+      });
+    }
+  }
+
   return errors;
 }
 

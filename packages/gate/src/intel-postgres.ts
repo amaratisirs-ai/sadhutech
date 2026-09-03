@@ -8,7 +8,7 @@ import { DEFAULT_QUORUM } from "@genesis/shared";
  * Implements same API as in-memory ThreatIntel for seamless swapping.
  */
 export class ThreatIntelPostgres {
-  private pool: Pool;
+  pool: Pool; // Made public for ContributorsService access
   private initialized = false;
 
   constructor(

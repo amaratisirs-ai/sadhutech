@@ -116,6 +116,34 @@ export interface ReportRequest {
   category: ThreatCategory;
   /** Stable pseudonymous id of the reporter (device/agent), for quorum counting. */
   reporterId: string;
+  /** Optional: detailed description of the threat. */
+  description?: string;
+  /** Optional: URL to evidence (screenshot, tweet, blockchain explorer). */
+  evidenceUrl?: string;
+  /** Optional: estimated number of victims affected. */
+  victimCount?: number;
+  /** Optional: chains this threat operates on (Ethereum, Polygon, Arbitrum, etc.). */
+  impactedChains?: string[];
+  /** Optional: reporter's email for follow-up on major incidents. */
+  reporterEmail?: string;
+  /** Optional: reporter's display name for leaderboard. */
+  reporterName?: string;
+}
+
+export interface Contributor {
+  reporterId: string;
+  displayName: string | null;
+  avatar: string;
+  totalReports: number;
+  reputationScore: number;
+  badges: string[];
+  status: "active" | "inactive" | "banned";
+  lastReportAt: string | null;
+  createdAt: string;
+}
+
+export interface LeaderboardEntry extends Contributor {
+  rank: number;
 }
 
 /** Maps a severity to its contribution to the 0..100 risk score. */
