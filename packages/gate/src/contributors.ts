@@ -116,7 +116,7 @@ export class ContributorsService {
   /**
    * Get top contributors leaderboard.
    */
-  async getLeaderboard(limit: number = 50): Promise<LeaderboardEntry[]> {
+  async getLeaderboard(limit: number = 50, offset: number = 0): Promise<LeaderboardEntry[]> {
     const query = `
       SELECT 
         ROW_NUMBER() OVER (ORDER BY reputation_score DESC, total_reports DESC) as rank,
@@ -132,11 +132,21 @@ export class ContributorsService {
       FROM contributors
       WHERE status = 'active'
       ORDER BY reputation_score DESC, total_reports DESC
-      LIMIT $1;
+      LIMIT $1 OFFSET $2;
     `;
 
-    const result = await this.pool.query(query, [limit]);
+    const result = await this.pool.query(query, [limit, offset]);
     return result.rows;
+  }
+
+  /**
+   * Get total count of active contributors.
+   */
+  async getContributorCount(): Promise<number> {
+    const result = await this.pool.query(
+      "SELECT COUNT(*) as count FROM contributors WHERE status = 'active';"
+    );
+    return parseInt(result.rows[0].count, 10);
   }
 
   /**

@@ -255,15 +255,15 @@ app.get("/v1/contributors/leaderboard", async (request, reply) => {
     const offset = Math.max(Number(query.offset) || 0, 0); // Pagination offset
     
     const leaderboard = await contributorsService.getLeaderboard(limit, offset);
-    const totalCount = await contributorsService.getContributorCount?.();
+    const totalCount = await contributorsService.getContributorCount();
     
     return {
       timestamp: new Date().toISOString(),
       pagination: {
         offset,
         limit,
-        total: totalCount || leaderboard.length,
-        hasMore: totalCount ? offset + leaderboard.length < totalCount : false,
+        total: totalCount,
+        hasMore: offset + leaderboard.length < totalCount,
       },
       count: leaderboard.length,
       leaderboard,
