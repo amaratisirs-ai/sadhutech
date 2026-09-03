@@ -1,13 +1,14 @@
 # GENESIS WalletConnect Middleware
 
-HTTP-based pre-sign transaction firewall for any WalletConnect-compatible wallet.
+HTTP-based pre-sign transaction firewall for WalletConnect onboarding, with Trust Wallet as the first production path.
 
 ## Overview
 
-The WalletConnect middleware adapter lets wallets analyze transactions via GENESIS gate before users sign them. No SDK overhead — just HTTP requests to `/v1/analyze`.
+The WalletConnect middleware adapter lets wallets analyze transactions via GENESIS gate before users sign them. In the current product flow, Trust Wallet is the primary onboarding target, and the same gate/API can later be adopted by additional WalletConnect-compatible wallets.
 
 **Key features:**
-- ✅ Works with **any** WalletConnect wallet (MetaMask, Rainbow, Ledger Live, Phantom, etc.)
+- ✅ Works with WalletConnect wallets that adopt the GENESIS flow
+- ✅ Trust Wallet is the first production onboarding path
 - ✅ Simple HTTP API (no WalletConnect SDK required for wallets)
 - ✅ Real-time risk scoring (allow/warn/block)
 - ✅ Plain-English verdict explanations
@@ -17,7 +18,7 @@ The WalletConnect middleware adapter lets wallets analyze transactions via GENES
 
 ### Pattern 1: Wallet Pre-Sign Hook (Recommended)
 
-Wallets can add a pre-sign interceptor that routes transactions through GENESIS:
+Wallets can add a pre-sign interceptor that routes transactions through GENESIS. This is the end-state for in-wallet protection.
 
 ```javascript
 // In your wallet's transaction handler
@@ -253,6 +254,16 @@ See [docs/POSTGRES-SETUP.md](../docs/POSTGRES-SETUP.md) for full deployment.
 3. **Graceful Fallback**: If gate is unreachable, wallets should allow signing (don't block users).
 4. **Rate Limiting**: Consider rate-limiting at the gate to prevent DoS.
 5. **CORS**: Gate allows permissive CORS for dev. Restrict in production.
+
+## Product Flow
+
+Current public onboarding follows this sequence:
+
+1. **MetaMask users** install the Snap and get wallet-native protection.
+2. **Trust Wallet users** start with WalletConnect onboarding to link the wallet to GENESIS.
+3. **Developers/integrators** use the API Explorer or middleware patterns to test `/v1/analyze` with real transactions.
+
+WalletConnect connection alone is a session handshake. Actual protection requires either a wallet-side pre-sign integration or a GENESIS-controlled analysis step before the final signature prompt.
 
 ## Multi-Chain Support
 

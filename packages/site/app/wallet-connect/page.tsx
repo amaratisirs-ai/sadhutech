@@ -184,18 +184,18 @@ export default function WalletConnect() {
   return (
     <div className="space-y-12">
       <div className="text-center space-y-4">
-        <h1 className="text-5xl md:text-6xl font-black text-white">🔗 Connect Your Wallet</h1>
+        <h1 className="text-5xl md:text-6xl font-black text-white">🔗 Trust Wallet Onboarding</h1>
         <p className="text-xl text-teal-200 max-w-2xl mx-auto">
           {isMobile
-            ? "Use Trust Wallet, Argent, Rainbow, and other supported wallets." 
-            : "Connect a supported wallet, then test real transactions in the API Explorer."}
+            ? "Start with Trust Wallet, then test real transactions in the API Explorer." 
+            : "Start with Trust Wallet via WalletConnect, then test real transactions in the API Explorer."}
         </p>
       </div>
 
       <section className="bg-gradient-to-br from-slate-900 to-indigo-950 border-2 border-indigo-500/30 rounded-2xl p-6 max-w-4xl mx-auto space-y-3">
         <h2 className="text-2xl font-bold text-white">What this page does</h2>
         <p className="text-sm text-slate-200">
-          This path connects WalletConnect-supported wallets. It does <strong>not</strong> install the MetaMask Snap. If you use MetaMask, go to the Snap install path instead.
+          This path starts with Trust Wallet over WalletConnect. It does <strong>not</strong> install the MetaMask Snap. If you use MetaMask, go to the Snap install path instead.
         </p>
         <div className="flex flex-wrap gap-3">
           <a href="/snap-install" className="px-4 py-2 rounded-lg bg-slate-800 text-slate-100 border border-slate-600 hover:border-teal-400 transition text-sm font-semibold">
@@ -210,6 +210,10 @@ export default function WalletConnect() {
       <div className={`grid ${isMobile ? "grid-cols-1" : "md:grid-cols-2"} gap-8 max-w-5xl mx-auto`}>
         <div className="space-y-4">
           <h2 className="text-2xl font-bold text-white mb-4">📱 Available Wallets</h2>
+          <div className="mb-3 rounded-xl border border-teal-500/30 bg-teal-500/10 p-4 text-sm text-slate-100">
+            <p className="font-semibold text-white">Recommended: Trust Wallet</p>
+            <p>Start with Trust Wallet first. Other supported wallets remain available below for later expansion.</p>
+          </div>
           <div className="grid grid-cols-2 gap-3 max-h-96 overflow-y-auto pr-2">
             {walletOptions.map((wallet) => (
               <button

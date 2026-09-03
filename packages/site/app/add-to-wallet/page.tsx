@@ -23,15 +23,15 @@ export default function AddToWallet() {
     },
     {
       id: "wallet-connect",
-      name: "WalletConnect Wallets",
-      description: "Trust Wallet, Argent, Rainbow, and 50+ supported wallets.",
+      name: "Trust Wallet via WalletConnect",
+      description: "Connect Trust Wallet first, then expand to other supported wallets if needed.",
       icon: "🔗",
-      badge: "Supported",
+      badge: "Recommended",
       status: "ready",
       action: () => router.push("/wallet-connect"),
       details: [
-        "Mobile-friendly flow",
-        "Connect supported wallets directly",
+        "Primary production path for non-MetaMask users",
+        "Starts with Trust Wallet onboarding",
         "Use the API Explorer to test real requests",
         "No MetaMask required",
       ],
@@ -44,7 +44,7 @@ export default function AddToWallet() {
       <div className="text-center space-y-4">
         <h1 className="text-5xl md:text-6xl font-black text-white">🛡️ Choose Your GENESIS Onboarding Path</h1>
         <p className="text-xl text-teal-200 max-w-2xl mx-auto">
-          Pick the path that matches your wallet: MetaMask Snap for MetaMask, or WalletConnect for supported wallets.
+          Pick the path that matches your wallet: MetaMask Snap for MetaMask, or Trust Wallet via WalletConnect for the production mobile flow.
         </p>
       </div>
 
@@ -56,8 +56,8 @@ export default function AddToWallet() {
             <p>Use this if you sign in MetaMask and want GENESIS inside the wallet.</p>
           </div>
           <div className="rounded-xl border border-slate-700 bg-slate-950/40 p-4 space-y-2">
-            <p className="font-bold text-white">2. WalletConnect</p>
-            <p>Use this for Trust Wallet, Rainbow, Argent, and other supported wallets.</p>
+            <p className="font-bold text-white">2. Trust Wallet via WalletConnect</p>
+            <p>Use this to connect Trust Wallet first, then test the real production flow.</p>
           </div>
         </div>
       </section>
@@ -158,6 +158,13 @@ export default function AddToWallet() {
             </div>
           </div>
         </div>
+      </section>
+
+      <section className="bg-slate-900/60 border border-teal-500/30 rounded-2xl p-6 max-w-3xl mx-auto space-y-3">
+        <h2 className="text-2xl font-bold text-white">Recommended production flow</h2>
+        <p className="text-sm text-slate-200">
+          If you are testing the real-world experience, start with Trust Wallet via WalletConnect. After connection, use the API Explorer to test transaction analysis and then expand to wallet-side integration if you want GENESIS inside the wallet app itself.
+        </p>
       </section>
     </div>
   );

@@ -11,15 +11,15 @@ export default function HelpPage() {
       questions: [
         {
           q: "Where do I install GENESIS Snap?",
-          a: "If you use MetaMask, go to /snap-install. If you use Trust Wallet, Rainbow, Argent, or another supported wallet, go to /wallet-connect. For a real transaction test, use /api-explorer.",
+          a: "If you use MetaMask, go to /snap-install. If you use Trust Wallet, go to /wallet-connect. For a real transaction test, use /api-explorer.",
         },
         {
           q: "Which onboarding path should I use?",
-          a: "MetaMask users should install the Snap. WalletConnect users should connect their supported wallet. Developers can use the API Explorer to test real requests.",
+          a: "MetaMask users should install the Snap. Trust Wallet users should start with WalletConnect. Developers can use the API Explorer to test real requests.",
         },
         {
           q: "What are the system requirements?",
-          a: "For the MetaMask Snap, you need MetaMask on a desktop browser. For WalletConnect, you need a supported wallet such as Trust Wallet, Rainbow, or Argent on a compatible device.",
+          a: "For the MetaMask Snap, you need MetaMask on a desktop browser. For WalletConnect onboarding, you need Trust Wallet on a compatible device.",
         },
         {
           q: "Is GENESIS Snap free?",

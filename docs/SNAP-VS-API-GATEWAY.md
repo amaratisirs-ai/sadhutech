@@ -244,7 +244,7 @@ Result: Best of both worlds
 ```
 
 **Ship:** Production API at `gate.genesis-security.io`
-- Integrate with Rabby, MathWallet, Tally Ho
+- Integrate with Trust Wallet first, then Rabby, MathWallet, Tally Ho
 - Publish npm @genesis/sdk
 - Launch bug bounty program
 
@@ -356,6 +356,12 @@ npm publish @genesis/sdk
 
 # Then later (optional): Add MetaMask Snap as convenience layer
 ```
+
+### Product Rollout Sequence
+
+1. **Trust Wallet onboarding via WalletConnect** for the first production mobile flow.
+2. **MetaMask Snap** for users who want direct in-wallet protection in MetaMask.
+3. **API Explorer / SDK** for developers and partner wallets to test and integrate the firewall.
 
 ### Users Get:
 
