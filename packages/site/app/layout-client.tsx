@@ -32,7 +32,9 @@ export function LayoutClient({ children }: { children: ReactNode }) {
               {/* Logo */}
               <a href="/" className="flex items-center gap-3 group" onClick={() => setMobileMenuOpen(false)}>
                 <img src="/logo.png" alt="GENESIS" className="w-14 h-14 object-contain" />
-                <span className="text-xl font-bold text-white hidden sm:inline">GENESIS</span>
+                <span className="text-2xl font-black italic tracking-wide hidden sm:inline bg-gradient-to-r from-white via-slate-200 to-teal-300 bg-clip-text text-transparent">
+                  GENESIS
+                </span>
               </a>
 
               {/* Desktop Nav */}
