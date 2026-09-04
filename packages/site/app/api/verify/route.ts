@@ -58,7 +58,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Reporting isn't configured yet." }, { status: 503 });
   }
 
-  const reporterId = "e:" + createHash("sha256").update(payload.email).digest("hex").slice(0, 24);
+  const reporterId = "e-" + createHash("sha256").update(payload.email).digest("hex").slice(0, 24);
   const gatePayload = {
     address: payload.address,
     category: payload.category,
