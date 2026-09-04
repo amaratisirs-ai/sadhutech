@@ -4,13 +4,14 @@ import { useEffect, useState } from "react";
 import { Icon } from "@/components/Icon";
 
 interface Contributor {
-  address: string;
-  username?: string;
-  reports: number;
-  threats: number;
-  verified: number;
-  score: number;
-  joinedAt: string;
+  reporterId: string;
+  displayName: string | null;
+  avatar: string;
+  totalReports: number;
+  reputationScore: number;
+  badges: string[];
+  lastReportAt: string | null;
+  createdAt: string;
 }
 
 export default function CommunityPage() {
@@ -182,42 +183,41 @@ export default function CommunityPage() {
                     <th className="px-6 py-3 text-left text-xs font-semibold text-slate-600 dark:text-slate-400">#</th>
                     <th className="px-6 py-3 text-left text-xs font-semibold text-slate-600 dark:text-slate-400">Contributor</th>
                     <th className="px-6 py-3 text-left text-xs font-semibold text-slate-600 dark:text-slate-400">Reports</th>
-                    <th className="px-6 py-3 text-left text-xs font-semibold text-slate-600 dark:text-slate-400">Threats Found</th>
                     <th className="px-6 py-3 text-left text-xs font-semibold text-slate-600 dark:text-slate-400">Verified</th>
                     <th className="px-6 py-3 text-left text-xs font-semibold text-slate-600 dark:text-slate-400">Score</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-200 dark:divide-slate-700">
                   {contributors
+                    .slice()
                     .sort((a, b) => {
-                      if (sortBy === "score") return b.score - a.score;
-                      if (sortBy === "reports") return b.reports - a.reports;
-                      if (sortBy === "verified") return b.verified - a.verified;
-                      if (sortBy === "latest") return new Date(b.joinedAt).getTime() - new Date(a.joinedAt).getTime();
+                      if (sortBy === "score") return b.reputationScore - a.reputationScore;
+                      if (sortBy === "reports") return b.totalReports - a.totalReports;
+                      if (sortBy === "verified") return Number(b.badges.includes("verified")) - Number(a.badges.includes("verified"));
+                      if (sortBy === "latest") return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
                       return 0;
                     })
                     .map((c, i) => (
-                    <tr key={i} className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+                    <tr key={c.reporterId} className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-2">
                           <div className="font-bold text-lg">{i === 0 ? "🥇" : i === 1 ? "🥈" : i === 2 ? "🥉" : `${i + 1}`}</div>
                         </div>
                       </td>
                       <td className="px-6 py-4">
-                        <div>
-                          <div className="font-semibold text-slate-900 dark:text-white">{c.username || "Anonymous"}</div>
-                          <div className="text-xs text-slate-600 dark:text-slate-400 font-mono">{c.address}</div>
+                        <div className="flex items-center gap-2">
+                          <span>{c.avatar || "🛡️"}</span>
+                          <div className="font-semibold text-slate-900 dark:text-white">{c.displayName || "Anonymous"}</div>
                         </div>
                       </td>
-                      <td className="px-6 py-4 text-slate-900 dark:text-white font-semibold">{c.reports}</td>
-                      <td className="px-6 py-4 text-slate-900 dark:text-white font-semibold">{c.threats}</td>
+                      <td className="px-6 py-4 text-slate-900 dark:text-white font-semibold">{c.totalReports}</td>
                       <td className="px-6 py-4">
                         <span className="inline-flex items-center gap-1 px-2 py-1 bg-green-500/20 text-green-700 dark:text-green-300 rounded text-sm font-medium">
-                          ✓ {c.verified}
+                          {c.badges.includes("verified") ? "✓ Verified" : "—"}
                         </span>
                       </td>
                       <td className="px-6 py-4">
-                        <div className="font-bold text-emerald-600 dark:text-emerald-400 text-lg">{c.score.toLocaleString()}</div>
+                        <div className="font-bold text-emerald-600 dark:text-emerald-400 text-lg">{c.reputationScore.toLocaleString()}</div>
                       </td>
                     </tr>
                   ))}
