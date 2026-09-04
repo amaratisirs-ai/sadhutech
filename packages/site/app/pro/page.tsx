@@ -106,20 +106,31 @@ export default function ProPage() {
   const ensureBase = async () => {
     const e = await getWalletProvider();
     if (!e) throw new Error("Connect a wallet before paying.");
+    const currentChain = await e.request({ method: "eth_chainId" });
+    if (String(currentChain).toLowerCase() === BASE_CHAIN_HEX) return;
     try {
       await e.request({ method: "wallet_switchEthereumChain", params: [{ chainId: BASE_CHAIN_HEX }] });
     } catch (err: any) {
       if (err?.code === 4902) {
-        await e.request({
-          method: "wallet_addEthereumChain",
-          params: [{
-            chainId: BASE_CHAIN_HEX,
-            chainName: "Base",
-            nativeCurrency: { name: "Ether", symbol: "ETH", decimals: 18 },
-            rpcUrls: ["https://mainnet.base.org"],
-            blockExplorerUrls: ["https://basescan.org"],
-          }],
-        });
+        try {
+          await e.request({
+            method: "wallet_addEthereumChain",
+            params: [{
+              chainId: BASE_CHAIN_HEX,
+              chainName: "Base",
+              nativeCurrency: { name: "Ether", symbol: "ETH", decimals: 18 },
+              rpcUrls: ["https://mainnet.base.org"],
+              blockExplorerUrls: ["https://basescan.org"],
+            }],
+          });
+        } catch (addError: any) {
+          if (addError?.code === 4200 || addError?.code === -32601) {
+            throw new Error("Switch your wallet to Base network, then tap Pay again.");
+          }
+          throw addError;
+        }
+      } else if (err?.code === 4200 || err?.code === -32601) {
+        throw new Error("Switch your wallet to Base network, then tap Pay again.");
       } else {
         throw err;
       }
