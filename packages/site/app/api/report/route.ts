@@ -10,7 +10,7 @@ const SIGNING_SECRET =
   process.env.REPORT_SIGNING_SECRET ||
   process.env.GENESIS_REPORT_API_KEY ||
   (process.env.GENESIS_API_KEYS || "").split(",")[0].trim();
-const TURNSTILE_SECRET = process.env.TURNSTILE_SECRET_KEY || "";
+const TURNSTILE_SECRET = process.env.TURNSTILE_SECRET_KEY || process.env.TURNSTILE_SECRET || "";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const ADDRESS_RE = /^0x[0-9a-fA-F]{40}$/;
