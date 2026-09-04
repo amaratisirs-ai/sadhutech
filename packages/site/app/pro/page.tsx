@@ -333,6 +333,11 @@ export default function ProPage() {
 
           {message && <p className="text-sm text-teal-200">{message}</p>}
           {error && <p className="text-sm text-rose-300">{error}</p>}
+          {credits > 0 && (
+            <a href="/check" className="block text-center text-sm font-semibold text-teal-300 hover:text-white hover:underline">
+              Continue to Check →
+            </a>
+          )}
         </div>
       )}
 

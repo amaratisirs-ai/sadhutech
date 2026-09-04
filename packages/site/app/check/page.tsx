@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { resolveDecisionOutcome, type DecisionOutcome } from "../../src/decision";
 import { Icon } from "@/components/Icon";
 
@@ -154,6 +154,21 @@ export default function CheckPage() {
   const [lastTx, setLastTx] = useState<Record<string, unknown> | null>(null);
   const [deepBusy, setDeepBusy] = useState(false);
   const [deepMsg, setDeepMsg] = useState<string | null>(null);
+  const [resumeDeepCheck, setResumeDeepCheck] = useState(false);
+
+  useEffect(() => {
+    const raw = sessionStorage.getItem("genesis_check_pending");
+    if (!raw) return;
+    sessionStorage.removeItem("genesis_check_pending");
+    try {
+      const saved = JSON.parse(raw);
+      if (saved.lastTx) setLastTx(saved.lastTx);
+      if (saved.result) setResult(saved.result);
+      if (saved.lastTx) setResumeDeepCheck(true);
+    } catch {
+      // ignore malformed restore payload
+    }
+  }, []);
 
   const analyzeTx = async (tx: Record<string, unknown>) => {
     const res = await fetch(`${GATE_URL}/v1/analyze`, {
@@ -250,14 +265,17 @@ export default function CheckPage() {
     if (!lastTx) return;
     const eth = await getWalletProvider();
     if (!eth) {
-      setDeepMsg("Connect a wallet first using MetaMask or WalletConnect, then return here to run a deep check.");
+      setDeepMsg("connect-wallet");
       return;
     }
     setDeepBusy(true);
     try {
       let w = wallet;
       if (!w) {
-        const accounts = (await eth.request({ method: "eth_requestAccounts" })) as string[];
+        let accounts = (await eth.request({ method: "eth_accounts" })) as string[];
+        if (!accounts?.[0]) {
+          accounts = (await eth.request({ method: "eth_requestAccounts" })) as string[];
+        }
         w = accounts?.[0]?.toLowerCase() ?? null;
         if (!w) { setDeepMsg("Wallet connection was rejected."); return; }
         setWallet(w);
@@ -289,6 +307,22 @@ export default function CheckPage() {
       setDeepBusy(false);
     }
   };
+
+  const connectForDeepCheck = () => {
+    try {
+      sessionStorage.setItem("genesis_check_pending", JSON.stringify({ lastTx, result }));
+    } catch {
+      // ignore storage failures; worst case the user re-runs the check
+    }
+    window.location.href = "/wallet-connect?returnTo=%2Fcheck";
+  };
+
+  useEffect(() => {
+    if (!resumeDeepCheck || !lastTx) return;
+    setResumeDeepCheck(false);
+    runDeepCheck();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [resumeDeepCheck, lastTx]);
 
   return (
     <div className="space-y-10 max-w-3xl mx-auto">
@@ -400,7 +434,18 @@ export default function CheckPage() {
           </div>
         </div>
       )}
-      {deepMsg && deepMsg !== "no-credits" && (
+      {deepMsg === "connect-wallet" && (
+        <div className="flex flex-col items-center gap-2">
+          <p className="text-xs text-amber-300 text-center">Connect a wallet to run a deep check.</p>
+          <button
+            onClick={connectForDeepCheck}
+            className="px-4 py-2 rounded-lg bg-amber-400 text-slate-950 text-sm font-bold hover:bg-amber-300 transition"
+          >
+            Connect wallet
+          </button>
+        </div>
+      )}
+      {deepMsg && deepMsg !== "no-credits" && deepMsg !== "connect-wallet" && (
         <p className="text-xs text-amber-300 text-center">{deepMsg}</p>
       )}
       {deepMsg === "no-credits" && (
