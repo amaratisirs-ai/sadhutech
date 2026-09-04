@@ -9,6 +9,8 @@ const nextConfig: NextConfig = {
       { source: "/add-to-wallet", destination: "/check", permanent: false },
       { source: "/transaction-check", destination: "/check", permanent: false },
       { source: "/demo", destination: "/check", permanent: false },
+      { source: "/post", destination: "/check", permanent: false },
+      { source: "/response", destination: "/check", permanent: false },
     ];
   },
 };

@@ -73,7 +73,7 @@ export async function POST(req: NextRequest) {
   const address = typeof body.address === "string" ? body.address.trim().toLowerCase() : "";
   const category = typeof body.category === "string" ? body.category : "";
   const email = typeof body.email === "string" ? body.email.trim().toLowerCase() : "";
-  const description = typeof body.description === "string" ? body.description.slice(0, 2000) : "";
+  const description = typeof body.description === "string" ? body.description.slice(0, 1000) : "";
   const reporterName = typeof body.reporterName === "string" ? body.reporterName.trim().slice(0, 80) : "";
   const turnstileToken = typeof body.turnstileToken === "string" ? body.turnstileToken : "";
 

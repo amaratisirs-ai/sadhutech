@@ -72,6 +72,13 @@ export default function ReportPage() {
     setLoading(true);
     setStatus('idle');
 
+    if (!/^0x[0-9a-fA-F]{40}$/.test(address.trim())) {
+      setStatus('error');
+      setMessage('❌ Enter a valid address — 0x followed by 40 hex characters.');
+      setLoading(false);
+      return;
+    }
+
     try {
       // Posts to our server-side proxy, which adds the gate API key and derives a stable reporter id from the email.
       const response = await fetch(`/api/report`, {
@@ -176,6 +183,7 @@ export default function ReportPage() {
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 rows={4}
+                maxLength={1000}
                 className="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
               />
             </div>
