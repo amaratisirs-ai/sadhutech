@@ -56,6 +56,12 @@ function detectNonEvmChain(addr: string): string | null {
   return null;
 }
 
+type Eth = { request: (a: { method: string; params?: unknown[] }) => Promise<unknown> };
+function getEth(): Eth | null {
+  if (typeof window === "undefined") return null;
+  return (window as unknown as { ethereum?: Eth }).ethereum ?? null;
+}
+
 function VerdictCard({ result }: { result: Result }) {
   if (result.error) {
     return (
@@ -106,6 +112,11 @@ export default function CheckPage() {
   const [dataInput, setDataInput] = useState("");
   const [checking, setChecking] = useState(false);
   const [result, setResult] = useState<Result | null>(null);
+  const [wallet, setWallet] = useState<string | null>(null);
+  const [credits, setCredits] = useState<number | null>(null);
+  const [lastTx, setLastTx] = useState<Record<string, unknown> | null>(null);
+  const [deepBusy, setDeepBusy] = useState(false);
+  const [deepMsg, setDeepMsg] = useState<string | null>(null);
 
   const analyzeTx = async (tx: Record<string, unknown>) => {
     const res = await fetch(`${GATE_URL}/v1/analyze`, {
@@ -139,8 +150,11 @@ export default function CheckPage() {
     }
     setChecking(true);
     setResult(null);
+    setDeepMsg(null);
     try {
-      const data = await analyzeTx({ chainId: 1, from: PROBE_FROM, to: addr, value: "1", data: "0x" });
+      const tx = { chainId: 1, from: PROBE_FROM, to: addr, value: "1", data: "0x" };
+      setLastTx(tx);
+      const data = await analyzeTx(tx);
       const outcome = resolveDecisionOutcome(data);
       const intel = (data.findings ?? []).find((f: { id?: string }) => String(f?.id).startsWith("intel."));
       const message = intel
@@ -164,14 +178,74 @@ export default function CheckPage() {
     }
     setChecking(true);
     setResult(null);
+    setDeepMsg(null);
     try {
-      const res = await analyzeTx({ chainId: 1, from: PROBE_FROM, to: PROBE_TO, value: "0", data });
+      const tx = { chainId: 1, from: PROBE_FROM, to: PROBE_TO, value: "0", data };
+      setLastTx(tx);
+      const res = await analyzeTx(tx);
       const outcome = resolveDecisionOutcome(res);
       setResult({ title, outcome, message: res.plainEnglish || outcome.reason, findings: res.findings ?? [] });
     } catch (e) {
       setResult({ title, error: e instanceof Error ? e.message : "Check failed" });
     } finally {
       setChecking(false);
+    }
+  };
+
+  const refreshStatus = async (addr: string) => {
+    try {
+      const r = await fetch(`${GATE_URL}/v1/pro/status/${addr}`);
+      if (!r.ok) return null;
+      const s = await r.json();
+      setCredits(typeof s.credits === "number" ? s.credits : 0);
+      return s as { credits?: number; premium?: boolean };
+    } catch {
+      return null;
+    }
+  };
+
+  const runDeepCheck = async () => {
+    setDeepMsg(null);
+    if (!lastTx) return;
+    const eth = getEth();
+    if (!eth) {
+      setDeepMsg("No wallet found. Install a browser wallet (e.g. MetaMask) to use deep checks.");
+      return;
+    }
+    setDeepBusy(true);
+    try {
+      let w = wallet;
+      if (!w) {
+        const accounts = (await eth.request({ method: "eth_requestAccounts" })) as string[];
+        w = accounts?.[0]?.toLowerCase() ?? null;
+        if (!w) { setDeepMsg("Wallet connection was rejected."); return; }
+        setWallet(w);
+      }
+      const s = await refreshStatus(w);
+      if (!s?.premium) { setDeepMsg("Deep checks (global ChainAbuse intel) are launching soon."); return; }
+      if (!s.credits || s.credits < 1) { setDeepMsg("no-credits"); return; }
+      const message = `SadhuTech deep check\nwallet: ${w}\nts: ${new Date().toISOString()}`;
+      const signature = (await eth.request({ method: "personal_sign", params: [message, w] })) as string;
+      const res = await fetch(`${GATE_URL}/v1/analyze`, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ tx: lastTx, pro: { wallet: w, message, signature } }),
+      });
+      if (res.status === 402) { await refreshStatus(w); setDeepMsg("no-credits"); return; }
+      if (!res.ok) { setDeepMsg(`Deep check failed (HTTP ${res.status}). Please try again.`); return; }
+      const data = await res.json();
+      const outcome = resolveDecisionOutcome(data);
+      setResult((prev) => ({
+        title: prev ? `${prev.title.replace(/ · deep$/, "")} · deep` : "Deep check",
+        outcome,
+        message: data.plainEnglish || outcome.reason,
+        findings: data.findings ?? [],
+      }));
+      if (typeof data.creditsLeft === "number") setCredits(data.creditsLeft);
+    } catch (e) {
+      setDeepMsg(e instanceof Error ? e.message : "Deep check failed.");
+    } finally {
+      setDeepBusy(false);
     }
   };
 
@@ -266,6 +340,31 @@ export default function CheckPage() {
       )}
 
       {result && <VerdictCard result={result} />}
+
+      {result && !result.error && lastTx && (
+        <div className="rounded-xl border border-amber-500/30 bg-amber-900/10 p-4 flex flex-col sm:flex-row sm:items-center gap-3 justify-between">
+          <div>
+            <p className="text-sm font-semibold text-white">🔒 Deep check <span className="text-xs font-normal text-amber-300/80">· Pro</span></p>
+            <p className="text-xs text-slate-400 mt-0.5">Cross-checks this address against ChainAbuse&apos;s global scam reports. Costs 1 credit.</p>
+          </div>
+          <div className="flex items-center gap-3 shrink-0">
+            {credits !== null && <span className="text-xs text-slate-400">{credits} left</span>}
+            <button
+              onClick={runDeepCheck}
+              disabled={deepBusy}
+              className="px-4 py-2 rounded-lg bg-amber-400 text-slate-950 text-sm font-bold hover:bg-amber-300 disabled:opacity-50 transition whitespace-nowrap"
+            >
+              {deepBusy ? "Working…" : wallet ? "Deep check (1 credit)" : "Connect &amp; deep check"}
+            </button>
+          </div>
+        </div>
+      )}
+      {deepMsg && deepMsg !== "no-credits" && (
+        <p className="text-xs text-amber-300 text-center">{deepMsg}</p>
+      )}
+      {deepMsg === "no-credits" && (
+        <p className="text-xs text-amber-300 text-center">You&apos;re out of checks. <a href="/pro" className="underline font-semibold">Buy more →</a></p>
+      )}
 
       {/* Examples */}
       <section className="space-y-3">
