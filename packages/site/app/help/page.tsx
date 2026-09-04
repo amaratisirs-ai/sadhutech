@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { Icon } from "@/components/Icon";
 
 export default function HelpPage() {
   const [openFaq, setOpenFaq] = useState<number | null>(0);
@@ -19,7 +20,7 @@ export default function HelpPage() {
         },
         {
           q: "What can I check?",
-          a: "Any EVM address or transaction — Ethereum, Polygon, Arbitrum, Optimism, and Avalanche.",
+          a: "Any EVM address or transaction  -  Ethereum, Polygon, Arbitrum, Optimism, and Avalanche.",
         },
         {
           q: "Is GENESIS free?",
@@ -27,7 +28,7 @@ export default function HelpPage() {
         },
         {
           q: "How much does it cost to use?",
-          a: "Zero cost. Checking a transaction or address is free — no gas fees, no charges.",
+          a: "Zero cost. Checking a transaction or address is free  -  no gas fees, no charges.",
         },
         {
           q: "Is my data safe?",
@@ -40,7 +41,7 @@ export default function HelpPage() {
       questions: [
         {
           q: "How do I read the result?",
-          a: "ALLOW (✅) = safe, no risks detected. WARN (⚠️) = potential risk, review carefully. BLOCK (🚫) = likely dangerous, don't sign.",
+          a: "ALLOW = safe, no risks detected. WARN = potential risk, review carefully. BLOCK = likely dangerous, don't sign.",
         },
         {
           q: "Why did it show WARN for something I trust?",
@@ -48,7 +49,7 @@ export default function HelpPage() {
         },
         {
           q: "Does it work on all blockchains?",
-          a: "It supports EVM chains — Ethereum, Polygon, Arbitrum, Optimism, and Avalanche.",
+          a: "It supports EVM chains  -  Ethereum, Polygon, Arbitrum, Optimism, and Avalanche.",
         },
         {
           q: "How fast is a check?",
@@ -65,11 +66,11 @@ export default function HelpPage() {
         },
         {
           q: "Does GENESIS track my transactions?",
-          a: "No. We don't log or store what you check — the transaction details are used only to produce a verdict.",
+          a: "No. We don't log or store what you check  -  the transaction details are used only to produce a verdict.",
         },
         {
           q: "Does GENESIS collect my address/wallet data?",
-          a: "Only what you paste. To produce a verdict we send the address or transaction you're checking to our server — nothing else. No accounts, no keys, no tracking, and we don't store it.",
+          a: "Only what you paste. To produce a verdict we send the address or transaction you're checking to our server  -  nothing else. No accounts, no keys, no tracking, and we don't store it.",
         },
         {
           q: "Is GENESIS open source?",
@@ -98,7 +99,7 @@ export default function HelpPage() {
         },
         {
           q: "My address shows no result",
-          a: "Make sure it's a valid EVM address — 0x followed by 40 characters. ENS names aren't supported yet.",
+          a: "Make sure it's a valid EVM address  -  0x followed by 40 characters. ENS names aren't supported yet.",
         },
       ],
     },
@@ -133,7 +134,7 @@ export default function HelpPage() {
     <div className="space-y-12">
       {/* Header */}
       <div className="text-center space-y-4">
-        <div className="text-6xl">❓</div>
+        <div className="flex justify-center text-teal-400"><Icon name="question" className="w-16 h-16" /></div>
         <h1 className="text-5xl font-black text-white">Help & Support</h1>
         <p className="text-lg text-teal-200 max-w-2xl mx-auto">
           Find answers to common questions or get in touch with our team.
@@ -148,7 +149,7 @@ export default function HelpPage() {
           rel="noopener noreferrer"
           className="bg-slate-900/50 border border-teal-500/30 rounded-2xl p-8 hover:border-teal-500/60 hover:shadow-lg hover:shadow-teal-500/20 transition-all group"
         >
-          <div className="text-3xl mb-3">🐛</div>
+          <div className="text-teal-400 mb-3"><Icon name="bug" className="w-8 h-8" /></div>
           <h3 className="font-bold text-white group-hover:text-teal-300">Report a Bug</h3>
           <p className="text-sm text-slate-400 mt-2">Found something broken? Let us know on GitHub.</p>
         </a>
@@ -157,7 +158,7 @@ export default function HelpPage() {
           href="/report"
           className="bg-slate-900/50 border border-teal-500/30 rounded-2xl p-8 hover:border-teal-500/60 hover:shadow-lg hover:shadow-teal-500/20 transition-all group"
         >
-          <div className="text-3xl mb-3">🚨</div>
+          <div className="text-teal-400 mb-3"><Icon name="bell" className="w-8 h-8" /></div>
           <h3 className="font-bold text-white group-hover:text-teal-300">Report a Threat</h3>
           <p className="text-sm text-slate-400 mt-2">Submit a dangerous address to the threat database.</p>
         </a>
@@ -166,9 +167,9 @@ export default function HelpPage() {
           href="mailto:support@genesis.com"
           className="bg-slate-900/50 border border-teal-500/30 rounded-2xl p-8 hover:border-teal-500/60 hover:shadow-lg hover:shadow-teal-500/20 transition-all group"
         >
-          <div className="text-3xl mb-3">✉️</div>
+          <div className="text-teal-400 mb-3"><Icon name="mail" className="w-8 h-8" /></div>
           <h3 className="font-bold text-white group-hover:text-teal-300">Email Support</h3>
-          <p className="text-sm text-slate-400 mt-2">support@genesis.com — We usually respond within 24h</p>
+          <p className="text-sm text-slate-400 mt-2">support@genesis.com  -  We usually respond within 24h</p>
         </a>
       </div>
 

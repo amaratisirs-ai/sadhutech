@@ -7,14 +7,14 @@
 
 ## Executive Summary
 
-Traditional cybersecurity defends through **centralization, predictability, and stasis**. A single control plane, one detection model, fixed topology — one gate to breach, and the fortress falls. Nature builds differently: colonies, cells, immune systems, branching realities. These systems have survived billions of years of adversarial pressure.
+Traditional cybersecurity defends through **centralization, predictability, and stasis**. A single control plane, one detection model, fixed topology  -  one gate to breach, and the fortress falls. Nature builds differently: colonies, cells, immune systems, branching realities. These systems have survived billions of years of adversarial pressure.
 
-**GENESIS is a security platform whose architecture is modeled on natural processes** — not as metaphor, but as engineering. We implement four natural mechanisms using modern cryptography, distributed systems, and deception technology:
+**GENESIS is a security platform whose architecture is modeled on natural processes**  -  not as metaphor, but as engineering. We implement four natural mechanisms using modern cryptography, distributed systems, and deception technology:
 
-1. **Hive** — emergent swarm detection with no single point of failure
-2. **Nucleus** — layered, atomic protection of crown jewels
-3. **Entanglement Fabric** — quantum-safe, unclonable trust bonds
-4. **Multiverse** — parallel universes for deception and self-healing
+1. **Hive**  -  emergent swarm detection with no single point of failure
+2. **Nucleus**  -  layered, atomic protection of crown jewels
+3. **Entanglement Fabric**  -  quantum-safe, unclonable trust bonds
+4. **Multiverse**  -  parallel universes for deception and self-healing
 
 Each plane is independent; together, they form a resilient security architecture that is:
 
@@ -52,16 +52,16 @@ A honeybee hive under attack does not deploy a stronger gate. Instead:
 
 - **It decentralizes**: No single bee is critical; loss of one bee weakens, not breaks, the swarm
 - **It emerges**: Threats are detected by quorum among many workers, not a single scout
-- **It moves**: Scan patterns, patrols, and resource allocation are stochastic — unpredictable
-- **It self-heals**: Propolis isolates, chemotaxis redirects, and drones are expelled — containment is local, not global
+- **It moves**: Scan patterns, patrols, and resource allocation are stochastic  -  unpredictable
+- **It self-heals**: Propolis isolates, chemotaxis redirects, and drones are expelled  -  containment is local, not global
 
-A cellular immune system works the same way: cells communicate locally; threats emerge at the quorum threshold; responses are probabilistic. The system adapts because it is **diverse, decentralized, and probabilistic** — not predictable.
+A cellular immune system works the same way: cells communicate locally; threats emerge at the quorum threshold; responses are probabilistic. The system adapts because it is **diverse, decentralized, and probabilistic**  -  not predictable.
 
 ---
 
 ## 2. The Four Planes of GENESIS
 
-### 2.1 Hive — Emergent Threat Detection
+### 2.1 Hive  -  Emergent Threat Detection
 
 **Metaphor**: A hive of honeybees with foragers ("worker bees"), a re-electable queen, and a waggle-dance (gossip) layer.
 
@@ -69,21 +69,21 @@ A cellular immune system works the same way: cells communicate locally; threats 
 
 - **Artificial Bee Colony (ABC)**: Agents self-allocate by fitness (risk × value × novelty), not central scheduling. Employed bees exploit known high-risk assets; onlookers focus probabilistically; scouts discover new assets using Lévy flights (unpredictable step patterns).
 
-- **Waggle-Dance Recruitment**: When a forager finds a high-severity threat, it broadcasts a recruitment message. Severity and confidence are proportional to recruitment strength and decay with topological distance and time — high-value signals spread fast, weak signals fade, and stale threats are ignored.
+- **Waggle-Dance Recruitment**: When a forager finds a high-severity threat, it broadcasts a recruitment message. Severity and confidence are proportional to recruitment strength and decay with topological distance and time  -  high-value signals spread fast, weak signals fade, and stale threats are ignored.
 
 - **Quorum Sensing**: A threat verdict emerges when a quorum of foragers agree (Byzantine-robust consensus). No single agent's judgment matters; consensus at the threshold is binding. This gives low false-positive verdicts.
 
-- **Moving Target Defense**: Scan patterns use Lévy-flight distributions — mostly local scans with occasional long jumps — so an attacker cannot learn the scan schedule to evade it.
+- **Moving Target Defense**: Scan patterns use Lévy-flight distributions  -  mostly local scans with occasional long jumps  -  so an attacker cannot learn the scan schedule to evade it.
 
 **Result**: Threats are detected at the *swarm* level, not by a central algorithm. If some agents are compromised or blind, the swarm still detects via quorum. The Queen orchestrates but is re-electable; if the Queen fails, a new one is elected.
 
-### 2.2 Nucleus — Layered Zero-Trust Protection
+### 2.2 Nucleus  -  Layered Zero-Trust Protection
 
 **Metaphor**: An atomic nucleus (crown jewels) surrounded by electron shells (privilege tiers), with quantized transitions, decay (auto-rotation), and ionization (anomalies).
 
 **Engineering**:
 
-- **Shells**: A resource is protected by discrete privilege tiers. Access requires jumping between shells inward (gaining privilege). Each jump is **quantized** — a step-up authentication event that requires cryptographic energy matching the shell gap. No continuous privilege — only discrete quantum leaps.
+- **Shells**: A resource is protected by discrete privilege tiers. Access requires jumping between shells inward (gaining privilege). Each jump is **quantized**  -  a step-up authentication event that requires cryptographic energy matching the shell gap. No continuous privilege  -  only discrete quantum leaps.
 
 - **Pauli Exclusion**: No two sessions may occupy the same quantum state. A compromised credential or token cannot coexist in two places; replay and token duplication are cryptographically impossible.
 
@@ -93,9 +93,9 @@ A cellular immune system works the same way: cells communicate locally; threats 
 
 **Result**: Crown-jewel data is protected in layers. Each layer requires a distinct credential or authentication event. The system is self-documenting: auditable transitions, verifiable privilege, and cryptographically enforced uniqueness.
 
-### 2.3 Entanglement Fabric — Quantum-Safe Trust Foundation
+### 2.3 Entanglement Fabric  -  Quantum-Safe Trust Foundation
 
-**Metaphor**: Quantum entanglement — correlated pairs that cannot be cloned, any measurement is detectable, and the link is tamper-evident and monogamous.
+**Metaphor**: Quantum entanglement  -  correlated pairs that cannot be cloned, any measurement is detectable, and the link is tamper-evident and monogamous.
 
 **Engineering**: Implemented with *classical, post-quantum cryptography* (no quantum hardware):
 
@@ -109,19 +109,19 @@ A cellular immune system works the same way: cells communicate locally; threats 
 
 **Result**: Trust is cryptographically enforced at the hardware level. Credentials cannot be copied; channels cannot be silently eavesdropped; pairing cannot be forged. The system is resilient against quantum attack and software-only compromise.
 
-### 2.4 Multiverse — Deception & Resilience
+### 2.4 Multiverse  -  Deception & Resilience
 
 **Metaphor**: Parallel universes. When a measurement (security event) occurs, reality forks. Some branches are decoys; some are shadows; one is prime.
 
 **Engineering**:
 
-- **Decoy Universes**: When Hive or Nucleus flags a session as hostile, the system forks that session into a high-interaction decoy — a mirror of production seeded with **honeytokens** (synthetic credentials). The attacker proceeds, believing they are in production, while the prime universe is untouched and attackers are studied.
+- **Decoy Universes**: When Hive or Nucleus flags a session as hostile, the system forks that session into a high-interaction decoy  -  a mirror of production seeded with **honeytokens** (synthetic credentials). The attacker proceeds, believing they are in production, while the prime universe is untouched and attackers are studied.
 
 - **Shadow Execution**: Borderline-risky requests are executed first in a shadow branch. Only if benign does the request commit to prime; if malicious, the branch is discarded.
 
 - **N-Universe Divergence**: Run a workload in N diverse configurations (different runtimes, memory layouts, libraries). Benign inputs produce identical behavior; exploits that depend on specific details cause divergence, which is detected.
 
-- **Branch Rollback**: Universes are checkpointed (snapshots). If a branch is confirmed compromised, it is rolled back to the last clean checkpoint — damage is discarded, not repaired.
+- **Branch Rollback**: Universes are checkpointed (snapshots). If a branch is confirmed compromised, it is rolled back to the last clean checkpoint  -  damage is discarded, not repaired.
 
 **Result**: Attackers cannot be sure which universe is real, and they cannot affect the prime. Deception enables study of attacker TTP (tactics, techniques, procedures). Self-healing is automatic via rollback.
 
@@ -161,7 +161,7 @@ Nature does not have a central command. Bees follow local waggle-dance rules; ce
 
 ### 4.3 Probabilistic Defense
 
-Nature does not commit to a fixed strategy. Immune cells are deployed stochastically; scan patterns use Levy flights; session routing is probabilistic. This makes the system an unpredictable *moving target* — an attacker cannot model it.
+Nature does not commit to a fixed strategy. Immune cells are deployed stochastically; scan patterns use Levy flights; session routing is probabilistic. This makes the system an unpredictable *moving target*  -  an attacker cannot model it.
 
 ### 4.4 Temporal Decay & Renewal
 

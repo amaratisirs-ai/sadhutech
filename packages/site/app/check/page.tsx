@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { resolveDecisionOutcome, type DecisionOutcome } from "../../src/decision";
+import { Icon } from "@/components/Icon";
 
 const GATE_URL = process.env.NEXT_PUBLIC_GATE_URL || "https://genesis-gate.onrender.com";
 const ADDRESS_RE = /^0x[0-9a-fA-F]{40}$/;
@@ -29,7 +30,7 @@ const EXAMPLES = [
   {
     key: "approval",
     label: "An unlimited spending approval",
-    hint: "Grants access to ALL your tokens — a common scam",
+    hint: "Grants access to ALL your tokens  -  a common scam",
     data: "0x095ea7b30000000000000000000000003333333333333333333333333333333333333333ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
   },
   {
@@ -67,7 +68,10 @@ function VerdictCard({ result }: { result: Result }) {
     return (
       <div className="rounded-xl border border-rose-500/50 bg-rose-900/20 p-5">
         <p className="text-sm font-semibold text-white">{result.title}</p>
-        <p className="mt-2 text-sm text-rose-200">❌ {result.error}</p>
+        <div className="mt-2 flex items-center gap-2 text-sm text-rose-200">
+          <Icon name="block" className="w-4 h-4" />
+          <span>{result.error}</span>
+        </div>
       </div>
     );
   }
@@ -75,17 +79,20 @@ function VerdictCard({ result }: { result: Result }) {
   const verdict = result.outcome?.verdict ?? "warn";
   const theme =
     verdict === "allow"
-      ? { border: "border-emerald-500/50", bg: "bg-emerald-900/20", label: "text-emerald-300", icon: "✅", head: "Looks safe" }
+      ? { border: "border-emerald-500/50", bg: "bg-emerald-900/20", label: "text-emerald-300", icon: "checkCircle" as const, head: "Looks safe" }
       : verdict === "block"
-        ? { border: "border-rose-500/50", bg: "bg-rose-900/20", label: "text-rose-300", icon: "🚫", head: "Do not sign" }
-        : { border: "border-amber-500/50", bg: "bg-amber-900/20", label: "text-amber-300", icon: "⚠️", head: "Be careful" };
+        ? { border: "border-rose-500/50", bg: "bg-rose-900/20", label: "text-rose-300", icon: "block" as const, head: "Do not sign" }
+        : { border: "border-amber-500/50", bg: "bg-amber-900/20", label: "text-amber-300", icon: "warning" as const, head: "Be careful" };
 
   return (
     <div className={`rounded-xl border p-5 space-y-3 ${theme.border} ${theme.bg}`}>
       <div className="flex items-center justify-between gap-3 flex-wrap">
         <div>
           <p className="text-xs uppercase tracking-wide text-slate-300">{result.title}</p>
-          <h3 className="text-2xl font-black text-white">{theme.icon} {theme.head}</h3>
+          <h3 className="text-2xl font-black text-white flex items-center gap-2">
+            <Icon name={theme.icon} className="w-6 h-6" />
+            <span>{theme.head}</span>
+          </h3>
         </div>
         <span className={`rounded-full border border-white/10 bg-black/20 px-3 py-1 text-xs font-bold uppercase tracking-wide ${theme.label}`}>
           {verdict}
@@ -133,17 +140,17 @@ export default function CheckPage() {
   const checkAddress = async () => {
     const addr = addressInput.trim();
     if (addr.toLowerCase().endsWith(".eth")) {
-      setResult({ title: "Address check", error: "ENS names aren't supported yet — paste the 0x address it points to." });
+      setResult({ title: "Address check", error: "ENS names aren't supported yet  -  paste the 0x address it points to." });
       return;
     }
     if (!ADDRESS_RE.test(addr)) {
       if (addr.startsWith("0x")) {
-        setResult({ title: "Address check", error: "That looks incomplete — an address is 0x followed by 40 characters." });
+        setResult({ title: "Address check", error: "That looks incomplete  -  an address is 0x followed by 40 characters." });
         return;
       }
       const chain = detectNonEvmChain(addr);
       const msg = chain
-        ? `That looks like a ${chain} address. GENESIS currently covers EVM chains (Ethereum, Polygon, Arbitrum, Optimism, Avalanche) — ${chain} support is on the roadmap, so we can't verify it yet.`
+        ? `That looks like a ${chain} address. GENESIS currently covers EVM chains (Ethereum, Polygon, Arbitrum, Optimism, Avalanche)  -  ${chain} support is on the roadmap, so we can't verify it yet.`
         : "We currently check EVM addresses (Ethereum, Polygon, Arbitrum, Optimism, Avalanche). Paste a 0x… address.";
       setResult({ title: "Address check", error: msg });
       return;
@@ -160,7 +167,7 @@ export default function CheckPage() {
       const message = intel
         ? intel.description
         : outcome.verdict === "allow"
-          ? "No known threats found for this address in the community feed. A clean result isn't a guarantee — stay cautious with new contracts."
+          ? "No known threats found for this address in the community feed. A clean result isn't a guarantee  -  stay cautious with new contracts."
           : outcome.reason;
       setResult({ title: `Safety check · ${short(addr)}`, outcome, message, findings: intel ? [intel] : [] });
     } catch (e) {
@@ -173,7 +180,7 @@ export default function CheckPage() {
   const checkTransaction = async (rawData: string, title: string) => {
     const data = rawData.trim();
     if (!/^0x[0-9a-fA-F]*$/.test(data) || data.length < 10) {
-      setResult({ title, error: "Paste valid transaction data — 0x followed by the encoded call (at least a 4-byte method)." });
+      setResult({ title, error: "Paste valid transaction data  -  0x followed by the encoded call (at least a 4-byte method)." });
       return;
     }
     setChecking(true);
@@ -254,7 +261,7 @@ export default function CheckPage() {
       <header className="text-center space-y-3">
         <h1 className="text-4xl md:text-5xl font-black text-white">Check before you sign</h1>
         <p className="text-slate-300 max-w-xl mx-auto">
-          Paste a crypto address or a transaction and GENESIS screens it against community threat intel — a plain-English
+          Paste a crypto address or a transaction and GENESIS screens it against community threat intel  -  a plain-English
           verdict in seconds. No wallet connection, no signup.
         </p>
       </header>
@@ -280,7 +287,7 @@ export default function CheckPage() {
       {mode === "address" ? (
         <section className="bg-slate-900/60 border-2 border-teal-500/40 rounded-2xl p-6 space-y-4">
           <div>
-            <h2 className="text-xl font-bold text-white">🔎 Is this address safe?</h2>
+            <h2 className="text-xl font-bold text-white flex items-center gap-2"><Icon name="search" className="w-5 h-5 text-teal-400" /> Is this address safe?</h2>
             <p className="text-sm text-slate-300 mt-1">
               About to approve a contract, connect to a dApp, or send funds? Paste that address first.
             </p>
@@ -318,7 +325,7 @@ export default function CheckPage() {
       ) : (
         <section className="bg-slate-900/60 border-2 border-teal-500/40 rounded-2xl p-6 space-y-4">
           <div>
-            <h2 className="text-xl font-bold text-white">🧾 Check transaction data</h2>
+            <h2 className="text-xl font-bold text-white flex items-center gap-2"><Icon name="document" className="w-5 h-5 text-teal-400" /> Check transaction data</h2>
             <p className="text-sm text-slate-300 mt-1">
               Paste the transaction data (calldata) your wallet is about to sign.
             </p>
@@ -344,7 +351,7 @@ export default function CheckPage() {
       {result && !result.error && lastTx && (
         <div className="rounded-xl border border-amber-500/30 bg-amber-900/10 p-4 flex flex-col sm:flex-row sm:items-center gap-3 justify-between">
           <div>
-            <p className="text-sm font-semibold text-white">🔒 Deep check <span className="text-xs font-normal text-amber-300/80">· Pro</span></p>
+            <p className="text-sm font-semibold text-white flex items-center gap-1.5"><Icon name="lock" className="w-4 h-4" /> Deep check <span className="text-xs font-normal text-amber-300/80">· Pro</span></p>
             <p className="text-xs text-slate-400 mt-0.5">Cross-checks this address against ChainAbuse&apos;s global scam reports. Costs 1 credit.</p>
           </div>
           <div className="flex items-center gap-3 shrink-0">
@@ -390,14 +397,14 @@ export default function CheckPage() {
         <div className="rounded-2xl border border-slate-700 bg-slate-900/50 p-5 space-y-2">
           <h3 className="text-sm font-bold text-white">Why trust the verdict?</h3>
           <p className="text-xs text-slate-300">
-            Threats are community-reported and confirmed by multiple independent reporters before they count — no single
+            Threats are community-reported and confirmed by multiple independent reporters before they count  -  no single
             person can flag an address alone. See the <a href="/threats" className="text-teal-300 hover:underline">live threat feed</a>.
           </p>
         </div>
         <div className="rounded-2xl border border-slate-700 bg-slate-900/50 p-5 space-y-2">
           <h3 className="text-sm font-bold text-white">Found a scam?</h3>
           <p className="text-xs text-slate-300">
-            Help protect everyone — <a href="/report" className="text-teal-300 hover:underline">report a malicious address</a>.
+            Help protect everyone  -  <a href="/report" className="text-teal-300 hover:underline">report a malicious address</a>.
             The more reports, the stronger the shield.
           </p>
         </div>

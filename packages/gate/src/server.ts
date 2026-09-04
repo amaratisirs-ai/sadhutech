@@ -108,7 +108,8 @@ app.post<{ Body: AnalyzeRequest }>("/v1/analyze",
         return reply.status(401).send({ error: "Bad signature." });
       }
       const tsMatch = /ts:\s*(\S+)/.exec(message);
-      const fresh = tsMatch ? Math.abs(Date.now() - Date.parse(tsMatch[1])) < 10 * 60 * 1000 : false;
+      const timestamp = tsMatch?.[1];
+      const fresh = timestamp ? Math.abs(Date.now() - Date.parse(timestamp)) < 10 * 60 * 1000 : false;
       if (signer.toLowerCase() !== wallet.toLowerCase() || !fresh || !message.toLowerCase().includes(wallet.toLowerCase())) {
         return reply.status(401).send({ error: "Invalid or expired signature." });
       }

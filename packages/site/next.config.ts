@@ -2,7 +2,7 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   async redirects() {
-    // MVP is a standalone checker — funnel the old wallet/developer flows to /check.
+    // MVP is a standalone checker  -  funnel the old wallet/developer flows to /check.
     return [
       { source: "/wallet-connect", destination: "/check", permanent: false },
       { source: "/connected", destination: "/check", permanent: false },

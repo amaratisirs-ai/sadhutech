@@ -1,11 +1,11 @@
 # GENESIS: Nature's Security Architecture
-## Layman's Presentation — 15 Slides
+## Layman's Presentation  -  15 Slides
 
 *A visual guide to how GENESIS protects crypto wallets and digital assets by copying nature's proven defense strategies*
 
 ---
 
-## SLIDE 1: The Problem — Why Normal Security Fails
+## SLIDE 1: The Problem  -  Why Normal Security Fails
 
 ```
 ┌─────────────────────────────────────┐
@@ -24,7 +24,7 @@
 🔓 Result: Attackers steal wallets, drain accounts, take everything
 ```
 
-**The Truth**: 99% of security systems fail the same way — one gate, one weakness, game over.
+**The Truth**: 99% of security systems fail the same way  -  one gate, one weakness, game over.
 
 ---
 
@@ -71,7 +71,7 @@ Each plane does one job very well. Together, they create a security system that:
 
 ---
 
-## SLIDE 4: Plane 1 — HIVE (Swarm Detection)
+## SLIDE 4: Plane 1  -  HIVE (Swarm Detection)
 
 ### **What Honeybees Do**
 
@@ -113,7 +113,7 @@ In GENESIS Hive:
 
 ---
 
-## SLIDE 5: Hive in Action — Example
+## SLIDE 5: Hive in Action  -  Example
 
 ```
 Your wallet receives a transaction request:
@@ -142,7 +142,7 @@ Your wallet receives a transaction request:
 
 ---
 
-## SLIDE 6: Plane 2 — NUCLEUS (Layered Protection)
+## SLIDE 6: Plane 2  -  NUCLEUS (Layered Protection)
 
 ### **What Atoms Do**
 
@@ -188,7 +188,7 @@ Each ring is SEPARATE. To go deeper:
 
 ---
 
-## SLIDE 7: Nucleus in Action — Example
+## SLIDE 7: Nucleus in Action  -  Example
 
 ```
 Attacker steals your password (outer shell)
@@ -211,7 +211,7 @@ Meanwhile, NUCLEUS detects unusual access:
 
 ---
 
-## SLIDE 8: Plane 3 — ENTANGLEMENT FABRIC (Unbreakable Trust)
+## SLIDE 8: Plane 3  -  ENTANGLEMENT FABRIC (Unbreakable Trust)
 
 ### **What Quantum Physics Shows**
 
@@ -255,7 +255,7 @@ GENESIS uses quantum-safe crypto to guarantee:
 
 ---
 
-## SLIDE 9: Entanglement Fabric in Action — Example
+## SLIDE 9: Entanglement Fabric in Action  -  Example
 
 ```
 Attacker intercepts your session token:
@@ -279,7 +279,7 @@ When attacker tries to use it:
 
 ---
 
-## SLIDE 10: Plane 4 — MULTIVERSE (Deception & Recovery)
+## SLIDE 10: Plane 4  -  MULTIVERSE (Deception & Recovery)
 
 ### **What Quantum Mechanics Suggests**
 
@@ -325,7 +325,7 @@ When a risky transaction arrives:
 
 ---
 
-## SLIDE 11: Multiverse in Action — Example
+## SLIDE 11: Multiverse in Action  -  Example
 
 ```
 Risky transaction arrives:
@@ -399,7 +399,7 @@ RESULT → VERDICT: ALLOW / WARN / BLOCK
 
 ---
 
-## SLIDE 13: Real-World Application — Protecting Your Crypto Wallet
+## SLIDE 13: Real-World Application  -  Protecting Your Crypto Wallet
 
 ```
 You're about to sign a transaction:
@@ -502,9 +502,9 @@ NEW SECURITY (GENESIS):
 
 ## Key Takeaways
 
-1. **Centralized security fails** — One gate, one weakness, game over.
+1. **Centralized security fails**  -  One gate, one weakness, game over.
 
-2. **Nature solves this** — Swarms, layers, quantum trust, parallel universes.
+2. **Nature solves this**  -  Swarms, layers, quantum trust, parallel universes.
 
 3. **GENESIS copies nature** with real modern cryptography and engineering.
 

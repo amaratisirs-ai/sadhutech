@@ -2,12 +2,13 @@
 
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
+import { Icon } from '@/components/Icon';
 
 const THREAT_CATEGORIES = [
-  { value: 'phishing', label: '🎣 Phishing' },
-  { value: 'drainer', label: '🔓 Drainer' },
-  { value: 'malicious-contract', label: '⚠️ Malicious Contract' },
-  { value: 'decoy-tripwire', label: '🪤 Honeypot' },
+  { value: 'phishing', label: 'Phishing' },
+  { value: 'drainer', label: 'Drainer' },
+  { value: 'malicious-contract', label: 'Malicious Contract' },
+  { value: 'decoy-tripwire', label: 'Honeypot' },
 ];
 const TURNSTILE_SITE_KEY = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || '';
 
@@ -74,7 +75,7 @@ export default function ReportPage() {
 
     if (!/^0x[0-9a-fA-F]{40}$/.test(address.trim())) {
       setStatus('error');
-      setMessage('❌ Enter a valid address — 0x followed by 40 hex characters.');
+      setMessage('Enter a valid address  -  0x followed by 40 hex characters.');
       setLoading(false);
       return;
     }
@@ -100,15 +101,15 @@ export default function ReportPage() {
 
       await response.json().catch(() => ({}));
       setStatus('success');
-      setMessage(`✅ Almost there — we've emailed ${email}. Click the confirmation link to submit your report.`);
+      setMessage(`Almost there  -  we've emailed ${email}. Click the confirmation link to submit your report.`);
       setAddress('');
       setDescription('');
       setCategory('drainer');    } catch (error) {
       setStatus('error');
       setMessage(
         error instanceof Error
-          ? `❌ Report failed: ${error.message}`
-          : '❌ Failed to submit threat report.'
+          ? `Report failed: ${error.message}`
+          : 'Failed to submit threat report.'
       );
     } finally {
       setLoading(false);
@@ -203,7 +204,7 @@ export default function ReportPage() {
                 className="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
               <p className="text-xs text-slate-400 mt-1">
-                Used to credit your report and build your reporter reputation. Kept private — never shown publicly or shared.
+                Used to credit your report and build your reporter reputation. Kept private  -  never shown publicly or shared.
               </p>
             </div>
 
@@ -235,7 +236,7 @@ export default function ReportPage() {
               disabled={loading || !address || !email || (!!TURNSTILE_SITE_KEY && !turnstileToken)}
               className="w-full px-6 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-slate-600 disabled:cursor-not-allowed text-white font-medium rounded-lg transition"
             >
-              {loading ? 'Reporting...' : '🚨 Report Threat'}
+              {loading ? 'Reporting…' : 'Report Threat'}
             </button>
           </form>
 
@@ -256,16 +257,16 @@ export default function ReportPage() {
         <div className="mt-8 bg-slate-700 border border-slate-600 rounded-lg p-6">
           <h2 className="text-lg font-semibold text-white mb-3">How It Works</h2>
           <ul className="space-y-2 text-slate-300 text-sm">
-            <li>✅ <strong>Submit:</strong> Report a malicious address (Ethereum, Polygon, Arbitrum, Optimism, etc.)</li>
-            <li>✅ <strong>Confirm:</strong> Click the link we email you — this proves the report is genuine</li>
-            <li>✅ <strong>Protect:</strong> Once confirmed by the community, GENESIS blocks the address for everyone</li>
-            <li>✅ <strong>Track:</strong> Build your reporter reputation on the community leaderboard</li>
+            <li className="flex gap-2"><Icon name="check" className="w-4 h-4 mt-0.5 text-green-400 flex-shrink-0" /><span><strong>Submit:</strong> Report a malicious address (Ethereum, Polygon, Arbitrum, Optimism, etc.)</span></li>
+            <li className="flex gap-2"><Icon name="check" className="w-4 h-4 mt-0.5 text-green-400 flex-shrink-0" /><span><strong>Confirm:</strong> Click the link we email you  -  this proves the report is genuine</span></li>
+            <li className="flex gap-2"><Icon name="check" className="w-4 h-4 mt-0.5 text-green-400 flex-shrink-0" /><span><strong>Protect:</strong> Once confirmed by the community, GENESIS blocks the address for everyone</span></li>
+            <li className="flex gap-2"><Icon name="check" className="w-4 h-4 mt-0.5 text-green-400 flex-shrink-0" /><span><strong>Track:</strong> Build your reporter reputation on the community leaderboard</span></li>
           </ul>
         </div>
 
         {/* Real community stat */}
         <div className="mt-8 bg-slate-700 rounded-lg p-6 text-center">
-          <div className="text-4xl font-bold text-blue-400">{threatCount !== null ? threatCount.toLocaleString() : '—'}</div>
+          <div className="text-4xl font-bold text-blue-400">{threatCount !== null ? threatCount.toLocaleString() : ' - '}</div>
           <div className="text-sm text-slate-400 mt-1">Malicious addresses in the community threat feed</div>
         </div>
       </div>

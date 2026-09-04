@@ -1,6 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { Icon } from "@/components/Icon";
 
 export default function AddToWallet() {
   const router = useRouter();
@@ -10,7 +11,7 @@ export default function AddToWallet() {
       id: "metamask",
       name: "MetaMask Snap",
       description: "Install GENESIS inside MetaMask on desktop so verdicts appear before signing.",
-      icon: "🦊",
+      icon: "shield" as const,
       badge: "MetaMask only",
       status: "ready",
       action: () => router.push("/snap-install"),
@@ -25,7 +26,7 @@ export default function AddToWallet() {
       id: "wallet-connect",
       name: "WalletConnect",
       description: "Connect supported mobile wallets using WalletConnect and test the real production flow.",
-      icon: "🔗",
+      icon: "link" as const,
       badge: "Recommended",
       status: "ready",
       action: () => router.push("/wallet-connect"),
@@ -76,7 +77,7 @@ export default function AddToWallet() {
             {/* Badge */}
             {wallet.badge && (
               <div className="flex justify-between items-start">
-                <div className="text-5xl">{wallet.icon}</div>
+                <div className="text-teal-400"><Icon name={wallet.icon} className="w-12 h-12" /></div>
                 <span
                   className={`px-3 py-1 rounded-full text-xs font-bold ${
                     wallet.status === "ready"
@@ -99,7 +100,7 @@ export default function AddToWallet() {
             <div className="space-y-2 py-4 border-y border-slate-700">
               {wallet.details.map((detail, i) => (
                 <div key={i} className="flex gap-2 text-sm">
-                  <span className="text-teal-400 flex-shrink-0">✓</span>
+                  <span className="text-teal-400 flex-shrink-0"><Icon name="checkCircle" className="w-4 h-4" /></span>
                   <span className="text-slate-200">{detail}</span>
                 </div>
               ))}
@@ -130,28 +131,28 @@ export default function AddToWallet() {
         <h2 className="text-2xl font-bold text-white">What you get after onboarding</h2>
         <div className="grid md:grid-cols-2 gap-4">
           <div className="flex gap-3">
-            <span className="text-2xl text-teal-400">⚡</span>
+            <span className="text-teal-400"><Icon name="bolt" className="w-6 h-6" /></span>
             <div>
               <p className="font-semibold text-white text-sm">Instant Protection</p>
               <p className="text-xs text-slate-300">Real-time threat detection on every transaction</p>
             </div>
           </div>
           <div className="flex gap-3">
-            <span className="text-2xl text-teal-400">🎯</span>
+            <span className="text-teal-400"><Icon name="chart" className="w-6 h-6" /></span>
             <div>
               <p className="font-semibold text-white text-sm">Clear Verdicts</p>
               <p className="text-xs text-slate-300">ALLOW, WARN, or BLOCK decisions</p>
             </div>
           </div>
           <div className="flex gap-3">
-            <span className="text-2xl text-teal-400">🔒</span>
+            <span className="text-teal-400"><Icon name="lock" className="w-6 h-6" /></span>
             <div>
               <p className="font-semibold text-white text-sm">100% Private</p>
               <p className="text-xs text-slate-300">Runs locally on your device</p>
             </div>
           </div>
           <div className="flex gap-3">
-            <span className="text-2xl text-teal-400">✓</span>
+            <span className="text-teal-400"><Icon name="users" className="w-6 h-6" /></span>
             <div>
               <p className="font-semibold text-white text-sm">Community-Powered</p>
               <p className="text-xs text-slate-300">Threat data verified by the community</p>

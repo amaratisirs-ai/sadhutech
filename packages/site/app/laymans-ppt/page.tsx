@@ -1,112 +1,113 @@
 "use client";
 
 import { useState } from "react";
+import { Icon } from "@/components/Icon";
 
 const slides = [
   {
     num: 1,
     title: "What is GENESIS?",
     subtitle: "Security that thinks like nature",
-    content: "GENESIS is a pre-sign security gate that analyzes your crypto transactions before you sign them. It catches scams, drainers, and tricks — all without accessing your private keys.",
-    icon: "🛡️",
+    content: "GENESIS is a pre-sign security gate that analyzes your crypto transactions before you sign them. It catches scams, drainers, and tricks  -  all without accessing your private keys.",
+    icon: "shield",
   },
   {
     num: 2,
     title: "The Problem",
     subtitle: "Why crypto wallets need protection",
     content: "Hackers exploit old permissions and approvals to drain wallets. A single bad approval can lock attackers into your assets forever. Traditional security can't adapt fast enough.",
-    icon: "⚠️",
+    icon: "warning",
   },
   {
     num: 3,
     title: "Nature's Solution",
     subtitle: "Four pillars of intelligent defense",
     content: "Just like ant colonies, immune systems, quantum entanglement, and biodiversity protect nature, GENESIS uses 4 natural mechanisms to build unbreakable security.",
-    icon: "🌿",
+    icon: "leaf",
   },
   {
     num: 4,
-    title: "Pillar 1: Hive 🐝",
+    title: "Pillar 1: Hive",
     subtitle: "Swarm voting (no single point of failure)",
     content: "Many independent security nodes analyze your transaction simultaneously. Like a colony, they vote on whether it's safe. No single node can be fooled or corrupted.",
-    icon: "🐝",
+    icon: "users",
   },
   {
     num: 5,
-    title: "Pillar 2: Nucleus ⚛️",
+    title: "Pillar 2: Nucleus",
     subtitle: "Layered protection (like concentric circles)",
     content: "Your most valuable assets (keys, approvals, big transfers) are wrapped in nested layers of checks. Bypass one layer? You hit the next one. Each layer is independent.",
-    icon: "⚛️",
+    icon: "atom",
   },
   {
     num: 6,
-    title: "Pillar 3: Entanglement Fabric 🔗",
+    title: "Pillar 3: Entanglement Fabric",
     subtitle: "Quantum-safe trust bonds (unbreakable connections)",
     content: "Your session and credentials are locked together with special cryptography. Steal a credential? It's useless without the session. Replay an attack? The bonds have changed.",
-    icon: "🔗",
+    icon: "link",
   },
   {
     num: 7,
-    title: "Pillar 4: Multiverse 🌀",
+    title: "Pillar 4: Multiverse",
     subtitle: "Deception & self-healing (parallel universes)",
     content: "If something looks wrong, your session forks. Attackers navigate a fake environment (honeypot) while your real transaction stays safe. System heals itself automatically.",
-    icon: "🌀",
+    icon: "network",
   },
   {
     num: 8,
     title: "How It Works: Step 1",
     subtitle: "You sign a transaction",
     content: "You open your wallet and try to approve a token swap, NFT mint, or DeFi interaction. Your private key stays in your wallet (never sent anywhere).",
-    icon: "✍️",
+    icon: "pencil",
   },
   {
     num: 9,
     title: "How It Works: Step 2",
     subtitle: "GENESIS analyzes it",
     content: "The Hive swarm instantly checks: Is this address known to be malicious? Are the token amounts reasonable? Does this violate your normal patterns? Is this a known exploit pattern?",
-    icon: "🔍",
+    icon: "search",
   },
   {
     num: 10,
     title: "How It Works: Step 3",
     subtitle: "You get a verdict",
-    content: "✅ ALLOW (safe to sign) | ⚠️ WARN (risky, double-check) | 🚫 BLOCK (likely scam, don't sign)",
-    icon: "📊",
+    content: "ALLOW (safe to sign) | WARN (risky, double-check) | BLOCK (likely scam, don't sign)",
+    icon: "chart",
   },
   {
     num: 11,
     title: "Real Example: Approval Attack",
     subtitle: "How GENESIS stops the most common scam",
     content: "You approve Token X for a swap. Hacker uses that old approval to drain your wallet. GENESIS catches it because: 1) Unusual recipient, 2) Unusual amount, 3) Known drainer address pattern.",
-    icon: "🚫",
+    icon: "block",
   },
   {
     num: 12,
     title: "Why Nature's Approach Wins",
     subtitle: "Comparison: Traditional vs. Natural",
     content: "Traditional security: One rule, one gate, one algorithm. Hackers know exactly what to bypass. Natural (GENESIS): Many nodes, emergent voting, moving target. Impossible to predict or prepare for.",
-    icon: "🏆",
+    icon: "trophy",
   },
   {
     num: 13,
     title: "Privacy: Your Keys Stay Yours",
     subtitle: "GENESIS never touches your private keys",
     content: "Only the transaction data (calldata) is analyzed. Your private keys never leave your wallet. You stay in full control. It's a guardian, not a gatekeeper.",
-    icon: "🔐",
+    icon: "lock",
   },
   {
     num: 14,
     title: "The Future",
     subtitle: "Crypto security that evolves",
     content: "As threats evolve, GENESIS adapts. The swarm learns. New patterns are detected. No firmware updates needed. The system self-heals and grows stronger, just like nature.",
-    icon: "🚀",
+    icon: "rocket",
   },
   {
     num: 15,
     title: "Ready to Protect Your Wallet?",
     subtitle: "Try GENESIS today",
     content: "Test it with your real transactions (GENESIS blocks nothing without your consent). See how it analyzes and explains every finding. Your crypto. Your control. Your security.",
-    icon: "🎯",
+    icon: "badge",
   },
 ];
 
@@ -146,7 +147,7 @@ export default function LaymansPPTPage() {
           {/* Slide Content */}
           <div>
             {/* Large Icon */}
-            <div className="text-7xl mb-8 text-center">{slide.icon}</div>
+            <div className="mb-8 flex justify-center text-teal-400"><Icon name={slide.icon as any} className="w-16 h-16" /></div>
 
             {/* Slide Number */}
             <div className="text-teal-500/50 text-sm font-mono mb-4">
@@ -231,22 +232,22 @@ export default function LaymansPPTPage() {
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="bg-slate-900/50 border-l-4 border-amber-500 rounded p-4">
-            <div className="text-2xl mb-2">🐝</div>
+            <div className="mb-2 text-amber-400"><Icon name="users" className="w-8 h-8" /></div>
             <p className="font-bold text-amber-400 text-sm">Hive: Swarm Voting</p>
             <p className="text-slate-400 text-xs mt-1">No single point of failure</p>
           </div>
           <div className="bg-slate-900/50 border-l-4 border-purple-500 rounded p-4">
-            <div className="text-2xl mb-2">⚛️</div>
+            <div className="mb-2 text-purple-400"><Icon name="atom" className="w-8 h-8" /></div>
             <p className="font-bold text-purple-400 text-sm">Nucleus: Layered Protection</p>
             <p className="text-slate-400 text-xs mt-1">Nested security circles</p>
           </div>
           <div className="bg-slate-900/50 border-l-4 border-cyan-500 rounded p-4">
-            <div className="text-2xl mb-2">🔗</div>
+            <div className="mb-2 text-cyan-400"><Icon name="link" className="w-8 h-8" /></div>
             <p className="font-bold text-cyan-400 text-sm">Entanglement: Quantum-Safe</p>
             <p className="text-slate-400 text-xs mt-1">Unbreakable trust bonds</p>
           </div>
           <div className="bg-slate-900/50 border-l-4 border-indigo-500 rounded p-4">
-            <div className="text-2xl mb-2">🌀</div>
+            <div className="mb-2 text-indigo-400"><Icon name="network" className="w-8 h-8" /></div>
             <p className="font-bold text-indigo-400 text-sm">Multiverse: Deception</p>
             <p className="text-slate-400 text-xs mt-1">Self-healing via honeypots</p>
           </div>

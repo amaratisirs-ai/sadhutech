@@ -43,7 +43,7 @@ const EXAMPLES = [
   {
     key: "approval",
     label: "An unlimited spending approval",
-    hint: "Common in scams — grants access to all your tokens",
+    hint: "Common in scams  -  grants access to all your tokens",
     data: "0x095ea7b30000000000000000000000003333333333333333333333333333333333333333ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
   },
   {
@@ -59,7 +59,10 @@ function VerdictCard({ result }: { result: CheckResult }) {
     return (
       <div className="rounded-xl border border-rose-500/50 bg-rose-900/20 p-5">
         <p className="text-sm font-semibold text-white">{result.title}</p>
-        <p className="mt-2 text-sm text-rose-200">❌ {result.error}</p>
+        <div className="mt-2 flex items-center gap-2 text-sm text-rose-200">
+          <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75"><path strokeLinecap="round" strokeLinejoin="round" d="M18.364 18.364A9 9 0 0 0 5.636 5.636m12.728 12.728A9 9 0 0 1 5.636 5.636m12.728 12.728L5.636 5.636" /></svg>
+          <span>{result.error}</span>
+        </div>
       </div>
     );
   }
@@ -67,17 +70,20 @@ function VerdictCard({ result }: { result: CheckResult }) {
   const verdict = result.outcome?.verdict ?? "warn";
   const theme =
     verdict === "allow"
-      ? { border: "border-emerald-500/50", bg: "bg-emerald-900/20", label: "text-emerald-300", icon: "✅", head: "Looks safe" }
+      ? { border: "border-emerald-500/50", bg: "bg-emerald-900/20", label: "text-emerald-300", icon: "checkCircle" as const, head: "Looks safe" }
       : verdict === "block"
-        ? { border: "border-rose-500/50", bg: "bg-rose-900/20", label: "text-rose-300", icon: "🚫", head: "Do not proceed" }
-        : { border: "border-amber-500/50", bg: "bg-amber-900/20", label: "text-amber-300", icon: "⚠️", head: "Be careful" };
+        ? { border: "border-rose-500/50", bg: "bg-rose-900/20", label: "text-rose-300", icon: "block" as const, head: "Do not proceed" }
+        : { border: "border-amber-500/50", bg: "bg-amber-900/20", label: "text-amber-300", icon: "warning" as const, head: "Be careful" };
 
   return (
     <div className={`rounded-xl border p-5 ${theme.border} ${theme.bg}`}>
       <div className="flex items-center justify-between gap-3 flex-wrap">
         <div>
           <p className="text-xs uppercase tracking-wide text-slate-300">{result.title}</p>
-          <h3 className="text-2xl font-black text-white">{theme.icon} {theme.head}</h3>
+          <h3 className="text-2xl font-black text-white flex items-center gap-2">
+            <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75">{theme.icon === "checkCircle" ? <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" /> : theme.icon === "block" ? <path strokeLinecap="round" strokeLinejoin="round" d="M18.364 18.364A9 9 0 0 0 5.636 5.636m12.728 12.728A9 9 0 0 1 5.636 5.636m12.728 12.728L5.636 5.636" /> : <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m0 3h.008M21 12c0 5.592-3.824 10.29-9 11.622C6.824 22.29 3 17.592 3 12V6.75A11.96 11.96 0 0 0 12 3a11.96 11.96 0 0 0 9 3.75V12Z" />}</svg>
+            <span>{theme.head}</span>
+          </h3>
         </div>
         <span className={`rounded-full border border-white/10 bg-black/20 px-3 py-1 text-xs font-bold uppercase tracking-wide ${theme.label}`}>
           {verdict}
@@ -130,12 +136,12 @@ function ConnectedContent() {
   const checkAddress = async () => {
     const addr = addressInput.trim();
     if (addr.toLowerCase().endsWith(".eth")) {
-      setResult({ title: "Address check", error: "ENS names aren't supported yet — paste the 0x address it points to." });
+      setResult({ title: "Address check", error: "ENS names aren't supported yet  -  paste the 0x address it points to." });
       return;
     }
     if (!ADDRESS_RE.test(addr)) {
       const msg = addr.startsWith("0x")
-        ? "That looks incomplete — an address is 0x followed by 40 characters."
+        ? "That looks incomplete  -  an address is 0x followed by 40 characters."
         : "We currently check EVM addresses (Ethereum, Polygon, Arbitrum, Optimism, Avalanche). Paste a 0x… address.";
       setResult({ title: "Address check", error: msg });
       return;
@@ -155,7 +161,7 @@ function ConnectedContent() {
       const message = intel
         ? intel.description
         : outcome.verdict === "allow"
-          ? "No known threats found for this address in the community feed. A clean result isn't a guarantee — stay cautious with new contracts."
+          ? "No known threats found for this address in the community feed. A clean result isn't a guarantee  -  stay cautious with new contracts."
           : outcome.reason;
       setResult({ title: `Safety check · ${short(addr)}`, outcome, message });
     } catch (e) {
@@ -193,7 +199,7 @@ function ConnectedContent() {
   if (!session) {
     return (
       <div className="max-w-2xl mx-auto text-center space-y-6 py-12">
-        <div className="text-6xl">🔌</div>
+        <div className="text-teal-400"><svg className="w-16 h-16 mx-auto" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75"><path strokeLinecap="round" strokeLinejoin="round" d="M13.5 10.5V6.75a4.5 4.5 0 1 1 9 0v3.75M3.75 21.75h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H3.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z" /></svg></div>
         <h1 className="text-4xl font-black text-white">No wallet connected</h1>
         <p className="text-slate-300">Connect a wallet first to start checking transactions before you sign them.</p>
         <a href="/wallet-connect" className="inline-block px-6 py-3 rounded-lg bg-teal-500 text-slate-950 font-bold hover:bg-teal-400 transition">
@@ -208,7 +214,7 @@ function ConnectedContent() {
       {/* Success header */}
       <section className="bg-gradient-to-br from-emerald-900/40 to-slate-900 border-2 border-emerald-500/50 rounded-2xl p-6 md:p-8 space-y-4">
         <div className="flex items-center gap-4">
-          <div className="text-5xl">✅</div>
+          <div className="text-emerald-400"><svg className="w-12 h-12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75"><path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" /></svg></div>
           <div>
             <h1 className="text-3xl md:text-4xl font-black text-white">You're connected</h1>
             <p className="text-emerald-200 text-sm">GENESIS is ready to check transactions before you sign them.</p>
@@ -241,10 +247,10 @@ function ConnectedContent() {
       {/* Primary tool: check an address */}
       <section className="bg-slate-900/60 border-2 border-teal-500/40 rounded-2xl p-6 space-y-4">
         <div>
-          <h3 className="text-xl font-bold text-white">🔎 Check any address before you approve it</h3>
+          <h3 className="text-xl font-bold text-white">Check any address before you approve it</h3>
           <p className="text-sm text-slate-300 mt-1">
             About to approve a contract, connect to a dApp, or send funds? Paste that address here first and GENESIS screens
-            it against community threat intel — before you sign anything in your wallet.
+            it against community threat intel  -  before you sign anything in your wallet.
           </p>
           <p className="text-xs text-slate-400 mt-2">
             Checking on <span className="text-teal-300 font-semibold">{chainName(session.chainId)}</span> · supports EVM chains (Ethereum, Polygon, Arbitrum, Optimism, Avalanche).
@@ -294,7 +300,7 @@ function ConnectedContent() {
         <h3 className="text-lg font-bold text-white">Coming soon: hands-free protection</h3>
         <p className="text-sm text-slate-300">
           Right now, paste-to-check keeps you safe before you approve anything. Automatic protection that pops up inside
-          your wallet as you sign is in progress — we'll let you know when it's ready.
+          your wallet as you sign is in progress  -  we'll let you know when it's ready.
         </p>
       </section>
     </div>

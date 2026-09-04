@@ -1,5 +1,5 @@
 import { Pool } from "pg";
-import { createPublicClient, http, parseAbiItem, getAddress, type PublicClient } from "viem";
+import { createPublicClient, http, parseAbiItem, getAddress } from "viem";
 import { base } from "viem/chains";
 
 // Native USDC on Base (6 decimals).
@@ -22,14 +22,13 @@ export interface VerifyResult {
  */
 export class ProAccessService {
   private pool: Pool;
-  private client: PublicClient;
+  private client = createPublicClient({
+    chain: base,
+    transport: http(process.env.BASE_RPC_URL || undefined),
+  });
 
   constructor(pool: Pool) {
     this.pool = pool;
-    this.client = createPublicClient({
-      chain: base,
-      transport: http(process.env.BASE_RPC_URL || undefined),
-    });
   }
 
   async initialize(): Promise<void> {

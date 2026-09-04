@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { Icon } from "@/components/Icon";
 
 interface AnalyzeResponse {
   verdict: "allow" | "warn" | "block";
@@ -168,7 +169,7 @@ export default function DemoPage() {
               </div>
 
               <div className="bg-slate-800/50 border border-slate-600 rounded p-3">
-                <p className="text-xs font-bold text-yellow-300 mb-1">⚠️ Common issue:</p>
+                <p className="text-xs font-bold text-yellow-300 mb-1">Common issue:</p>
                 <p className="text-xs text-slate-300">"Connection failed" error? Make sure you ran <code className="bg-slate-800 px-1 py-0.5 rounded text-teal-300 font-mono">pnpm gate</code> in another terminal window, or check that the gate server is reachable.</p>
               </div>
             </div>
@@ -212,7 +213,7 @@ export default function DemoPage() {
               <li><strong>NFT Collection Approval:</strong> Giving access to manage your whole NFT collection (WARN)</li>
               <li><strong>Approve to Known Drainer:</strong> Approving to a verified malicious address (BLOCK)</li>
             </ul>
-            <p className="text-xs text-teal-300 pt-2">💡 Use these to learn how GENESIS works before analyzing your own transactions.</p>
+            <p className="text-xs text-teal-300 pt-2">Use these to learn how GENESIS works before analyzing your own transactions.</p>
           </div>
         )}
 
@@ -300,19 +301,19 @@ export default function DemoPage() {
             <div className="bg-teal-500/10 border border-teal-500/30 rounded-lg p-4 text-sm text-slate-300 space-y-3">
               <div>
                 <p className="font-semibold text-slate-300 flex items-center gap-2">
-                  <span className="text-2xl">✅</span> ALLOW (Safe)
+                  <Icon name="checkCircle" className="w-6 h-6 text-green-400" /> ALLOW (Safe)
                 </p>
                 <p className="text-slate-400 mt-1">Low risk. The transaction looks normal and safe to sign. No known threats detected.</p>
               </div>
               <div>
                 <p className="font-semibold text-slate-300 flex items-center gap-2">
-                  <span className="text-2xl">⚠️</span> WARN (Caution)
+                  <Icon name="warning" className="w-6 h-6 text-yellow-400" /> WARN (Caution)
                 </p>
                 <p className="text-slate-400 mt-1">Medium risk. Something unusual detected (risky permission, new contract, etc.). Review carefully before signing.</p>
               </div>
               <div>
                 <p className="font-semibold text-slate-300 flex items-center gap-2">
-                  <span className="text-2xl">🚫</span> BLOCK (Danger)
+                  <Icon name="block" className="w-6 h-6 text-red-400" /> BLOCK (Danger)
                 </p>
                 <p className="text-slate-400 mt-1">High risk. Known scam, drainer, or exploit detected. <strong>DO NOT SIGN</strong>.</p>
               </div>
@@ -331,7 +332,7 @@ export default function DemoPage() {
               {/* Verdict */}
               <div>
                 <p className="text-sm font-semibold opacity-90 mb-2">VERDICT</p>
-                <p className="text-5xl font-bold">{response.verdict === "allow" ? "✅" : response.verdict === "warn" ? "⚠️" : "🚫"}</p>
+                <p className="text-5xl font-bold">{response.verdict === "allow" ? <Icon name="checkCircle" className="w-12 h-12 text-white" /> : response.verdict === "warn" ? <Icon name="warning" className="w-12 h-12 text-white" /> : <Icon name="block" className="w-12 h-12 text-white" />}</p>
                 <p className="text-3xl font-bold mt-2">{response.verdict.toUpperCase()}</p>
               </div>
 
@@ -367,8 +368,8 @@ export default function DemoPage() {
           {response.findings.length > 0 && (
             <div className="bg-white rounded-xl border-2 border-slate-200 p-6 space-y-4">
               <div className="flex items-center gap-2">
-                <h3 className="font-bold text-lg text-slate-900">
-                  🔍 Findings ({response.findings.length})
+                <h3 className="font-bold text-lg text-slate-900 flex items-center gap-2">
+                  <Icon name="search" className="w-5 h-5 text-slate-700" /> Findings ({response.findings.length})
                 </h3>
                 <button
                   type="button"
@@ -414,7 +415,7 @@ export default function DemoPage() {
                   return (
                     <div key={f.id} className={`border-l-4 p-4 rounded-lg ${color}`}>
                       <p className="font-semibold text-slate-900">
-                        {emoji} {f.severity.toUpperCase()} — {f.title}
+                        {emoji} {f.severity.toUpperCase()}  -  {f.title}
                       </p>
                       <p className="text-sm text-slate-700 mt-2">{f.description}</p>
                     </div>

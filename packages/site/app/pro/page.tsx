@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { Icon } from "@/components/Icon";
 
 const GATE_URL = process.env.NEXT_PUBLIC_GATE_URL || "https://genesis-gate.onrender.com";
 const PAYMENT_ADDRESS = (process.env.NEXT_PUBLIC_PAYMENT_ADDRESS || "").toLowerCase();
@@ -98,7 +99,7 @@ export default function ProPage() {
       const d = await r.json().catch(() => ({}));
       if (r.ok && d.ok) {
         setCredits(d.balance ?? credits);
-        setMessage(`✅ Added ${d.credited} check${d.credited === 1 ? "" : "s"} — you now have ${d.balance}.`);
+        setMessage(`Added ${d.credited} check${d.credited === 1 ? "" : "s"}  -  you now have ${d.balance}.`);
         return true;
       }
       await new Promise((res) => setTimeout(res, 8000));
@@ -125,7 +126,7 @@ export default function ProPage() {
         params: [{ from: account, to: USDC_BASE, data, value: "0x0" }],
       });
       setBusy("verifying");
-      setMessage("Payment sent — adding your checks (this can take ~30s)…");
+      setMessage("Payment sent  -  adding your checks (this can take ~30s)…");
       const ok = await pollVerify(account);
       if (!ok) setMessage("Payment sent. If your checks haven't appeared, tap “Already paid? Add checks” shortly.");
     } catch (err: any) {
@@ -148,10 +149,10 @@ export default function ProPage() {
   if (!CONFIGURED) {
     return (
       <div className="max-w-xl mx-auto text-center space-y-6 py-16">
-        <div className="text-6xl">⚡</div>
+        <div className="flex justify-center text-teal-400"><Icon name="bolt" className="w-16 h-16" /></div>
         <h1 className="text-4xl font-black text-white">Pro is coming soon</h1>
         <p className="text-slate-300">
-          Pay-as-you-go deep checks — pay only for what you use, straight from your wallet, powered by ChainAbuse for
+          Pay-as-you-go deep checks  -  pay only for what you use, straight from your wallet, powered by ChainAbuse for
           cross-chain coverage. We'll flip it on shortly.
         </p>
         <a href="/check" className="inline-block px-6 py-3 rounded-lg bg-teal-500 text-slate-950 font-bold hover:bg-teal-400 transition">
@@ -168,7 +169,7 @@ export default function ProPage() {
       <header className="text-center space-y-3">
         <h1 className="text-4xl font-black text-white">Deep checks, pay-as-you-go</h1>
         <p className="text-slate-300">
-          Pay what you like (min {MIN_USDC} USDC) in USDC on Base — {CREDITS_PER_USDC} check{CREDITS_PER_USDC === 1 ? "" : "s"} per
+          Pay what you like (min {MIN_USDC} USDC) in USDC on Base  -  {CREDITS_PER_USDC} check{CREDITS_PER_USDC === 1 ? "" : "s"} per
           USDC. No subscription, no account, just your wallet.
         </p>
       </header>
@@ -196,7 +197,7 @@ export default function ProPage() {
           </div>
 
           <div className="space-y-2">
-            <p className="text-sm text-slate-300">Add checks — pay what you like:</p>
+            <p className="text-sm text-slate-300">Add checks  -  pay what you like:</p>
             <div className="flex gap-2">
               {[1, 5, 10].map((v) => (
                 <button
@@ -219,7 +220,7 @@ export default function ProPage() {
               />
             </div>
             <p className="text-xs text-slate-400">
-              = {buyChecks} check{buyChecks === 1 ? "" : "s"}. Paid on Base — make sure your wallet holds USDC on Base.
+              = {buyChecks} check{buyChecks === 1 ? "" : "s"}. Paid on Base  -  make sure your wallet holds USDC on Base.
             </p>
           </div>
 
@@ -239,7 +240,7 @@ export default function ProPage() {
           </button>
 
           {message && <p className="text-sm text-teal-200">{message}</p>}
-          {error && <p className="text-sm text-rose-300">❌ {error}</p>}
+          {error && <p className="text-sm text-rose-300">{error}</p>}
         </div>
       )}
 

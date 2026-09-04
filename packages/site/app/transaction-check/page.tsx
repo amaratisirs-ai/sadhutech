@@ -185,7 +185,7 @@ function APIExplorerContent() {
     <div className="space-y-8 max-w-7xl">
       {/* Header */}
       <div className="space-y-4">
-        <h1 className="text-5xl font-black text-white mb-4">🔒 Transaction Review</h1>
+        <h1 className="text-5xl font-black text-white mb-4">Transaction Review</h1>
         <p className="text-slate-300 text-lg">
           Connect your wallet, review the transaction, and let GENESIS check it before signing.
         </p>
@@ -334,7 +334,7 @@ function APIExplorerContent() {
               : "text-slate-400 hover:text-white"
           }`}
         >
-          ✏️ Request Editor
+          Request Editor
         </button>
         <button
           onClick={() => setActiveTab("docs")}
@@ -344,7 +344,7 @@ function APIExplorerContent() {
               : "text-slate-400 hover:text-white"
           }`}
         >
-          📚 API Docs
+          API Docs
         </button>
       </div>
 
@@ -353,7 +353,7 @@ function APIExplorerContent() {
         <div className="space-y-6">
           {/* Quick Scenarios */}
           <div className="space-y-3">
-            <p className="text-sm font-bold text-slate-900">⚡ Quick Test Scenarios:</p>
+            <p className="text-sm font-bold text-slate-900">Quick Test Scenarios:</p>
             <div className="grid md:grid-cols-2 gap-3">
               {[
                 {
@@ -421,7 +421,7 @@ function APIExplorerContent() {
           <div className="grid md:grid-cols-2 gap-6">
             {/* Request */}
             <div className="space-y-2">
-              <h3 className="font-bold text-slate-900">📤 Request Body</h3>
+              <h3 className="font-bold text-slate-900">Request Body</h3>
               <div className="bg-white rounded-lg border-2 border-slate-200 overflow-hidden">
                 <div className="bg-indigo-50 px-4 py-2 border-b border-slate-200 text-xs font-mono text-slate-900 font-bold">
                   POST {gateUrl}/v1/analyze
@@ -437,16 +437,16 @@ function APIExplorerContent() {
 
             {/* Response */}
             <div className="space-y-2">
-              <h3 className="font-bold text-slate-900">📥 Response</h3>
+              <h3 className="font-bold text-slate-900">Response</h3>
               <div className="bg-white rounded-lg border-2 border-slate-200 overflow-hidden">
                 <div className="bg-slate-50 px-4 py-2 border-b border-slate-200 text-xs font-medium text-slate-900 font-bold flex justify-between items-center">
                   <span>Response Output</span>
-                  {loading && <span className="text-blue-600 animate-spin">⟳</span>}
+                  {loading && <span className="text-blue-600 text-xs">Loading…</span>}
                 </div>
                 <div className="p-4 font-mono text-xs whitespace-pre-wrap break-all h-96 overflow-auto bg-white">
                   {error ? (
                     <span className="text-red-600">
-                      ❌ {error}
+                      {error}
                     </span>
                   ) : response ? (
                     <span className="text-green-600">{response}</span>
@@ -512,34 +512,34 @@ function APIExplorerContent() {
             <div className="space-y-4 pt-4 border-t border-slate-200">
               {/* Request */}
               <div>
-                <h4 className="font-semibold text-slate-900 mb-2">📤 Request Parameters</h4>
+                <h4 className="font-semibold text-slate-900 mb-2">Request Parameters</h4>
                 <div className="bg-slate-50 p-4 rounded-lg space-y-2 text-sm font-mono">
-                  <p><span className="text-blue-700 font-bold">tx</span> (required) — Transaction object</p>
+                  <p><span className="text-blue-700 font-bold">tx</span> (required)  -  Transaction object</p>
                   <div className="ml-4 space-y-1 text-slate-800">
-                    <p><span className="text-slate-900">chainId</span>: number — EIP-155 chain ID (1=mainnet)</p>
-                    <p><span className="text-slate-900">from</span>: string — Sender address (0x...)</p>
-                    <p><span className="text-slate-900">to</span>: string — Target contract address</p>
-                    <p><span className="text-slate-900">data</span>: string — Encoded calldata (0x...)</p>
-                    <p><span className="text-slate-900">value</span>: string — ETH amount in wei (optional)</p>
+                    <p><span className="text-slate-900">chainId</span>: number  -  EIP-155 chain ID (1=mainnet)</p>
+                    <p><span className="text-slate-900">from</span>: string  -  Sender address (0x...)</p>
+                    <p><span className="text-slate-900">to</span>: string  -  Target contract address</p>
+                    <p><span className="text-slate-900">data</span>: string  -  Encoded calldata (0x...)</p>
+                    <p><span className="text-slate-900">value</span>: string  -  ETH amount in wei (optional)</p>
                   </div>
                 </div>
               </div>
 
               {/* Response */}
               <div>
-                <h4 className="font-semibold text-slate-900 mb-2">📥 Response Fields</h4>
+                <h4 className="font-semibold text-slate-900 mb-2">Response Fields</h4>
                 <div className="bg-slate-50 p-4 rounded-lg space-y-2 text-sm font-mono">
                   <p><span className="text-green-700 font-bold">verdict</span>: "allow" | "warn" | "block"</p>
-                  <p><span className="text-green-700 font-bold">score</span>: number — Risk score (0-100)</p>
-                  <p><span className="text-green-700 font-bold">plainEnglish</span>: string — User-friendly explanation</p>
-                  <p><span className="text-green-700 font-bold">findings</span>: Finding[] — Detailed findings with severity</p>
-                  <p><span className="text-green-700 font-bold">simulation</span>: object — Decoded transaction details</p>
+                  <p><span className="text-green-700 font-bold">score</span>: number  -  Risk score (0-100)</p>
+                  <p><span className="text-green-700 font-bold">plainEnglish</span>: string  -  User-friendly explanation</p>
+                  <p><span className="text-green-700 font-bold">findings</span>: Finding[]  -  Detailed findings with severity</p>
+                  <p><span className="text-green-700 font-bold">simulation</span>: object  -  Decoded transaction details</p>
                 </div>
               </div>
 
               {/* Example */}
               <div>
-                <h4 className="font-bold text-slate-900 mb-2">💡 Example Response</h4>
+                <h4 className="font-bold text-slate-900 mb-2">Example Response</h4>
                 <div className="bg-slate-800 p-4 rounded-lg text-xs font-mono overflow-auto max-h-64 text-slate-100">
                   <pre className="text-slate-100">{`{
   "verdict": "warn",
@@ -587,7 +587,7 @@ function APIExplorerContent() {
 
           {/* Integration Guide */}
           <div className="bg-gradient-to-br from-purple-50 to-blue-50 rounded-lg border-2 border-purple-200 p-6 space-y-4">
-            <h4 className="font-bold text-slate-900 mb-3">🔗 Integration Patterns</h4>
+            <h4 className="font-bold text-slate-900 mb-3">Integration Patterns</h4>
             <div className="grid md:grid-cols-2 gap-4">
               <div>
                 <p className="font-bold text-slate-900 mb-2">JavaScript/Web</p>

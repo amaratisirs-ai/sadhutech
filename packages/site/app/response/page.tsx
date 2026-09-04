@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { Icon } from "@/components/Icon";
 
 interface Finding {
   id: string;
@@ -76,7 +77,7 @@ export default function ResponsePage() {
       bg: "bg-green-500/10",
       border: "border-green-500/50",
       text: "text-green-400",
-      icon: "✓",
+      icon: "checkCircle",
       label: "SAFE TO SIGN",
       description: "This transaction appears to be legitimate and safe.",
     },
@@ -84,7 +85,7 @@ export default function ResponsePage() {
       bg: "bg-yellow-500/10",
       border: "border-yellow-500/50",
       text: "text-yellow-400",
-      icon: "⚠",
+      icon: "warning",
       label: "RISKY - REVIEW CAREFULLY",
       description: "This transaction has some risks. Review the findings below before proceeding.",
     },
@@ -92,7 +93,7 @@ export default function ResponsePage() {
       bg: "bg-red-500/10",
       border: "border-red-500/50",
       text: "text-red-400",
-      icon: "✕",
+      icon: "block",
       label: "DANGEROUS - DO NOT SIGN",
       description: "This transaction appears to be malicious. Do not proceed.",
     },
@@ -106,8 +107,8 @@ export default function ResponsePage() {
       <section className={`rounded-2xl border-2 p-8 ${config.bg} ${config.border}`}>
         <div className="space-y-6">
           <div className="flex items-start gap-4">
-            <div className={`w-16 h-16 rounded-xl flex items-center justify-center flex-shrink-0 text-3xl font-black ${config.text}`}>
-              {config.icon}
+            <div className={`w-16 h-16 rounded-xl flex items-center justify-center flex-shrink-0 ${config.text}`}>
+              <Icon name={config.icon as any} className="w-8 h-8" />
             </div>
             <div className="flex-1">
               <h2 className={`text-4xl font-black ${config.text} mb-2`}>
@@ -159,7 +160,10 @@ export default function ResponsePage() {
                 <div key={finding.id} className={`rounded-lg border-l-4 ${sConfig.bg} border-l-${finding.severity === "BLOCK" ? "red" : finding.severity === "WARN" ? "yellow" : "green"}-500 p-4`}>
                   <div className="flex gap-3">
                     <div className={`font-bold text-sm ${sConfig.text} flex-shrink-0 pt-1`}>
-                      {finding.severity === "BLOCK" ? "✕" : finding.severity === "WARN" ? "⚠" : "ℹ"}
+                      <Icon
+                        name={finding.severity === "BLOCK" ? "block" : finding.severity === "WARN" ? "warning" : "info"}
+                        className="w-5 h-5"
+                      />
                     </div>
                     <div className="flex-1">
                       <h3 className="font-bold text-white mb-1">{finding.title}</h3>

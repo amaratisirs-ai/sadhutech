@@ -1,14 +1,25 @@
 "use client";
 
-import { useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { ThemeProvider } from "./theme-provider";
+import { Icon } from "@/components/Icon";
 
 export function LayoutClient({ children }: { children: ReactNode }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [showScrollTop, setShowScrollTop] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => setShowScrollTop(window.scrollY > 400);
+    handleScroll();
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  const scrollToTop = () => window.scrollTo({ top: 0, behavior: "smooth" });
 
   return (
     <ThemeProvider>
-      {/* Modern Sticky Nav — Dark with Teal Border */}
+      {/* Modern Sticky Nav  -  Dark with Teal Border */}
       <nav className="bg-slate-950 backdrop-blur-xl border-b-2 border-teal-500 sticky top-0 z-50 shadow-lg">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
@@ -107,6 +118,16 @@ export function LayoutClient({ children }: { children: ReactNode }) {
         {children}
       </main>
 
+      <button
+        type="button"
+        onClick={scrollToTop}
+        className={`hidden md:flex fixed bottom-6 right-6 z-40 w-10 h-10 items-center justify-center rounded-lg border border-teal-400/40 bg-slate-900/90 text-teal-300 shadow-lg backdrop-blur transition-all hover:border-teal-300 hover:bg-slate-800 hover:text-white hover:-translate-y-0.5 ${showScrollTop ? "opacity-100" : "pointer-events-none opacity-0"}`}
+        aria-label="Back to top"
+        title="Back to top"
+      >
+        <Icon name="arrowUp" className="w-5 h-5" />
+      </button>
+
       {/* Bottom Navigation (Mobile App-like) */}
       <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-slate-950 border-t-2 border-teal-500 backdrop-blur-xl z-40 safe-bottom">
         <div className="flex justify-around items-center h-20">
@@ -157,7 +178,7 @@ export function LayoutClient({ children }: { children: ReactNode }) {
           </div>
 
           <div className="border-t border-teal-500/20 pt-8 text-center text-sm text-teal-200">
-            <p className="font-medium">GENESIS Firewall v0.1 — Community-powered pre-sign gate for crypto wallets</p>
+            <p className="font-medium">GENESIS Firewall v0.1  -  Community-powered pre-sign gate for crypto wallets</p>
             <p className="mt-2 text-xs text-teal-300">
               Powered by <a href="https://bhusoft.com" className="text-teal-300 hover:text-teal-100 underline transition">Bhusoft LLC</a> • <a href="https://github.com/amaratisirs-ai" className="text-teal-300 hover:text-teal-100 underline transition">Open Source</a>
             </p>

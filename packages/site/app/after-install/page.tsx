@@ -1,11 +1,13 @@
 "use client";
 
+import { Icon } from "@/components/Icon";
+
 export default function AfterInstallPage() {
   return (
     <div className="space-y-12">
       {/* Header */}
       <div className="text-center space-y-4">
-        <div className="text-6xl">✅</div>
+        <div className="flex justify-center text-emerald-400"><Icon name="checkCircle" className="w-16 h-16" /></div>
         <h1 className="text-5xl font-black text-white">You're Protected!</h1>
         <p className="text-lg text-teal-200 max-w-2xl mx-auto">
           GENESIS Snap is now active. Here's what happens next.
@@ -14,7 +16,7 @@ export default function AfterInstallPage() {
 
       {/* What to Expect Section */}
       <section className="bg-slate-900/50 rounded-2xl border border-teal-500/20 p-12">
-        <h2 className="text-3xl font-bold text-white mb-8">🎯 What to Expect</h2>
+        <h2 className="text-3xl font-bold text-white mb-8 flex items-center gap-3"><Icon name="badge" className="w-7 h-7 text-teal-400" /> What to Expect</h2>
         
         <div className="grid md:grid-cols-2 gap-8">
           <div className="space-y-4">
@@ -36,7 +38,7 @@ export default function AfterInstallPage() {
             </p>
             <div className="bg-indigo-500/10 border border-indigo-500/30 rounded-lg p-4">
               <p className="text-sm text-indigo-200">
-                ℹ️ New to MetaMask? The Insights panel is above the "Sign" button
+                New to MetaMask? The Insights panel is above the "Sign" button
               </p>
             </div>
           </div>
@@ -45,12 +47,12 @@ export default function AfterInstallPage() {
 
       {/* Three Verdicts - Visual Guide */}
       <section>
-        <h2 className="text-3xl font-bold text-white mb-8">📊 Understand the Verdicts</h2>
+        <h2 className="text-3xl font-bold text-white mb-8 flex items-center gap-3"><Icon name="chart" className="w-7 h-7 text-teal-400" /> Understand the Verdicts</h2>
         
         <div className="grid md:grid-cols-3 gap-6">
           {[
             {
-              emoji: "✅",
+              iconName: "checkCircle",
               verdict: "ALLOW",
               score: "0-30",
               meaning: "No risks detected",
@@ -60,7 +62,7 @@ export default function AfterInstallPage() {
               border: "border-green-500/30",
             },
             {
-              emoji: "⚠️",
+              iconName: "warning",
               verdict: "WARN",
               score: "31-70",
               meaning: "Potential risk detected",
@@ -70,7 +72,7 @@ export default function AfterInstallPage() {
               border: "border-yellow-500/30",
             },
             {
-              emoji: "🚫",
+              iconName: "block",
               verdict: "BLOCK",
               score: "71-100",
               meaning: "Likely dangerous",
@@ -85,7 +87,7 @@ export default function AfterInstallPage() {
               className={`bg-gradient-to-br ${item.color} border-2 ${item.border} rounded-2xl p-8 space-y-4`}
             >
               <div className="space-y-2">
-                <div className="text-5xl">{item.emoji}</div>
+                <div className="text-emerald-300"><Icon name={item.iconName} className="w-12 h-12" /></div>
                 <h3 className="text-2xl font-black text-white">{item.verdict}</h3>
                 <p className="text-sm text-slate-400">Risk Score: {item.score}</p>
               </div>
@@ -111,29 +113,30 @@ export default function AfterInstallPage() {
 
       {/* Real-World Signals */}
       <section className="bg-slate-900/50 rounded-2xl border border-teal-500/20 p-12">
-        <h2 className="text-3xl font-bold text-white mb-8">🔎 What GENESIS looks for</h2>
+        <h2 className="text-3xl font-bold text-white mb-8 flex items-center gap-3"><Icon name="search" className="w-7 h-7 text-teal-400" /> What GENESIS looks for</h2>
 
         <div className="space-y-4">
           {[
             {
-              icon: "✅",
+              icon: "checkCircle",
               title: "Safe transactions",
               desc: "A normal, legitimate transaction with no known issues shows a green verdict and no findings.",
             },
             {
-              icon: "⚠️",
+              icon: "warning",
               title: "Risky permissions",
               desc: "GENESIS may warn if a transaction requests broad or unnecessary token approvals that could expose your wallet.",
             },
             {
-              icon: "🚫",
+              icon: "block",
               title: "Known threats",
               desc: "If a destination or smart contract matches a known drainer, phishing pattern, or flagged address, GENESIS blocks it before you sign.",
             },
           ].map((scenario, i) => (
             <div key={i} className="bg-slate-800/50 border border-teal-500/10 rounded-lg p-6 space-y-3">
-              <h3 className="text-lg font-bold text-white">
-                {scenario.icon} {scenario.title}
+              <h3 className="text-lg font-bold text-white flex items-center gap-3">
+                <Icon name={scenario.icon as any} className="w-5 h-5 text-teal-400" />
+                <span>{scenario.title}</span>
               </h3>
               <p className="text-slate-300">{scenario.desc}</p>
             </div>
@@ -143,7 +146,7 @@ export default function AfterInstallPage() {
 
       {/* Findings Explained */}
       <section>
-        <h2 className="text-3xl font-bold text-white mb-8">🔍 What Findings Mean</h2>
+        <h2 className="text-3xl font-bold text-white mb-8 flex items-center gap-3"><Icon name="search" className="w-7 h-7 text-teal-400" /> What Findings Mean</h2>
         
         <p className="text-slate-300 mb-6">
           When GENESIS detects something, it shows a finding with details. Here are common ones:
@@ -154,28 +157,28 @@ export default function AfterInstallPage() {
             {
               id: "intel.confirmed",
               title: "Community-Flagged Address (Verified)",
-              severity: "HIGH 🔴",
+              severity: "HIGH",
               meaning: "Multiple security experts have flagged this address as dangerous",
               action: "DO NOT SIGN. This is very likely a scam.",
             },
             {
               id: "intel.unconfirmed",
               title: "Community-Flagged Address (Unconfirmed)",
-              severity: "MEDIUM 🟡",
+              severity: "MEDIUM",
               meaning: "Community members have reported this, but not yet verified",
               action: "Proceed with caution. Check on RugDoc or Twitter before signing.",
             },
             {
               id: "erc20.unlimited-approval",
               title: "Unlimited Token Approval",
-              severity: "MEDIUM 🟡",
+              severity: "MEDIUM",
               meaning: "You're giving a contract permission to spend unlimited tokens",
               action: "Only do this if you trust the contract completely.",
             },
             {
               id: "general.hidden-function",
               title: "Hidden/Complex Function Call",
-              severity: "MEDIUM 🟡",
+              severity: "MEDIUM",
               meaning: "Transaction calls multiple functions at once (batching)",
               action: "Decode the transaction to understand what it does.",
             },
@@ -195,7 +198,7 @@ export default function AfterInstallPage() {
 
       {/* Troubleshooting */}
       <section className="bg-slate-900/50 rounded-2xl border border-teal-500/20 p-12">
-        <h2 className="text-3xl font-bold text-white mb-8">❓ Troubleshooting</h2>
+        <h2 className="text-3xl font-bold text-white mb-8 flex items-center gap-3"><Icon name="question" className="w-7 h-7 text-teal-400" /> Troubleshooting</h2>
         
         <div className="space-y-4">
           {[
@@ -255,7 +258,7 @@ export default function AfterInstallPage() {
       {/* Final Note */}
       <section className="bg-teal-500/10 border-2 border-teal-500/30 rounded-2xl p-8 text-center space-y-3">
         <p className="text-teal-200">
-          💡 <strong>Pro Tip:</strong> GENESIS learns from your feedback. If you find a false positive or false negative, please report it!
+          <strong>Pro Tip:</strong> GENESIS learns from your feedback. If you find a false positive or false negative, please report it!
         </p>
         <p className="text-sm text-slate-400">
           Privacy: GENESIS never sees your addresses or personal data. All analysis is done on your device.

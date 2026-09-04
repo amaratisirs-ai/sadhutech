@@ -3,7 +3,7 @@ import { createHmac } from "node:crypto";
 
 // Step 1 of reporting: rate-limit + bot-check + validate, then email a signed confirmation link.
 // The report is only recorded after the user clicks the link (see /api/verify),
-// which proves they own the email — Sybil resistance with no extra storage.
+// which proves they own the email  -  Sybil resistance with no extra storage.
 const RESEND_KEY = process.env.RESEND_API_KEY || process.env.RESENT_API_KEY || "";
 const FROM = process.env.REPORT_FROM_EMAIL || "GENESIS <noreply@sadhutech.com>";
 const SIGNING_SECRET =
@@ -37,7 +37,7 @@ function clientIp(req: NextRequest): string {
 }
 
 async function verifyTurnstile(token: string, ip: string): Promise<boolean> {
-  if (!TURNSTILE_SECRET) return true; // Not configured (e.g. local dev) — skip.
+  if (!TURNSTILE_SECRET) return true; // Not configured (e.g. local dev)  -  skip.
   const form = new URLSearchParams({ secret: TURNSTILE_SECRET, response: token });
   if (ip && ip !== "unknown") form.set("remoteip", ip);
   try {
@@ -110,7 +110,7 @@ export async function POST(req: NextRequest) {
         html: `<div style="font-family:system-ui,sans-serif;max-width:480px">
           <h2>Confirm your report</h2>
           <p>Thanks for helping protect the community. Click below to confirm your report of:</p>
-          <p><code>${address}</code> — ${category}</p>
+          <p><code>${address}</code>  -  ${category}</p>
           <p><a href="${link}" style="display:inline-block;background:#0d9488;color:#fff;padding:10px 18px;border-radius:8px;text-decoration:none">Confirm my report</a></p>
           <p style="color:#64748b;font-size:13px">This link expires in 24 hours. If you didn't submit this, you can ignore this email.</p>
         </div>`,

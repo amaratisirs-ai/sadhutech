@@ -1,5 +1,7 @@
 "use client";
 
+import { Icon } from "@/components/Icon";
+
 export default function WhitepaperPage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 text-white">
@@ -24,29 +26,29 @@ export default function WhitepaperPage() {
           <div className="border-l-4 border-red-500 pl-6 py-4">
             <h2 className="text-3xl font-black text-red-400 mb-4">The Problem</h2>
             <p className="text-slate-300 text-lg leading-relaxed mb-4">
-              Traditional security defends through <strong>centralization, predictability, and stasis</strong>. One gate, one detection model, fixed topology — breach one, lose all.
+              Traditional security defends through <strong>centralization, predictability, and stasis</strong>. One gate, one detection model, fixed topology  -  breach one, lose all.
             </p>
           </div>
 
           {/* Fortress Paradox Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="bg-red-950/40 border-2 border-red-500/30 rounded-lg p-6">
-              <div className="text-3xl mb-2">🏰</div>
+              <div className="mb-2 text-red-400"><Icon name="building" className="w-8 h-8" /></div>
               <h3 className="font-bold text-red-400 mb-2">Centralization</h3>
               <p className="text-slate-400 text-sm">Single control plane = single point of failure</p>
             </div>
             <div className="bg-red-950/40 border-2 border-red-500/30 rounded-lg p-6">
-              <div className="text-3xl mb-2">📊</div>
+              <div className="mb-2 text-red-400"><Icon name="chart" className="w-8 h-8" /></div>
               <h3 className="font-bold text-red-400 mb-2">Predictability</h3>
               <p className="text-slate-400 text-sm">Known detection models can be bypassed</p>
             </div>
             <div className="bg-red-950/40 border-2 border-red-500/30 rounded-lg p-6">
-              <div className="text-3xl mb-2">🗺️</div>
+              <div className="mb-2 text-red-400"><Icon name="map" className="w-8 h-8" /></div>
               <h3 className="font-bold text-red-400 mb-2">Fixed Topology</h3>
               <p className="text-slate-400 text-sm">Attackers can map the infrastructure</p>
             </div>
             <div className="bg-red-950/40 border-2 border-red-500/30 rounded-lg p-6">
-              <div className="text-3xl mb-2">💥</div>
+              <div className="mb-2 text-red-400"><Icon name="fire" className="w-8 h-8" /></div>
               <h3 className="font-bold text-red-400 mb-2">Breach Cascade</h3>
               <p className="text-slate-400 text-sm">One bypass compromises everything</p>
             </div>
@@ -63,7 +65,7 @@ export default function WhitepaperPage() {
           {/* Pillar 1: Hive */}
           <div className="bg-gradient-to-r from-amber-950/40 to-slate-900/40 border-l-4 border-amber-500 rounded-lg p-8 space-y-4">
             <div className="flex items-center gap-4">
-              <div className="text-4xl">🐝</div>
+              <div className="text-amber-400"><Icon name="users" className="w-10 h-10" /></div>
               <div>
                 <h3 className="text-2xl font-bold text-amber-400">Hive: Emergent Swarm Detection</h3>
                 <p className="text-sm text-slate-400">No single decision-maker; consensus from the colony</p>
@@ -79,7 +81,7 @@ export default function WhitepaperPage() {
           {/* Pillar 2: Nucleus */}
           <div className="bg-gradient-to-r from-purple-950/40 to-slate-900/40 border-l-4 border-purple-500 rounded-lg p-8 space-y-4">
             <div className="flex items-center gap-4">
-              <div className="text-4xl">⚛️</div>
+              <div className="text-purple-400"><Icon name="atom" className="w-10 h-10" /></div>
               <div>
                 <h3 className="text-2xl font-bold text-purple-400">Nucleus: Layered Atomic Protection</h3>
                 <p className="text-sm text-slate-400">Concentric rings around the crown jewels</p>
@@ -95,7 +97,7 @@ export default function WhitepaperPage() {
           {/* Pillar 3: Entanglement Fabric */}
           <div className="bg-gradient-to-r from-cyan-950/40 to-slate-900/40 border-l-4 border-cyan-500 rounded-lg p-8 space-y-4">
             <div className="flex items-center gap-4">
-              <div className="text-4xl">🔗</div>
+              <div className="text-cyan-400"><Icon name="link" className="w-10 h-10" /></div>
               <div>
                 <h3 className="text-2xl font-bold text-cyan-400">Entanglement Fabric: Quantum-Safe Trust</h3>
                 <p className="text-sm text-slate-400">Unclonable bonds between participants</p>
@@ -111,7 +113,7 @@ export default function WhitepaperPage() {
           {/* Pillar 4: Multiverse */}
           <div className="bg-gradient-to-r from-indigo-950/40 to-slate-900/40 border-l-4 border-indigo-500 rounded-lg p-8 space-y-4">
             <div className="flex items-center gap-4">
-              <div className="text-4xl">🌀</div>
+              <div className="text-indigo-400"><Icon name="network" className="w-10 h-10" /></div>
               <div>
                 <h3 className="text-2xl font-bold text-indigo-400">Multiverse: Deception & Self-Healing</h3>
                 <p className="text-sm text-slate-400">Parallel universes for containment and rollback</p>
@@ -187,7 +189,7 @@ export default function WhitepaperPage() {
               </div>
               <div className="bg-slate-900/50 border-l-4 border-indigo-500 rounded p-6 flex-1">
                 <h3 className="font-bold text-indigo-400 mb-2">Multiverse renders verdict</h3>
-                <p className="text-slate-400 text-sm"><strong>✅ ALLOW:</strong> Safe to sign. <strong>⚠️ WARN:</strong> Risky but not malicious. <strong>🚫 BLOCK:</strong> Likely exploit; fork to decoy universe.</p>
+                <p className="text-slate-400 text-sm"><strong>ALLOW:</strong> Safe to sign. <strong>WARN:</strong> Risky but not malicious. <strong>BLOCK:</strong> Likely exploit; fork to decoy universe.</p>
               </div>
             </div>
           </div>
@@ -203,7 +205,7 @@ export default function WhitepaperPage() {
             {/* Level 1: User Wallet */}
             <div className="flex justify-center mb-3">
               <div className="bg-gradient-to-r from-indigo-900/60 to-indigo-800/60 border-2 border-indigo-500/60 rounded-lg px-6 py-2 w-full max-w-xs text-center">
-                <div className="text-sm font-bold text-indigo-300">🔐 User Wallet</div>
+                <div className="text-sm font-bold text-indigo-300">User Wallet</div>
                 <div className="text-xs text-indigo-400">Private keys stay local</div>
               </div>
             </div>
@@ -221,7 +223,7 @@ export default function WhitepaperPage() {
             {/* Level 2: GENESIS Gate */}
             <div className="flex justify-center mb-4">
               <div className="bg-gradient-to-r from-teal-900/60 to-cyan-900/60 border-2 border-teal-500/70 rounded-lg px-6 py-2 w-full max-w-lg text-center">
-                <div className="text-base font-black text-teal-300">⚡ GENESIS Gate</div>
+                <div className="text-base font-black text-teal-300 flex items-center justify-center gap-2"><Icon name="bolt" className="w-5 h-5" /> GENESIS Gate</div>
                 <div className="text-xs text-teal-400">(Pre-sign Analysis)</div>
               </div>
             </div>
@@ -239,25 +241,25 @@ export default function WhitepaperPage() {
             <div className="grid grid-cols-4 gap-2 mb-4">
               {/* Hive */}
               <div className="bg-gradient-to-br from-amber-900/50 to-amber-800/40 border-2 border-amber-500/50 rounded p-2 text-center">
-                <div className="text-2xl">🐝</div>
+                <div className="flex justify-center text-amber-400"><Icon name="users" className="w-7 h-7" /></div>
                 <div className="font-bold text-amber-400 text-xs">Hive</div>
               </div>
 
               {/* Nucleus */}
               <div className="bg-gradient-to-br from-purple-900/50 to-purple-800/40 border-2 border-purple-500/50 rounded p-2 text-center">
-                <div className="text-2xl">⚛️</div>
+                <div className="flex justify-center text-purple-400"><Icon name="atom" className="w-7 h-7" /></div>
                 <div className="font-bold text-purple-400 text-xs">Nucleus</div>
               </div>
 
               {/* Entanglement */}
               <div className="bg-gradient-to-br from-cyan-900/50 to-cyan-800/40 border-2 border-cyan-500/50 rounded p-2 text-center">
-                <div className="text-2xl">🔗</div>
+                <div className="flex justify-center text-cyan-400"><Icon name="link" className="w-7 h-7" /></div>
                 <div className="font-bold text-cyan-400 text-xs">Entanglement</div>
               </div>
 
               {/* Multiverse */}
               <div className="bg-gradient-to-br from-indigo-900/50 to-indigo-800/40 border-2 border-indigo-500/50 rounded p-2 text-center">
-                <div className="text-2xl">🌀</div>
+                <div className="flex justify-center text-indigo-400"><Icon name="network" className="w-7 h-7" /></div>
                 <div className="font-bold text-indigo-400 text-xs">Multiverse</div>
               </div>
             </div>
@@ -286,19 +288,19 @@ export default function WhitepaperPage() {
             <div className="grid grid-cols-3 gap-3 max-w-lg mx-auto">
               {/* Allow */}
               <div className="bg-gradient-to-br from-green-900/40 to-emerald-900/30 border-2 border-green-500/60 rounded p-3 text-center">
-                <div className="text-3xl mb-1">✅</div>
+                <div className="flex justify-center text-green-400"><Icon name="checkCircle" className="w-8 h-8" /></div>
                 <div className="font-bold text-green-400 text-sm">ALLOW</div>
               </div>
 
               {/* Warn */}
               <div className="bg-gradient-to-br from-yellow-900/40 to-orange-900/30 border-2 border-yellow-500/60 rounded p-3 text-center">
-                <div className="text-3xl mb-1">⚠️</div>
+                <div className="flex justify-center text-yellow-400"><Icon name="warning" className="w-8 h-8" /></div>
                 <div className="font-bold text-yellow-400 text-sm">WARN</div>
               </div>
 
               {/* Block */}
               <div className="bg-gradient-to-br from-red-900/40 to-red-800/30 border-2 border-red-500/60 rounded p-3 text-center">
-                <div className="text-3xl mb-1">🚫</div>
+                <div className="flex justify-center text-red-400"><Icon name="block" className="w-8 h-8" /></div>
                 <div className="font-bold text-red-400 text-sm">BLOCK</div>
               </div>
             </div>
@@ -339,7 +341,7 @@ export default function WhitepaperPage() {
 
           <div className="bg-gradient-to-r from-teal-950/30 to-indigo-950/30 border-2 border-teal-500/30 rounded-lg p-8">
             <p className="text-slate-300 leading-relaxed mb-4">
-              GENESIS is a security platform that embraces nature's wisdom: <strong>decentralization, emergent consensus, unpredictability, and self-healing</strong>. By modeling our architecture on biological systems, we create defenses that survive adversarial pressure — not because they're unbreakable, but because they're incomprehensibly adaptable.
+              GENESIS is a security platform that embraces nature's wisdom: <strong>decentralization, emergent consensus, unpredictability, and self-healing</strong>. By modeling our architecture on biological systems, we create defenses that survive adversarial pressure  -  not because they're unbreakable, but because they're incomprehensibly adaptable.
             </p>
             <p className="text-slate-400 text-sm italic">
               "Nature doesn't build fortresses. It builds ecosystems."

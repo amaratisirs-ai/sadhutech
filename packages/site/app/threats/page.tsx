@@ -234,9 +234,9 @@ export default function ThreatsPage() {
           <h3 className="font-semibold text-slate-900 dark:text-white mb-3">Sort By:</h3>
           <div className="flex flex-wrap gap-2">
             {[
-              { id: "latest" as SortBy, label: "⏱️ Latest First" },
-              { id: "reports" as SortBy, label: "📊 Most Reports" },
-              { id: "verified" as SortBy, label: "✓ Verified First" },
+              { id: "latest" as SortBy, label: "Latest First" },
+              { id: "reports" as SortBy, label: "Most Reports" },
+              { id: "verified" as SortBy, label: "Verified First" },
             ].map((sort) => (
               <button
                 key={sort.id}

@@ -4,11 +4,11 @@ import "./globals.css";
 import { LayoutClient } from "./layout-client";
 
 export const metadata: Metadata = {
-  title: "GENESIS Firewall — Pre-sign Gate Dashboard | Bhusoft",
+  title: "GENESIS Firewall  -  Pre-sign Gate Dashboard | Bhusoft",
   description: "Community-powered transaction risk intelligence for crypto wallets. A Bhusoft LLC product.",
   openGraph: {
     type: "website",
-    title: "GENESIS Firewall — Pre-sign Gate Dashboard",
+    title: "GENESIS Firewall  -  Pre-sign Gate Dashboard",
     description: "Community-powered transaction risk intelligence for crypto wallets. By Bhusoft LLC.",
     url: "https://sadhutech.com",
   },

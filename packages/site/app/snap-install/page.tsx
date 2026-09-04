@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { QRCodeCanvas } from "qrcode.react";
 import { SNAP_CONFIG } from "@/config/snap-config";
+import { Icon } from "@/components/Icon";
 
 declare global {
   interface Window {
@@ -89,7 +90,7 @@ export default function SnapInstallPage() {
       <div className="space-y-12">
         {/* Header */}
         <div className="text-center space-y-4">
-          <h1 className="text-5xl font-black text-white">🔐 Get GENESIS Protection in MetaMask</h1>
+          <h1 className="text-5xl font-black text-white flex items-center justify-center gap-3"><Icon name="lock" className="w-12 h-12 text-teal-400" /> Get GENESIS Protection in MetaMask</h1>
           <p className="text-lg text-teal-200 max-w-2xl mx-auto">
             This path installs the MetaMask Snap. If you use Trust Wallet, Rainbow, Argent, or another WalletConnect wallet, use the WalletConnect path instead.
           </p>
@@ -98,7 +99,7 @@ export default function SnapInstallPage() {
               {SNAP_CONFIG.getSnapMode() === "testing" ? (
                 <>🧪 <strong>Testing Mode:</strong> Direct bundle testing. Switch to <code>NEXT_PUBLIC_USE_REGISTRY_SNAP=true</code> when registry approved.</>
               ) : (
-                <>✅ <strong>Production Mode:</strong> Using official MetaMask registry snap.</>
+                <><strong>Production Mode:</strong> Using official MetaMask registry snap.</>
               )}
             </p>
           </div>
@@ -111,15 +112,15 @@ export default function SnapInstallPage() {
             <h2 className="text-2xl font-bold text-white mb-6">Why GENESIS?</h2>
             <div className="space-y-4">
               {[
-                { icon: "⚡", title: "Instant Analysis", desc: "<200ms transaction analysis" },
-                { icon: "🛡️", title: "Community Powered", desc: "4,122+ verified threats in database" },
-                { icon: "📊", title: "Clear Verdicts", desc: "ALLOW, WARN, or BLOCK in plain English" },
-                { icon: "🔄", title: "Always Updated", desc: "New threats added hourly" },
-                { icon: "100", title: "100% Private", desc: "Runs locally, zero data tracking" },
-                { icon: "✅", title: "Non-Custodial", desc: "Your keys, your control, always" },
+                { icon: <Icon name="bolt" className="w-6 h-6" />, title: "Instant Analysis", desc: "<200ms transaction analysis" },
+                { icon: <Icon name="shield" className="w-6 h-6" />, title: "Community Powered", desc: "4,122+ verified threats in database" },
+                { icon: <Icon name="chart" className="w-6 h-6" />, title: "Clear Verdicts", desc: "ALLOW, WARN, or BLOCK in plain English" },
+                { icon: <Icon name="refresh" className="w-6 h-6" />, title: "Always Updated", desc: "New threats added hourly" },
+                { icon: <Icon name="lock" className="w-6 h-6" />, title: "100% Private", desc: "Runs locally, zero data tracking" },
+                { icon: <Icon name="checkCircle" className="w-6 h-6" />, title: "Non-Custodial", desc: "Your keys, your control, always" },
               ].map((item, i) => (
                 <div key={i} className="flex gap-3">
-                  <span className="text-2xl flex-shrink-0">{item.icon}</span>
+                  <span className="text-teal-500 flex-shrink-0">{item.icon}</span>
                   <div>
                     <h3 className="font-bold text-white">{item.title}</h3>
                     <p className="text-sm text-slate-400">{item.desc}</p>
@@ -152,7 +153,7 @@ export default function SnapInstallPage() {
             {state === "ready" && hasMetaMask && (
               <div className="bg-gradient-to-br from-teal-500/10 to-indigo-500/10 border-2 border-teal-500/30 rounded-2xl p-8 space-y-6">
                 <div className="text-center space-y-2">
-                  <div className="text-6xl">🦊</div>
+                  <div className="flex justify-center text-teal-400"><Icon name="shield" className="w-16 h-16" /></div>
                   <h3 className="text-xl font-bold text-white">Ready to Install</h3>
                   <p className="text-sm text-teal-300">MetaMask detected ✓</p>
                 </div>
@@ -220,7 +221,7 @@ export default function SnapInstallPage() {
             {state === "done" && (
               <div className="bg-gradient-to-br from-green-500/10 to-teal-500/10 border-2 border-green-500/30 rounded-2xl p-8 space-y-6">
                 <div className="text-center space-y-3">
-                  <div className="text-6xl">✅</div>
+                  <div className="flex justify-center text-green-400"><Icon name="checkCircle" className="w-16 h-16" /></div>
                   <h3 className="text-2xl font-bold text-white">All Set!</h3>
                   <p className="text-slate-400">GENESIS is now protecting your transactions</p>
                 </div>
@@ -255,7 +256,7 @@ export default function SnapInstallPage() {
             {state === "ready" && !hasMetaMask && (
               <div className="bg-gradient-to-br from-orange-500/10 to-red-500/10 border-2 border-orange-500/30 rounded-2xl p-8 space-y-6">
                 <div className="text-center space-y-2">
-                  <div className="text-5xl">🦊</div>
+                  <div className="flex justify-center text-orange-400"><Icon name="warning" className="w-14 h-14" /></div>
                   <h3 className="text-xl font-bold text-white">MetaMask Not Found</h3>
                   <p className="text-sm text-orange-300">Install the extension first or use WalletConnect if you already have another wallet</p>
                 </div>
@@ -264,7 +265,7 @@ export default function SnapInstallPage() {
                   <p className="text-white font-semibold">3 Easy Steps:</p>
                   <ol className="space-y-2 text-sm text-slate-300">
                     <li className="flex gap-2">
-                      <span className="font-bold text-orange-400 flex-shrink-0">1️⃣</span>
+                      <span className="font-bold text-orange-400 flex-shrink-0">1.</span>
                       <span>
                         Visit{" "}
                         <a
@@ -278,11 +279,11 @@ export default function SnapInstallPage() {
                       </span>
                     </li>
                     <li className="flex gap-2">
-                      <span className="font-bold text-orange-400 flex-shrink-0">2️⃣</span>
+                      <span className="font-bold text-orange-400 flex-shrink-0">2.</span>
                       <span>Click "Get Chrome Extension" (or your browser)</span>
                     </li>
                     <li className="flex gap-2">
-                      <span className="font-bold text-orange-400 flex-shrink-0">3️⃣</span>
+                      <span className="font-bold text-orange-400 flex-shrink-0">3.</span>
                       <span>Come back to this page and refresh</span>
                     </li>
                   </ol>
@@ -319,7 +320,7 @@ export default function SnapInstallPage() {
             {state === "error" && (
               <div className="bg-gradient-to-br from-red-500/10 to-red-500/5 border-2 border-red-500/30 rounded-2xl p-8 space-y-6">
                 <div className="text-center space-y-2">
-                  <div className="text-5xl">❌</div>
+                  <div className="flex justify-center text-red-400"><Icon name="block" className="w-14 h-14" /></div>
                   <h3 className="text-xl font-bold text-white">Installation Failed</h3>
                 </div>
 
@@ -345,7 +346,7 @@ export default function SnapInstallPage() {
                 onClick={() => setShowQR(!showQR)}
                 className="w-full px-4 py-2 text-sm text-teal-300 hover:text-teal-200 font-semibold flex items-center justify-center gap-2"
               >
-                {showQR ? "✕ Hide" : "📱 Install on Mobile?"} QR Code
+                {showQR ? "Hide" : "Install on Mobile?"} QR Code
               </button>
               {showQR && (
                 <div className="mt-4 p-4 bg-slate-900/50 rounded-lg flex flex-col items-center gap-3">
@@ -370,16 +371,16 @@ export default function SnapInstallPage() {
           <h2 className="text-2xl font-bold text-white text-center mb-12">How Protection Works</h2>
           <div className="grid md:grid-cols-4 gap-8">
             {[
-              { num: "1", emoji: "📝", title: "You Sign", desc: "You're about to sign a transaction" },
-              { num: "2", emoji: "🔍", title: "We Analyze", desc: "Checked against threat intelligence in <200ms" },
-              { num: "3", emoji: "📊", title: "We Score", desc: "Risk computed from community intel" },
-              { num: "4", emoji: "✅", title: "You Decide", desc: "Clear verdict before you confirm" },
+              { num: "1", icon: "document", title: "You Sign", desc: "You're about to sign a transaction" },
+              { num: "2", icon: "search", title: "We Analyze", desc: "Checked against threat intelligence in <200ms" },
+              { num: "3", icon: "chart", title: "We Score", desc: "Risk computed from community intel" },
+              { num: "4", icon: "checkCircle", title: "You Decide", desc: "Clear verdict before you confirm" },
             ].map((step) => (
               <div key={step.num} className="text-center space-y-3">
                 <div className="w-12 h-12 rounded-full bg-teal-500/20 border-2 border-teal-500 flex items-center justify-center mx-auto font-bold text-teal-300">
                   {step.num}
                 </div>
-                <div className="text-3xl">{step.emoji}</div>
+                <div className="flex justify-center text-teal-400"><Icon name={step.icon as any} className="w-8 h-8" /></div>
                 <h3 className="font-bold text-white">{step.title}</h3>
                 <p className="text-sm text-slate-400">{step.desc}</p>
               </div>
@@ -389,7 +390,7 @@ export default function SnapInstallPage() {
 
         {/* Permissions Section */}
         <div className="bg-indigo-500/10 border-2 border-indigo-500/30 rounded-2xl p-12">
-          <h2 className="text-2xl font-bold text-white mb-6">🔐 About Snap Permissions</h2>
+          <h2 className="text-2xl font-bold text-white mb-6">About Snap Permissions</h2>
           <p className="text-slate-300 mb-8">
             When you install GENESIS, MetaMask asks for two permissions. Here's why we need them and how they keep you safe:
           </p>
@@ -397,7 +398,7 @@ export default function SnapInstallPage() {
           <div className="grid md:grid-cols-2 gap-8">
             <div className="space-y-4">
               <div className="bg-slate-900/50 rounded-lg p-6 border border-indigo-500/20">
-                <h3 className="text-lg font-bold text-white mb-3">🔍 Transaction Insight</h3>
+                <h3 className="text-lg font-bold text-white mb-3 flex items-center gap-2"><Icon name="search" className="w-5 h-5 text-teal-400" /> Transaction Insight</h3>
                 <p className="text-slate-300 mb-4">
                   This lets GENESIS <strong>see transactions before you sign</strong> so it can analyze them for risks.
                 </p>
@@ -424,7 +425,7 @@ export default function SnapInstallPage() {
 
             <div className="space-y-4">
               <div className="bg-slate-900/50 rounded-lg p-6 border border-indigo-500/20">
-                <h3 className="text-lg font-bold text-white mb-3">🌐 Network Access</h3>
+                <h3 className="text-lg font-bold text-white mb-3 flex items-center gap-2"><Icon name="globe" className="w-5 h-5 text-teal-400" /> Network Access</h3>
                 <p className="text-slate-300 mb-4">
                   This lets GENESIS <strong>fetch the latest threat database</strong> from our servers so it has current threat intel.
                 </p>
@@ -452,7 +453,7 @@ export default function SnapInstallPage() {
 
           <div className="mt-8 p-6 bg-teal-500/10 border border-teal-500/30 rounded-lg">
             <p className="text-teal-200">
-              <strong>✅ Your security:</strong> GENESIS runs in MetaMask's sandbox. It can't access your keys, funds, or personal info. All analysis happens locally on your device.
+              <strong>Your security:</strong> GENESIS runs in MetaMask's sandbox. It can't access your keys, funds, or personal info. All analysis happens locally on your device.
             </p>
           </div>
         </div>
@@ -467,21 +468,21 @@ export default function SnapInstallPage() {
     <div className="space-y-8">
       {/* Header */}
       <div className="text-center space-y-3">
-        <h1 className="text-3xl font-black text-white">🔐 GENESIS Protection</h1>
+        <h1 className="text-3xl font-black text-white">GENESIS Protection</h1>
         <p className="text-sm text-teal-200">MetaMask Snap for MetaMask users. WalletConnect users should use the connect flow instead.</p>
       </div>
 
       {/* Mobile Info - Desktop Only */}
       <div className="bg-gradient-to-r from-indigo-500/20 to-blue-500/20 border-2 border-indigo-500 rounded-lg p-5 space-y-4">
         <div className="flex gap-3 items-start">
-          <span className="text-3xl">💻</span>
+          <span className="text-teal-400"><Icon name="monitor" className="w-8 h-8" /></span>
           <div className="flex-1">
             <h2 className="font-bold text-white text-lg">Desktop Only: MetaMask Snaps</h2>
             <p className="text-xs text-indigo-100 mt-1">Snaps require the MetaMask browser extension on desktop</p>
 
             <div className="bg-slate-900/60 rounded-lg p-4 mt-3 space-y-3">
               <div className="space-y-2 text-xs text-indigo-200">
-                <p><strong>✅ What Works:</strong></p>
+                <p><strong>What Works:</strong></p>
                 <ul className="list-disc list-inside space-y-1">
                   <li>Desktop browsers: Chrome, Firefox, Safari, Brave</li>
                   <li>MetaMask browser extension installed</li>
@@ -490,7 +491,7 @@ export default function SnapInstallPage() {
               </div>
 
               <div className="space-y-2 text-xs text-slate-400 pt-3 border-t border-slate-700">
-                <p><strong>❌ Doesn't Work on Mobile:</strong></p>
+                <p><strong>Doesn't Work on Mobile:</strong></p>
                 <ul className="list-disc list-inside space-y-1">
                   <li>MetaMask mobile app (no Snap support yet)</li>
                   <li>Safari / Chrome on iPhone or Android</li>
@@ -499,7 +500,7 @@ export default function SnapInstallPage() {
               </div>
 
               <div className="mt-3 p-3 bg-blue-900/50 rounded text-xs text-blue-200 border border-blue-500/30">
-                <strong>💡 Tip:</strong> Use the QR code on desktop to share this page. Then open on your computer with MetaMask extension installed.
+                <strong>Tip:</strong> Use the QR code on desktop to share this page. Then open on your computer with MetaMask extension installed.
               </div>
 
               <div className="flex flex-col sm:flex-row gap-3 mt-3">
@@ -548,7 +549,7 @@ export default function SnapInstallPage() {
 
           {state === "done" && (
             <div className="text-center space-y-3">
-              <div className="text-4xl">✅</div>
+              <div className="flex justify-center text-green-400"><Icon name="checkCircle" className="w-12 h-12" /></div>
               <h3 className="font-bold text-white">Installation Complete!</h3>
               <p className="text-xs text-slate-400">GENESIS is now protecting your transactions</p>
               <a href="/after-install" className="block mt-3 px-4 py-2 bg-teal-500 text-slate-950 font-bold rounded-lg text-center text-sm">
@@ -559,7 +560,7 @@ export default function SnapInstallPage() {
 
           {state === "error" && (
             <div className="text-center space-y-3">
-              <div className="text-3xl">❌</div>
+              <div className="flex justify-center text-red-400"><Icon name="block" className="w-10 h-10" /></div>
               <p className="text-red-300 text-sm">{errorMsg}</p>
               <button
                 onClick={() => {
@@ -600,22 +601,10 @@ export default function SnapInstallPage() {
       <div className="bg-slate-900/50 rounded-lg p-4 space-y-3">
         <h3 className="font-bold text-white text-sm">Why GENESIS?</h3>
         <div className="space-y-2 text-xs text-slate-300">
-          <div className="flex gap-2">
-            <span>⚡</span>
-            <span>Instant analysis in milliseconds</span>
-          </div>
-          <div className="flex gap-2">
-            <span>🛡️</span>
-            <span>Community-powered threat detection</span>
-          </div>
-          <div className="flex gap-2">
-            <span>📊</span>
-            <span>Clear verdict: ALLOW, WARN, BLOCK</span>
-          </div>
-          <div className="flex gap-2">
-            <span>✅</span>
-            <span>100% private, runs locally on your device</span>
-          </div>
+          <div className="flex gap-2 items-center"><Icon name="bolt" className="w-4 h-4 text-teal-400" /><span>Instant analysis in milliseconds</span></div>
+          <div className="flex gap-2 items-center"><Icon name="shield" className="w-4 h-4 text-teal-400" /><span>Community-powered threat detection</span></div>
+          <div className="flex gap-2 items-center"><Icon name="chart" className="w-4 h-4 text-teal-400" /><span>Clear verdict: ALLOW, WARN, BLOCK</span></div>
+          <div className="flex gap-2 items-center"><Icon name="checkCircle" className="w-4 h-4 text-teal-400" /><span>100% private, runs locally on your device</span></div>
         </div>
       </div>
     </div>

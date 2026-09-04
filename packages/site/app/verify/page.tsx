@@ -2,6 +2,7 @@
 
 import { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
+import { Icon } from "@/components/Icon";
 
 function VerifyContent() {
   const params = useSearchParams();
@@ -39,13 +40,13 @@ function VerifyContent() {
     <div className="max-w-lg mx-auto text-center space-y-6 py-16">
       {state === "loading" && (
         <>
-          <div className="text-5xl animate-pulse">⏳</div>
+          <div className="flex justify-center text-teal-400"><Icon name="refresh" className="w-12 h-12 animate-spin" /></div>
           <h1 className="text-2xl font-bold text-white">Confirming your report…</h1>
         </>
       )}
       {state === "ok" && (
         <>
-          <div className="text-6xl">✅</div>
+          <div className="flex justify-center text-emerald-400"><Icon name="checkCircle" className="w-16 h-16" /></div>
           <h1 className="text-3xl font-black text-white">Report confirmed</h1>
           <p className="text-slate-300">
             Thank you for helping protect the community. Your report is now in the GENESIS threat feed and will be trusted
@@ -59,7 +60,7 @@ function VerifyContent() {
       )}
       {state === "error" && (
         <>
-          <div className="text-6xl">⚠️</div>
+          <div className="flex justify-center text-amber-400"><Icon name="warning" className="w-16 h-16" /></div>
           <h1 className="text-3xl font-black text-white">Couldn't confirm</h1>
           <p className="text-slate-300">{message}</p>
           <a href="/report" className="inline-block px-5 py-2.5 rounded-lg bg-teal-500 text-slate-950 font-bold hover:bg-teal-400 transition">Back to report</a>

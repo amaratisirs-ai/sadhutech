@@ -1,5 +1,7 @@
 "use client";
 
+import { Icon } from "@/components/Icon";
+
 export default function Home() {
   const flowSteps = [
     { 
@@ -52,32 +54,32 @@ export default function Home() {
 
   const features = [
     {
-      icon: <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>,
+      icon: <Icon name="warning" className="w-6 h-6" />,
       title: "Real Threats",
       desc: "Curated list of known drainers and malicious contracts from the community.",
     },
     {
-      icon: <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>,
+      icon: <Icon name="cube" className="w-6 h-6" />,
       title: "Complex Transactions",
       desc: "Handles smart transactions that call multiple functions in one go.",
     },
     {
-      icon: <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>,
+      icon: <Icon name="chart" className="w-6 h-6" />,
       title: "Risk Scoring",
       desc: "Each transaction gets a score so you know how risky it is.",
     },
     {
-      icon: <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9-9a9 9 0 019 9" /></svg>,
+      icon: <Icon name="globe" className="w-6 h-6" />,
       title: "Works Everywhere",
       desc: "Use it as a MetaMask Snap, HTTP API, or direct integration.",
     },
     {
-      icon: <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /> <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>,
+      icon: <Icon name="eye" className="w-6 h-6" />,
       title: "Simple & Clear",
       desc: "Plain language verdicts. No crypto jargon, just what you need to know.",
     },
     {
-      icon: <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>,
+      icon: <Icon name="refresh" className="w-6 h-6" />,
       title: "Always Synced",
       desc: "One threat feed across all your devices. Always up to date.",
     },
@@ -99,19 +101,19 @@ export default function Home() {
               </h1>
 
               <p className="text-xl text-slate-200 leading-relaxed">
-                Transactions happen in milliseconds. So should your security. <strong>GENESIS analyzes every transaction instantly</strong> against community-verified threats—right inside your wallet.
+                Transactions happen in milliseconds. So should your security. <strong>GENESIS analyzes every transaction instantly</strong> against community-verified threats - right inside your wallet.
               </p>
 
               <p className="text-lg text-slate-300">
-                Get a clear verdict before you sign: <span className="font-bold text-green-400">✅ ALLOW</span>, <span className="font-bold text-yellow-400">⚠️ WARN</span>, or <span className="font-bold text-red-400">🚫 BLOCK</span>
+                Get a clear verdict before you sign: <span className="font-bold text-green-400">ALLOW</span>, <span className="font-bold text-yellow-400">WARN</span>, or <span className="font-bold text-red-400">BLOCK</span>
               </p>
 
               <div className="flex gap-4 flex-wrap pt-2">
                 <a
                   href="/check"
-                  className="px-8 py-4 bg-gradient-to-r from-teal-500 to-teal-400 text-slate-950 rounded-lg font-bold hover:shadow-xl transition-all hover:shadow-teal-500/50 text-lg"
+                  className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-teal-500 to-teal-400 text-slate-950 rounded-lg font-bold hover:shadow-xl transition-all hover:shadow-teal-500/50 text-lg"
                 >
-                  🔎 Check a transaction — free
+                  <Icon name="search" className="w-5 h-5" /> Check a transaction  -  free
                 </a>
                 <a
                   href="/threats"
@@ -420,7 +422,7 @@ export default function Home() {
           {/* MetaMask Snap */}
           <div className="bg-gradient-to-br from-orange-50 to-red-50 dark:from-orange-900/20 dark:to-red-900/20 rounded-xl border-2 border-orange-200 dark:border-orange-600 p-8 space-y-4">
             <div className="flex items-center gap-3">
-              <span className="text-4xl">🦊</span>
+              <span className="text-orange-500"><Icon name="wallet" className="w-9 h-9" /></span>
               <div>
                 <h3 className="font-bold text-lg text-slate-900 dark:text-white">MetaMask Snap</h3>
                 <p className="text-sm text-slate-700 dark:text-slate-400">One-click install</p>
@@ -437,7 +439,7 @@ export default function Home() {
           {/* HTTP API */}
           <div className="bg-gradient-to-br from-indigo-50 to-indigo-50 dark:from-indigo-900/20 dark:to-indigo-900/20 rounded-xl border-2 border-indigo-200 dark:border-indigo-600 p-8 space-y-4">
             <div className="flex items-center gap-3">
-              <span className="text-4xl">⚙️</span>
+              <span className="text-indigo-500"><Icon name="code" className="w-9 h-9" /></span>
               <div>
                 <h3 className="font-bold text-lg text-slate-900 dark:text-white">HTTP API</h3>
                 <p className="text-sm text-slate-700 dark:text-slate-400">For developers</p>
@@ -466,7 +468,7 @@ export default function Home() {
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           <div className="bg-white dark:bg-slate-800 rounded-lg border-2 border-slate-200 dark:border-slate-700 p-6 space-y-3 hover:border-indigo-300 dark:hover:border-indigo-500 transition">
-            <div className="text-3xl">💰</div>
+            <div className="text-teal-500 dark:text-teal-400"><Icon name="dollar" className="w-8 h-8" /></div>
             <h3 className="font-bold text-slate-900 dark:text-white">DeFi Traders</h3>
             <p className="text-sm text-slate-700 dark:text-slate-300">
               Swap, stake, and farm with confidence. GENESIS checks approvals before you risk your funds.
@@ -474,7 +476,7 @@ export default function Home() {
           </div>
 
           <div className="bg-white dark:bg-slate-800 rounded-lg border-2 border-slate-200 dark:border-slate-700 p-6 space-y-3 hover:border-indigo-300 dark:hover:border-indigo-500 transition">
-            <div className="text-3xl">🖼️</div>
+            <div className="text-teal-500 dark:text-teal-400"><Icon name="photo" className="w-8 h-8" /></div>
             <h3 className="font-bold text-slate-900 dark:text-white">NFT Collectors</h3>
             <p className="text-sm text-slate-700 dark:text-slate-300">
               Protect your valuable collections. GENESIS blocks approvals to known NFT thieves.
@@ -482,7 +484,7 @@ export default function Home() {
           </div>
 
           <div className="bg-white dark:bg-slate-800 rounded-lg border-2 border-slate-200 dark:border-slate-700 p-6 space-y-3 hover:border-indigo-300 dark:hover:border-indigo-500 transition">
-            <div className="text-3xl">🛡️</div>
+            <div className="text-teal-500 dark:text-teal-400"><Icon name="shield" className="w-8 h-8" /></div>
             <h3 className="font-bold text-slate-900 dark:text-white">Crypto Beginners</h3>
             <p className="text-sm text-slate-700 dark:text-slate-300">
               New to crypto? GENESIS explains transactions in plain English, not jargon.
@@ -490,7 +492,7 @@ export default function Home() {
           </div>
 
           <div className="bg-white dark:bg-slate-800 rounded-lg border-2 border-slate-200 dark:border-slate-700 p-6 space-y-3 hover:border-indigo-300 dark:hover:border-indigo-500 transition">
-            <div className="text-3xl">🚀</div>
+            <div className="text-teal-500 dark:text-teal-400"><Icon name="rocket" className="w-8 h-8" /></div>
             <h3 className="font-bold text-slate-900 dark:text-white">Power Users</h3>
             <p className="text-sm text-slate-700 dark:text-slate-300">
               Complex transactions? GENESIS decodes bundled actions and shows what each one really does.
@@ -498,7 +500,7 @@ export default function Home() {
           </div>
 
           <div className="bg-white dark:bg-slate-800 rounded-lg border-2 border-slate-200 dark:border-slate-700 p-6 space-y-3 hover:border-indigo-300 dark:hover:border-indigo-500 transition">
-            <div className="text-3xl">🔧</div>
+            <div className="text-teal-500 dark:text-teal-400"><Icon name="wrench" className="w-8 h-8" /></div>
             <h3 className="font-bold text-slate-900 dark:text-white">Developers</h3>
             <p className="text-sm text-slate-700 dark:text-slate-300">
               Build safer wallets and apps. Our API returns a clear verdict for any transaction.
@@ -506,10 +508,10 @@ export default function Home() {
           </div>
 
           <div className="bg-white dark:bg-slate-800 rounded-lg border-2 border-slate-200 dark:border-slate-700 p-6 space-y-3 hover:border-indigo-300 dark:hover:border-indigo-500 transition">
-            <div className="text-3xl">🔍</div>
+            <div className="text-teal-500 dark:text-teal-400"><Icon name="search" className="w-8 h-8" /></div>
             <h3 className="font-bold text-slate-900 dark:text-white">Security Teams</h3>
             <p className="text-sm text-slate-700 dark:text-slate-300">
-              Community-verified threat intelligence — confirmed by multiple independent reporters before it counts.
+              Community-verified threat intelligence  -  confirmed by multiple independent reporters before it counts.
             </p>
           </div>
         </div>
@@ -542,7 +544,7 @@ export default function Home() {
 
             <div className="space-y-3">
               <p className="text-emerald-950 dark:text-slate-300">
-                We've built a working gate that checks crypto transactions before you sign. It blocks known scams, warns you about risky moves, and explains everything in plain English—no crypto jargon.
+                We've built a working gate that checks crypto transactions before you sign. It blocks known scams, warns you about risky moves, and explains everything in plain English - no crypto jargon.
               </p>
               <p className="text-emerald-950 dark:text-slate-300">
                 Try it with real transactions on our demo. The system learns from community reports, so it gets smarter over time.
@@ -572,7 +574,7 @@ export default function Home() {
 
             <div className="space-y-3">
               <p className="text-indigo-950 dark:text-slate-300">
-                Install GENESIS as a MetaMask Snap and get real-time protection every time you sign. No copy-pasting addresses or leaving your wallet—just one-click safety.
+                Install GENESIS as a MetaMask Snap and get real-time protection every time you sign. No copy-pasting addresses or leaving your wallet - just one-click safety.
               </p>
               <p className="text-indigo-950 dark:text-slate-300">
                 Works across Ethereum, Polygon, Base, and more. Whether you're trading, collecting NFTs, or doing DeFi, GENESIS watches your back.
@@ -602,7 +604,7 @@ export default function Home() {
                 Threat intel is stronger when the community contributes. We're building tools for security researchers, white-hats, and everyday users to report scams and vote on what's dangerous.
               </p>
               <p className="text-orange-950 dark:text-slate-300">
-                You'll earn rewards for helping protect others. Together, we grow the world's most trusted threat intelligence network—owned by the community, not by any corporation.
+                You'll earn rewards for helping protect others. Together, we grow the world's most trusted threat intelligence network - owned by the community, not by any corporation.
               </p>
             </div>
           </div>
@@ -610,10 +612,10 @@ export default function Home() {
 
         {/* Not roadmap: What we won't do */}
         <div className="bg-slate-50 dark:bg-slate-800 border-2 border-slate-300 dark:border-slate-700 rounded-lg p-6">
-          <p className="font-semibold text-slate-900 dark:text-white mb-3">🎯 Our Promise</p>
+          <p className="font-semibold text-slate-900 dark:text-white mb-3 flex items-center gap-2"><Icon name="badge" className="w-5 h-5 text-teal-500" /> Our Promise</p>
           <div className="grid md:grid-cols-3 gap-4 text-sm text-slate-900 dark:text-slate-300">
             <div>
-              <p className="font-medium text-red-600">❌ We won't</p>
+              <p className="font-medium text-red-600">We won't</p>
               <ul className="mt-2 space-y-1">
                 <li>Claim to be "hack-proof"</li>
                 <li>Hide code or go closed-source</li>
@@ -621,7 +623,7 @@ export default function Home() {
               </ul>
             </div>
             <div>
-              <p className="font-medium text-red-600">❌ We won't</p>
+              <p className="font-medium text-red-600">We won't</p>
               <ul className="mt-2 space-y-1">
                 <li>Custody your funds</li>
                 <li>Lock basic safety behind a paywall</li>
@@ -629,7 +631,7 @@ export default function Home() {
               </ul>
             </div>
             <div>
-              <p className="font-medium text-green-600">✅ We will</p>
+              <p className="font-medium text-green-600">We will</p>
               <ul className="mt-2 space-y-1">
                 <li>Keep code open-source</li>
                 <li>Respect your privacy</li>
@@ -649,7 +651,7 @@ export default function Home() {
             href="/check"
             className="px-8 py-4 bg-gradient-to-r from-indigo-600 to-indigo-600 text-white rounded-lg font-semibold hover:shadow-xl transition-all hover:scale-105"
           >
-            Check a transaction — free
+            Check a transaction  -  free
           </a>
           <a
             href="https://github.com/amaratisirs-ai/sadhutech"

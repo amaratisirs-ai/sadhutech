@@ -27,7 +27,7 @@ const TIERS = [
       "Everything in Free",
       "Deep checks powered by ChainAbuse",
       "Cross-chain coverage (BTC, Solana & more)",
-      "Pay-as-you-go — no subscription, no account",
+      "Pay-as-you-go  -  no subscription, no account",
       "Pay what you like, min 1 USDC",
       "Checks tied to your wallet",
     ],
@@ -55,7 +55,7 @@ export default function PricingPage() {
       <header className="text-center space-y-3">
         <h1 className="text-4xl md:text-5xl font-black text-white">Simple, honest pricing</h1>
         <p className="text-slate-300 max-w-2xl mx-auto">
-          Basic safety is free forever — that's how the community feed gets stronger. Pay only for depth, speed, and
+          Basic safety is free forever  -  that's how the community feed gets stronger. Pay only for depth, speed, and
           cross-chain coverage.
         </p>
       </header>
@@ -117,12 +117,12 @@ export default function PricingPage() {
       <section className="max-w-3xl mx-auto bg-slate-900/50 border border-slate-700 rounded-2xl p-6 space-y-3">
         <h3 className="text-lg font-bold text-white">How Free vs Pro works</h3>
         <p className="text-sm text-slate-300">
-          <strong className="text-white">Free</strong> checks against our community threat feed — thousands of
+          <strong className="text-white">Free</strong> checks against our community threat feed  -  thousands of
           scam addresses reported and confirmed by the community. <strong className="text-white">Pro</strong> is
           pay-as-you-go: buy checks with USDC from your wallet and get ChainAbuse's premium, cross-chain intel per check.
         </p>
         <p className="text-xs text-slate-400">
-          We will never paywall basic safety or charge you to report a scam — that's what keeps everyone protected.
+          We will never paywall basic safety or charge you to report a scam  -  that's what keeps everyone protected.
         </p>
       </section>
     </div>

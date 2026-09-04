@@ -4,6 +4,7 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { QRCodeCanvas } from "qrcode.react";
+import { Icon, type IconName } from "@/components/Icon";
 
 // Only request what every EVM wallet can fulfil. Non-universal methods (eth_sign,
 // typed-data, chain switching) go in optionalMethods so wallets like Trust Wallet
@@ -37,6 +38,7 @@ interface WalletOption {
   id: string;
   name: string;
   icon: string;
+  iconName: IconName;
   chain: string;
 }
 
@@ -67,22 +69,22 @@ export default function WalletConnect() {
   }, [selectedWallet]);
 
   const walletOptions: WalletOption[] = [
-    { id: "trust", name: "Trust Wallet", icon: "🔵", chain: "EVM" },
-    { id: "argent", name: "Argent", icon: "🔐", chain: "EVM" },
-    { id: "rainbow", name: "Rainbow", icon: "🌈", chain: "EVM" },
-    { id: "wallet3", name: "Wallet3", icon: "3️⃣", chain: "EVM" },
-    { id: "walletio", name: "Wallet.io", icon: "💳", chain: "EVM" },
-    { id: "math", name: "Math Wallet", icon: "➕", chain: "Multi" },
-    { id: "ledger", name: "Ledger Live", icon: "🔑", chain: "EVM" },
-    { id: "zerion", name: "Zerion", icon: "🎯", chain: "EVM" },
-    { id: "gnosis", name: "Safe (Gnosis)", icon: "📦", chain: "EVM" },
-    { id: "imtoken", name: "imToken", icon: "🪙", chain: "Multi" },
-    { id: "tokenpocket", name: "TokenPocket", icon: "👝", chain: "Multi" },
-    { id: "huobi", name: "Huobi Wallet", icon: "🚀", chain: "Multi" },
-    { id: "hyperpay", name: "HyperPay", icon: "⚡", chain: "Multi" },
-    { id: "ambire", name: "Ambire", icon: "🎭", chain: "EVM" },
-    { id: "alphawallet", name: "AlphaWallet", icon: "Ⓐ", chain: "EVM" },
-    { id: "coinomi", name: "Coinomi", icon: "🪙", chain: "Multi" },
+    { id: "trust", name: "Trust Wallet", icon: "Trust", iconName: "wallet", chain: "EVM" },
+    { id: "argent", name: "Argent", icon: "Argent", iconName: "shield", chain: "EVM" },
+    { id: "rainbow", name: "Rainbow", icon: "Rainbow", iconName: "sparkles", chain: "EVM" },
+    { id: "wallet3", name: "Wallet3", icon: "Wallet3", iconName: "wallet", chain: "EVM" },
+    { id: "walletio", name: "Wallet.io", icon: "Wallet.io", iconName: "wallet", chain: "EVM" },
+    { id: "math", name: "Math Wallet", icon: "Math", iconName: "chart", chain: "Multi" },
+    { id: "ledger", name: "Ledger Live", icon: "Ledger", iconName: "lock", chain: "EVM" },
+    { id: "zerion", name: "Zerion", icon: "Zerion", iconName: "chart", chain: "EVM" },
+    { id: "gnosis", name: "Safe (Gnosis)", icon: "Safe", iconName: "shield", chain: "EVM" },
+    { id: "imtoken", name: "imToken", icon: "imToken", iconName: "wallet", chain: "Multi" },
+    { id: "tokenpocket", name: "TokenPocket", icon: "TokenPocket", iconName: "wallet", chain: "Multi" },
+    { id: "huobi", name: "Huobi Wallet", icon: "Huobi", iconName: "rocket", chain: "Multi" },
+    { id: "hyperpay", name: "HyperPay", icon: "HyperPay", iconName: "bolt", chain: "Multi" },
+    { id: "ambire", name: "Ambire", icon: "Ambire", iconName: "shieldAlert", chain: "EVM" },
+    { id: "alphawallet", name: "AlphaWallet", icon: "Alpha", iconName: "wallet", chain: "EVM" },
+    { id: "coinomi", name: "Coinomi", icon: "Coinomi", iconName: "wallet", chain: "Multi" },
   ];
 
   const getWalletLaunchUrl = (wallet: WalletOption, uri: string) => {
@@ -248,7 +250,7 @@ export default function WalletConnect() {
         const handleConnect = () => {
           const account = getProviderAccount(ethereumProvider);
           const chainId = getProviderChainId(ethereumProvider);
-          const wallet = selectedWalletRef.current ?? { id: "walletconnect", name: "WalletConnect", icon: "🔗", chain: "EVM" };
+          const wallet = selectedWalletRef.current ?? { id: "walletconnect", name: "WalletConnect", icon: "link", chain: "EVM" };
           if (account) {
             finalizeWalletConnection(wallet, account, chainId);
           } else {
@@ -357,7 +359,7 @@ export default function WalletConnect() {
   return (
     <div className="space-y-12">
       <div className="text-center space-y-4">
-        <h1 className="text-5xl md:text-6xl font-black text-white">🔗 Connect your wallet</h1>
+        <h1 className="text-5xl md:text-6xl font-black text-white">Connect your wallet</h1>
         <p className="text-xl text-teal-200 max-w-2xl mx-auto">
           {isMobile
             ? "Choose WalletConnect, pick your wallet, approve the session, then return to the browser to check the transaction." 
@@ -397,7 +399,7 @@ export default function WalletConnect() {
 
       <div className={`grid ${isMobile ? "grid-cols-1" : "md:grid-cols-2"} gap-8 max-w-5xl mx-auto`}>
         <div className="space-y-4">
-          <h2 className="text-2xl font-bold text-white mb-4">📱 Available Wallets</h2>
+          <h2 className="text-2xl font-bold text-white mb-4">Available Wallets</h2>
           <div className="mb-3 rounded-xl border border-teal-500/30 bg-teal-500/10 p-4 text-sm text-slate-100">
             <p className="font-semibold text-white">WalletConnect path</p>
             <p>Select your wallet below, approve the connection, and return to the browser to continue with transaction verification.</p>
@@ -412,14 +414,14 @@ export default function WalletConnect() {
                   selectedWallet?.id === wallet.id ? "border-teal-400 bg-teal-900/40" : "border-slate-600 bg-slate-800/50 hover:border-teal-500"
                 } ${isConnecting && selectedWallet?.id !== wallet.id ? "opacity-50 cursor-not-allowed" : ""}`}
               >
-                <div className="text-3xl">{wallet.icon}</div>
+                <div className="flex justify-center text-teal-400"><Icon name={wallet.iconName} className="w-8 h-8" /></div>
                 <div className="text-sm font-bold text-white">{wallet.name}</div>
                 <div className="text-xs text-teal-300">{wallet.chain}</div>
               </button>
             ))}
           </div>
           <div className="bg-blue-900/30 border border-blue-500/50 rounded-lg p-4 mt-4 space-y-2">
-            <p className="text-sm font-semibold text-blue-200">💡 How it works:</p>
+            <p className="text-sm font-semibold text-blue-200">How it works:</p>
             <ol className="text-xs text-blue-100 space-y-1">
               {isMobile ? (
                 <>
@@ -446,7 +448,7 @@ export default function WalletConnect() {
           {!selectedWallet ? (
             <div className="bg-slate-800 border-2 border-dashed border-slate-600 rounded-lg p-12 flex items-center justify-center h-72">
               <div className="text-center space-y-2">
-                <div className="text-6xl">📱</div>
+                <div className="text-teal-400"><Icon name="wallet" className="w-16 h-16 mx-auto" /></div>
                 <p className="text-slate-300 font-medium">Select a wallet to begin</p>
               </div>
             </div>
@@ -469,7 +471,7 @@ export default function WalletConnect() {
                     <>
                       <QRCodeCanvas value={getQrValue(selectedWallet, connectionState.uri) || ""} size={200} level="H" includeMargin={true} />
                       <p className="text-slate-700 text-sm font-medium">Scan to open {selectedWallet.name}</p>
-                      <p className="text-xs text-slate-500">{connectionState.connectionApproved ? "✅ Connection approved!" : "Waiting for approval..."}</p>
+                      <p className="text-xs text-slate-500">{connectionState.connectionApproved ? "Connection approved." : "Waiting for approval..."}</p>
                     </>
                   ) : (
                     <>
@@ -481,7 +483,7 @@ export default function WalletConnect() {
               </div>
               <div className="bg-teal-900/30 border border-teal-500/50 rounded-lg p-4 space-y-3">
                 <div className="flex items-center gap-3">
-                  <div className="text-3xl">{selectedWallet.icon}</div>
+                  <div className="text-teal-400"><Icon name={selectedWallet.iconName} className="w-10 h-10" /></div>
                   <div>
                     <p className="font-bold text-white">{selectedWallet.name}</p>
                     <p className="text-xs text-teal-300">{selectedWallet.chain} • Connected via WalletConnect</p>
@@ -492,7 +494,7 @@ export default function WalletConnect() {
                 )}
                 {connectionState.connectionApproved && (
                     <div className="space-y-3">
-                      <p className="text-xs text-teal-200">✅ Wallet connected. Your next step is to check a real transaction before signing.</p>
+                      <p className="text-xs text-teal-200">Wallet connected. Your next step is to check a real transaction before signing.</p>
                       <div className="flex flex-col sm:flex-row gap-3">
                         <button
                           type="button"
@@ -559,7 +561,7 @@ export default function WalletConnect() {
             </div>
           ) : connectionState.connectionApproved ? (
             <div className="bg-green-900/40 border border-green-500/50 rounded-lg p-4 text-center space-y-3">
-              <p className="text-green-200 font-semibold">✅ Connection Approved!</p>
+              <p className="text-green-200 font-semibold">Connection Approved.</p>
               <p className="text-xs text-green-300">Wallet connected. Check a real transaction before signing next.</p>
               <div className="flex flex-col gap-2">
                 <button
@@ -619,18 +621,18 @@ export default function WalletConnect() {
       )}
 
       <section className="bg-gradient-to-r from-slate-900 to-slate-950 border-2 border-slate-700 rounded-xl p-8 max-w-3xl mx-auto space-y-4">
-        <h3 className="text-xl font-bold text-white">🌍 Supported Networks</h3>
+        <h3 className="text-xl font-bold text-white">Supported Networks</h3>
         <div className="grid md:grid-cols-4 gap-3">
-          <div className="flex items-center gap-2"><span className="text-lg">⛓️</span><p className="text-sm text-slate-200">Ethereum</p></div>
-          <div className="flex items-center gap-2"><span className="text-lg">🟣</span><p className="text-sm text-slate-200">Polygon</p></div>
-          <div className="flex items-center gap-2"><span className="text-lg">🔵</span><p className="text-sm text-slate-200">Arbitrum</p></div>
-          <div className="flex items-center gap-2"><span className="text-lg">🔴</span><p className="text-sm text-slate-200">Optimism</p></div>
+          <div className="flex items-center gap-2"><Icon name="link" className="w-5 h-5 text-teal-400" /><p className="text-sm text-slate-200">Ethereum</p></div>
+          <div className="flex items-center gap-2"><Icon name="network" className="w-5 h-5 text-violet-400" /><p className="text-sm text-slate-200">Polygon</p></div>
+          <div className="flex items-center gap-2"><Icon name="chart" className="w-5 h-5 text-blue-400" /><p className="text-sm text-slate-200">Arbitrum</p></div>
+          <div className="flex items-center gap-2"><Icon name="warning" className="w-5 h-5 text-red-400" /><p className="text-sm text-slate-200">Optimism</p></div>
         </div>
         <p className="text-xs text-slate-400">+ 10+ more EVM chains supported</p>
       </section>
 
       <section className="bg-gradient-to-br from-green-900/30 to-slate-900 border-2 border-green-500/40 rounded-xl p-8 max-w-3xl mx-auto space-y-3">
-        <h3 className="text-xl font-bold text-white">🔒 Connection Security</h3>
+        <h3 className="text-xl font-bold text-white">Connection Security</h3>
         <ul className="space-y-2 text-sm text-slate-200">
           <li className="flex gap-2"><span className="text-green-400">✓</span><span>WalletConnect uses industry-standard encryption</span></li>
           <li className="flex gap-2"><span className="text-green-400">✓</span><span>Your private keys never leave your wallet</span></li>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { Icon } from "@/components/Icon";
 
 interface Contributor {
   address: string;
@@ -60,7 +61,7 @@ export default function CommunityPage() {
       const errorMsg = err instanceof Error ? err.message : "Failed to load leaderboard";
       console.error("Failed to fetch contributors:", err);
       setError(errorMsg);
-      // No fabricated data — show an honest empty state when the feed is unavailable.
+      // No fabricated data  -  show an honest empty state when the feed is unavailable.
       if (fetchOffset === 0) {
         setContributors([]);
       }
@@ -110,9 +111,9 @@ export default function CommunityPage() {
       {/* Tab Navigation */}
       <div className="flex flex-wrap gap-2 p-3 bg-slate-50 dark:bg-slate-900/30 rounded-lg border border-slate-200 dark:border-slate-700 sticky top-16 z-40">
         {[
-          { id: "leaderboard" as const, label: "🏆 Leaderboard" },
-          { id: "contribute" as const, label: "📝 How to Contribute" },
-          { id: "rewards" as const, label: "🎁 Rewards Program" },
+          { id: "leaderboard" as const, label: "Leaderboard" },
+          { id: "contribute" as const, label: "How to Contribute" },
+          { id: "rewards" as const, label: "Rewards Program" },
         ].map((tab) => (
           <button
             key={tab.id}
@@ -135,12 +136,12 @@ export default function CommunityPage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="bg-slate-50 dark:bg-slate-900/30 rounded-lg border border-slate-200 dark:border-slate-700 p-4">
               <div className="text-sm text-slate-600 dark:text-slate-400 mb-1">Threats tracked</div>
-              <div className="text-3xl font-bold text-slate-900 dark:text-white">{threatCount !== null ? threatCount.toLocaleString() : "—"}</div>
+              <div className="text-3xl font-bold text-slate-900 dark:text-white">{threatCount !== null ? threatCount.toLocaleString() : " - "}</div>
               <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Malicious addresses in the community threat feed.</p>
             </div>
             <div className="bg-slate-50 dark:bg-slate-900/30 rounded-lg border border-slate-200 dark:border-slate-700 p-4">
               <div className="text-sm text-slate-600 dark:text-slate-400 mb-1">Community contributors</div>
-              <div className="text-3xl font-bold text-slate-900 dark:text-white">{totalCount ? totalCount.toLocaleString() : "—"}</div>
+              <div className="text-3xl font-bold text-slate-900 dark:text-white">{totalCount ? totalCount.toLocaleString() : " - "}</div>
               <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Grows as verified reports come in. Rewards program coming soon.</p>
             </div>
           </div>
@@ -154,10 +155,10 @@ export default function CommunityPage() {
               <div className="flex flex-wrap gap-2">
                 <span className="text-sm font-medium text-slate-600 dark:text-slate-400 py-2">Sort by:</span>
                 {[
-                  { id: "score", label: "📊 Top Score" },
-                  { id: "reports", label: "📝 Most Reports" },
-                  { id: "verified", label: "✓ Most Verified" },
-                  { id: "latest", label: "⏱️ Latest Join" },
+                  { id: "score", label: "Top Score" },
+                  { id: "reports", label: "Most Reports" },
+                  { id: "verified", label: "Most Verified" },
+                  { id: "latest", label: "Latest Join" },
                 ].map((sort) => (
                   <button
                     key={sort.id}
@@ -274,35 +275,35 @@ export default function CommunityPage() {
                   step: "1",
                   title: "Identify a Malicious Address",
                   desc: "Find a phishing address, drainer, or malicious contract. You can search blockchain explorers, community reports, or security tools.",
-                  icon: "🔍",
+                  icon: <Icon name="search" className="w-7 h-7" />,
                 },
                 {
                   step: "2",
                   title: "Gather Evidence",
                   desc: "Collect evidence: victim complaints, contract code, transaction patterns. Documentation strengthens verification chances.",
-                  icon: "📋",
+                  icon: <Icon name="document" className="w-7 h-7" />,
                 },
                 {
                   step: "3",
                   title: "Submit Report via /v1/report",
                   desc: "Use the GENESIS API endpoint to submit your threat report with description, category, and chain information.",
-                  icon: "📤",
+                  icon: <Icon name="arrowRight" className="w-7 h-7" />,
                 },
                 {
                   step: "4",
                   title: "Community Votes",
-                  desc: "Other security researchers review your report. It only counts once multiple independent reporters agree — so accuracy stays high.",
-                  icon: "🗳️",
+                  desc: "Other security researchers review your report. It only counts once multiple independent reporters agree  -  so accuracy stays high.",
+                  icon: <Icon name="users" className="w-7 h-7" />,
                 },
                 {
                   step: "5",
                   title: "Earn Rewards",
                   desc: "Once verified, earn points and rewards. Higher quality reports earn more. Monthly leaderboard winners get bonus payouts.",
-                  icon: "🎁",
+                  icon: <Icon name="gift" className="w-7 h-7" />,
                 },
               ].map((item) => (
                 <div key={item.step} className="flex gap-4">
-                  <div className="text-3xl flex-shrink-0">{item.icon}</div>
+                  <div className="text-indigo-500 dark:text-indigo-400 flex-shrink-0">{item.icon}</div>
                   <div>
                     <div className="flex items-baseline gap-2 mb-1">
                       <span className="inline-flex items-center justify-center w-6 h-6 bg-indigo-600 text-white rounded-full text-sm font-bold">
@@ -317,7 +318,7 @@ export default function CommunityPage() {
             </div>
 
             <div className="mt-8 p-4 bg-white dark:bg-slate-800 border border-indigo-200 dark:border-indigo-800 rounded-lg">
-              <h3 className="font-semibold text-slate-900 dark:text-white mb-2">📚 API Documentation</h3>
+              <h3 className="font-semibold text-slate-900 dark:text-white mb-2 flex items-center gap-2"><Icon name="document" className="w-5 h-5 text-indigo-500" /> API Documentation</h3>
               <p className="text-sm text-slate-600 dark:text-slate-400 mb-4">
                 Submit threat reports programmatically using the GENESIS API:
               </p>
@@ -388,7 +389,7 @@ Content-Type: application/json
 
             {/* Redemption */}
             <div className="bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-800 rounded-lg p-6">
-              <h3 className="font-semibold text-emerald-900 dark:text-emerald-100 mb-4">🎁 How to Redeem</h3>
+              <h3 className="font-semibold text-emerald-900 dark:text-emerald-100 mb-4 flex items-center gap-2"><Icon name="gift" className="w-5 h-5" /> How to Redeem</h3>
               <ul className="space-y-2 text-sm text-emerald-900 dark:text-emerald-100">
                 <li>• Points automatically added to your contributor dashboard</li>
                 <li>• Redeem 1,000 points = $50 USDC or ETH</li>

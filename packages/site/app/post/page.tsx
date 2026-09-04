@@ -139,7 +139,7 @@ export default function PostPage() {
 
             {expandedHelp === "calldata" && (
               <div className="bg-teal-500/10 border border-teal-500/30 rounded-lg p-4 text-sm text-slate-300 space-y-3">
-                <p><strong>What is it?</strong> This is the secret code that tells the blockchain what your transaction will actually do. Most wallets hide this from you — but we decode it so you can see what you're really signing.</p>
+                <p><strong>What is it?</strong> This is the secret code that tells the blockchain what your transaction will actually do. Most wallets hide this from you  -  but we decode it so you can see what you're really signing.</p>
                 
                 <p><strong>What it looks like:</strong> A string of letters and numbers starting with 0x, like:</p>
                 <p className="font-mono text-xs bg-slate-800 p-2 rounded text-slate-200 break-all">

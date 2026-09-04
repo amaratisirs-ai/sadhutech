@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { Icon } from "@/components/Icon";
 
 type Tab = "threats" | "articles" | "tips" | "stats";
 
@@ -189,10 +190,10 @@ export default function NewsPage() {
       {/* Tab Navigation */}
       <div className="flex flex-wrap gap-2 p-3 bg-slate-50 dark:bg-slate-900/30 rounded-lg border border-slate-200 dark:border-slate-700 sticky top-16 z-40">
         {[
-          { id: "threats" as Tab, label: "🚨 Breaking Threats" },
-          { id: "articles" as Tab, label: "📰 Articles & Research" },
-          { id: "tips" as Tab, label: "🛡️ Safety Tips" },
-          { id: "stats" as Tab, label: "📊 Statistics" },
+          { id: "threats" as Tab, label: "Breaking Threats" },
+          { id: "articles" as Tab, label: "Articles & Research" },
+          { id: "tips" as Tab, label: "Safety Tips" },
+          { id: "stats" as Tab, label: "Statistics" },
         ].map((tab) => (
           <button
             key={tab.id}
@@ -397,16 +398,16 @@ export default function NewsPage() {
       {activeTab === "tips" && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {[
-            { icon: "✅", title: "Verify URLs", desc: "Check official websites, not phishing clones" },
-            { icon: "🔒", title: "Never Share Keys", desc: "Legitimate services never ask for private keys" },
-            { icon: "⚠️", title: "Review Approvals", desc: "Check token approvals carefully before signing" },
-            { icon: "🔍", title: "Research First", desc: "Verify projects and teams before transactions" },
-            { icon: "🛑", title: "Trust Your Gut", desc: "Stop if something feels wrong" },
-            { icon: "📱", title: "Use GENESIS", desc: "Always verify transactions before signing" },
+            { icon: <Icon name="checkCircle" className="w-6 h-6" />, title: "Verify URLs", desc: "Check official websites, not phishing clones" },
+            { icon: <Icon name="lock" className="w-6 h-6" />, title: "Never Share Keys", desc: "Legitimate services never ask for private keys" },
+            { icon: <Icon name="warning" className="w-6 h-6" />, title: "Review Approvals", desc: "Check token approvals carefully before signing" },
+            { icon: <Icon name="search" className="w-6 h-6" />, title: "Research First", desc: "Verify projects and teams before transactions" },
+            { icon: <Icon name="block" className="w-6 h-6" />, title: "Trust Your Gut", desc: "Stop if something feels wrong" },
+            { icon: <Icon name="shield" className="w-6 h-6" />, title: "Use GENESIS", desc: "Always verify transactions before signing" },
           ].map((tip, i) => (
             <div key={i} className="bg-slate-50 dark:bg-slate-900/30 border border-slate-200 dark:border-slate-700 rounded-lg p-4">
               <div className="flex gap-3">
-                <div className="text-2xl flex-shrink-0">{tip.icon}</div>
+                <div className="text-teal-500 dark:text-teal-400 flex-shrink-0">{tip.icon}</div>
                 <div>
                   <h3 className="font-semibold text-slate-900 dark:text-white mb-1">{tip.title}</h3>
                   <p className="text-sm text-slate-600 dark:text-slate-400">{tip.desc}</p>
