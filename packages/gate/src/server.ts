@@ -1,5 +1,5 @@
 import Fastify from "fastify";
-import { isAddress } from "viem";
+import { isAddress, recoverMessageAddress } from "viem";
 import type { AnalyzeRequest, ReportRequest } from "@genesis/shared";
 import { analyze } from "./analyze.js";
 import { createIntelAsync } from "./index.js";
@@ -8,6 +8,7 @@ import { initSyncService } from "./sync-external-threats.js";
 import type { ThreatIntelPostgres } from "./intel-postgres.js";
 import { ContributorsService } from "./contributors.js";
 import { ProAccessService } from "./pro-access.js";
+import { premiumAvailable, lookupChainAbuse } from "./chainabuse-lookup.js";
 import {
   loadApiKeys,
   createApiKeyMiddleware,
@@ -92,8 +93,50 @@ app.post<{ Body: AnalyzeRequest }>("/v1/analyze",
     const body = request.body;
     const tx = body.tx!; // TypeScript safe now after validation
 
+    // Optional Pro "deep check": signed by the wallet, spends 1 credit, adds ChainAbuse intel.
+    let proMeta: { creditsLeft: number; flagged: boolean; category?: string; reports?: number } | null = null;
+    const proReq = (request.body as any).pro as { wallet?: string; message?: string; signature?: string } | undefined;
+    if (proReq && premiumAvailable() && proAccessService) {
+      const { wallet, message, signature } = proReq;
+      if (!wallet || !isAddress(wallet) || !message || !signature) {
+        return reply.status(400).send({ error: "Invalid deep-check request." });
+      }
+      let signer: string;
+      try {
+        signer = await recoverMessageAddress({ message, signature: signature as `0x${string}` });
+      } catch {
+        return reply.status(401).send({ error: "Bad signature." });
+      }
+      const tsMatch = /ts:\s*(\S+)/.exec(message);
+      const fresh = tsMatch ? Math.abs(Date.now() - Date.parse(tsMatch[1])) < 10 * 60 * 1000 : false;
+      if (signer.toLowerCase() !== wallet.toLowerCase() || !fresh || !message.toLowerCase().includes(wallet.toLowerCase())) {
+        return reply.status(401).send({ error: "Invalid or expired signature." });
+      }
+      // Perform the premium lookup (the value the credit buys), then spend the credit.
+      const hit = tx.to ? await lookupChainAbuse(tx.to) : null;
+      const remaining = await proAccessService.consume(wallet.toLowerCase(), 1);
+      if (remaining === null) {
+        return reply.status(402).send({ error: "No checks left. Buy more at /pro." });
+      }
+      proMeta = { creditsLeft: remaining, flagged: !!hit?.flagged, category: hit?.category, reports: hit?.reports };
+    }
+
     try {
-      return await analyze(body, intel);
+      const result = await analyze(body, intel);
+      if (proMeta) {
+        (result as any).creditsLeft = proMeta.creditsLeft;
+        if (proMeta.flagged) {
+          result.findings.push({
+            id: "intel.chainabuse",
+            severity: "critical",
+            title: `ChainAbuse: reported as ${proMeta.category || "scam"}`,
+            description: `This address has ${proMeta.reports || 1} report(s) on ChainAbuse.`,
+            subject: tx.to!,
+          });
+          (result as any).verdict = "block";
+        }
+      }
+      return result;
     } catch (err) {
       request.log.error(err);
       return reply.status(400).send({
@@ -196,7 +239,8 @@ app.get<{ Params: { address: string } }>("/v1/pro/status/:address", async (reque
   if (!proAccessService) {
     return reply.status(503).send({ error: "Pro status unavailable." });
   }
-  return proAccessService.getStatus(address);
+  const s = await proAccessService.getStatus(address);
+  return { ...s, premium: premiumAvailable() };
 });
 
 // GET /v1/threats/latest - Recent threats for /news page feed (paginated)
