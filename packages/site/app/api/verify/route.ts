@@ -9,6 +9,21 @@ const SIGNING_SECRET =
   process.env.GENESIS_REPORT_API_KEY ||
   (process.env.GENESIS_API_KEYS || "").split(",")[0].trim();
 
+// Best-effort per-instance limiter to blunt token-guessing.
+const ipHits = new Map<string, { count: number; resetAt: number }>();
+
+function allow(ip: string, max: number, windowMs: number): boolean {
+  const now = Date.now();
+  const e = ipHits.get(ip);
+  if (!e || now > e.resetAt) {
+    ipHits.set(ip, { count: 1, resetAt: now + windowMs });
+    return true;
+  }
+  if (e.count >= max) return false;
+  e.count++;
+  return true;
+}
+
 function verifyToken(token: string): any | null {
   const [body, sig] = token.split(".");
   if (!body || !sig) return null;
@@ -26,6 +41,11 @@ function verifyToken(token: string): any | null {
 }
 
 export async function POST(req: NextRequest) {
+  const ip = (req.headers.get("x-forwarded-for") || "").split(",")[0].trim() || "unknown";
+  if (!allow(ip, 20, 10 * 60 * 1000)) {
+    return NextResponse.json({ error: "Too many attempts. Please wait a few minutes." }, { status: 429 });
+  }
+
   const { token } = await req.json().catch(() => ({}));
   if (typeof token !== "string") {
     return NextResponse.json({ error: "Missing token." }, { status: 400 });
