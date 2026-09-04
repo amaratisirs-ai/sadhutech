@@ -20,15 +20,19 @@ export default function HelpPage() {
         },
         {
           q: "What can I check?",
-          a: "Any EVM address or transaction  -  Ethereum, Polygon, Arbitrum, Optimism, and Avalanche.",
+          a: "Any EVM address or transaction  -  Ethereum, Polygon, Arbitrum, Optimism, and Avalanche  -  for free. Pro adds cross-chain coverage (BTC, Solana & more) and deeper ChainAbuse-powered checks.",
         },
         {
           q: "Is GENESIS free?",
-          a: "Completely free to check. No payment, no subscription. GENESIS is open source.",
+          a: "The core check is free forever  -  no payment, no subscription, no account. Pro is optional, pay-as-you-go (from 1 USDC per check) for deeper cross-chain checks. See /pricing for details.",
         },
         {
           q: "How much does it cost to use?",
-          a: "Zero cost. Checking a transaction or address is free  -  no gas fees, no charges.",
+          a: "Free tier: zero cost, no gas fees, no charges. Pro tier: pay only for what you check, from 1 USDC per check, no subscription required.",
+        },
+        {
+          q: "What's the difference between Free and Pro?",
+          a: "Free covers EVM address & transaction checks against the community threat feed. Pro adds ChainAbuse-powered deep checks and cross-chain coverage (BTC, Solana & more), billed per check. There's also a Business/API tier for wallets, dapps, and security teams  -  see /pricing.",
         },
         {
           q: "Is my data safe?",
@@ -49,7 +53,7 @@ export default function HelpPage() {
         },
         {
           q: "Does it work on all blockchains?",
-          a: "It supports EVM chains  -  Ethereum, Polygon, Arbitrum, Optimism, and Avalanche.",
+          a: "Free checks cover EVM chains  -  Ethereum, Polygon, Arbitrum, Optimism, and Avalanche. Pro adds cross-chain coverage (BTC, Solana & more) via ChainAbuse-powered deep checks.",
         },
         {
           q: "How fast is a check?",
