@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { useWallet } from "@/src/wallet/useWallet";
 
 const GATE_URL = process.env.NEXT_PUBLIC_GATE_URL || "https://genesis-gate.onrender.com";
@@ -91,7 +92,7 @@ export function AccountWidget() {
         >
           Connect
         </button>
-        {showConsent && (
+        {showConsent && typeof document !== "undefined" && createPortal(
           <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 p-4" onClick={() => setShowConsent(false)}>
             <div
               className="w-full max-w-sm rounded-xl border border-teal-500/30 bg-slate-900 p-5 space-y-4 shadow-2xl"
@@ -120,7 +121,8 @@ export function AccountWidget() {
                 </button>
               </div>
             </div>
-          </div>
+          </div>,
+          document.body
         )}
       </>
     );

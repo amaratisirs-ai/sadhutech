@@ -13,7 +13,7 @@ import { initSyncService } from "./sync-external-threats.js";
 import type { ThreatIntelPostgres } from "./intel-postgres.js";
 import { ContributorsService } from "./contributors.js";
 import { ProAccessService } from "./pro-access.js";
-import { AuditLogService } from "./audit-log.js";
+import { AuditLogService, getClientIp, lookupGeoIp } from "./audit-log.js";
 import { premiumAvailable, lookupChainAbuse } from "./chainabuse-lookup.js";
 import {
   loadApiKeys,
@@ -319,7 +319,16 @@ app.post<{ Body: { address?: string; type?: string; version?: string; context?: 
     if (!auditLogService) {
       return reply.status(503).send({ error: "Consent logging isn't available right now." });
     }
-    await auditLogService.logConsent(address, type, version || "2026-09", context);
+    const ipAddress = getClientIp(request);
+    const userAgent = request.headers["user-agent"] as string | undefined;
+    const geo = await lookupGeoIp(ipAddress);
+    await auditLogService.logConsent(address, type, version || "2026-09", context, {
+      ipAddress,
+      userAgent,
+      country: geo?.country,
+      region: geo?.region,
+      city: geo?.city,
+    });
     return { ok: true };
   }
 );
