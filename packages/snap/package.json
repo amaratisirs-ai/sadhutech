@@ -1,6 +1,6 @@
 {
   "name": "genesis-snap",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "GENESIS pre-sign transaction firewall — analyzes crypto transactions in real-time against community-verified threats",
   "private": false,
   "license": "MIT",

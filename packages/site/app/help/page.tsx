@@ -164,12 +164,12 @@ export default function HelpPage() {
         </a>
 
         <a
-          href="mailto:support@genesis.com"
+          href="mailto:contact@bhusoft.com"
           className="bg-slate-900/50 border border-teal-500/30 rounded-2xl p-8 hover:border-teal-500/60 hover:shadow-lg hover:shadow-teal-500/20 transition-all group"
         >
           <div className="text-teal-400 mb-3"><Icon name="mail" className="w-8 h-8" /></div>
           <h3 className="font-bold text-white group-hover:text-teal-300">Email Support</h3>
-          <p className="text-sm text-slate-400 mt-2">support@genesis.com  -  We usually respond within 24h</p>
+          <p className="text-sm text-slate-400 mt-2">contact@bhusoft.com  -  We usually respond within 24h</p>
         </a>
       </div>
 
@@ -225,10 +225,10 @@ export default function HelpPage() {
 
         <div className="flex flex-col sm:flex-row gap-4 justify-center mt-6">
           <a
-            href="mailto:support@genesis.com"
+            href="mailto:contact@bhusoft.com"
             className="px-6 py-3 bg-teal-500 text-slate-950 font-bold rounded-xl hover:bg-teal-400 transition-all"
           >
-            Email support@genesis.com
+            Email contact@bhusoft.com
           </a>
           <a
             href="https://github.com/amaratisirs-ai/sadhutech/discussions"

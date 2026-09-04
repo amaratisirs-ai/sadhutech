@@ -8,6 +8,8 @@ import { panel, heading, text, divider } from "@metamask/snaps-sdk";
 const GATE_URL = "https://genesis-gate.onrender.com/v1/analyze";
 const GATE_SIGNATURE_URL = "https://genesis-gate.onrender.com/v1/analyze-signature";
 const PRO_STATUS_URL = "https://genesis-gate.onrender.com/v1/pro/status";
+const CONSENT_URL = "https://genesis-gate.onrender.com/v1/consent";
+const CONSENT_VERSION = "2026-09";
 
 /** Matches the server's extended freshness window for source:"snap" pro requests. */
 const AUTH_TTL_MS = 24 * 60 * 60 * 1000;
@@ -91,6 +93,8 @@ function renderResult(result: GateResult) {
     content.push(divider(), text(`— 1 deep-check credit used, ${result.creditsLeft} remaining`));
   }
 
+  content.push(divider(), text("_Informational only, not financial advice. sadhutech.com/terms_"));
+
   return { content: panel(content) };
 }
 
@@ -117,13 +121,22 @@ export const onHomePage: OnHomePageHandler = async () => {
       const accounts = (await ethereum.request({ method: "eth_requestAccounts" })) as string[];
       const wallet = accounts[0];
       if (!wallet) throw new Error("no account");
-      const message = `GENESIS deep check authorization\nwallet: ${wallet}\nts: ${new Date().toISOString()}`;
+      const message =
+        `GENESIS deep check authorization\n` +
+        `I agree to the GENESIS Terms of Service and Privacy Policy (sadhutech.com/terms, sadhutech.com/privacy).\n` +
+        `wallet: ${wallet}\nts: ${new Date().toISOString()}`;
       const signature = (await ethereum.request({
         method: "personal_sign",
         params: [message, wallet],
       })) as string;
       auth = { wallet, message, signature, signedAt: Date.now() };
       await storeAuth(auth);
+      // Best-effort audit record — never blocks the authorization flow if it fails.
+      fetch(CONSENT_URL, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ address: wallet, type: "snap-onboarding", version: CONSENT_VERSION, context: "onHomePage" }),
+      }).catch(() => {});
     } catch {
       return {
         content: panel([

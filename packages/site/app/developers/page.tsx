@@ -113,7 +113,7 @@ export default function DevelopersPage() {
           <a href="/transaction-check" className="text-teal-300 hover:text-white hover:underline">Interactive API request builder</a>
           <a href="/check" className="text-teal-300 hover:text-white hover:underline">User-facing checker</a>
           <a href="https://github.com/amaratisirs-ai/sadhutech" className="text-teal-300 hover:text-white hover:underline">Source on GitHub</a>
-          <a href="mailto:support@genesis.com" className="text-teal-300 hover:text-white hover:underline">Contact support</a>
+          <a href="mailto:contact@bhusoft.com" className="text-teal-300 hover:text-white hover:underline">Contact support</a>
         </div>
       </section>
     </div>

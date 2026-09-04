@@ -16,7 +16,7 @@ describe("AuditLogService", () => {
     console.error = originalError;
   });
 
-  it("initialize() creates all three tables", async () => {
+  it("initialize() creates all four tables", async () => {
     const pool = fakePool();
     const svc = new AuditLogService(pool);
     await svc.initialize();
@@ -25,6 +25,7 @@ describe("AuditLogService", () => {
     expect(sql).toContain("credit_ledger");
     expect(sql).toContain("security_events");
     expect(sql).toContain("integration_failures");
+    expect(sql).toContain("consent_log");
   });
 
   it("logCreditConsumption() inserts a row with the given fields", async () => {
@@ -54,6 +55,30 @@ describe("AuditLogService", () => {
     expect(pool.query).toHaveBeenCalledWith(expect.stringContaining("INSERT INTO integration_failures"), [
       "goplus-address",
       "HTTP 500",
+    ]);
+  });
+
+  it("logConsent() inserts a row with a lowercased address", async () => {
+    const pool = fakePool();
+    const svc = new AuditLogService(pool);
+    await svc.logConsent("0xABC", "wallet-connect", "2026-09", "site-header");
+    expect(pool.query).toHaveBeenCalledWith(expect.stringContaining("INSERT INTO consent_log"), [
+      "0xabc",
+      "wallet-connect",
+      "2026-09",
+      "site-header",
+    ]);
+  });
+
+  it("logConsent() accepts an undefined address (e.g. pre-connect Snap install)", async () => {
+    const pool = fakePool();
+    const svc = new AuditLogService(pool);
+    await svc.logConsent(undefined, "snap-install", "2026-09");
+    expect(pool.query).toHaveBeenCalledWith(expect.stringContaining("INSERT INTO consent_log"), [
+      null,
+      "snap-install",
+      "2026-09",
+      null,
     ]);
   });
 

@@ -154,6 +154,7 @@ export function LayoutClient({ children }: { children: ReactNode }) {
                 <li><a href="/check" className="hover:text-white transition">Check a transaction</a></li>
                 <li><a href="/after-install" className="hover:text-white transition">Getting Started</a></li>
                 <li><a href="/threats" className="hover:text-white transition">Threats Hub</a></li>
+                <li><a href="/partners" className="hover:text-white transition">Integrations &amp; Partners</a></li>
               </ul>
             </div>
             <div>
@@ -169,15 +170,15 @@ export function LayoutClient({ children }: { children: ReactNode }) {
               <ul className="space-y-2 text-sm text-teal-300">
                 <li><a href="/help" className="hover:text-white transition">Help Center</a></li>
                 <li><a href="/whitepaper" className="hover:text-white transition">Vision & roadmap</a></li>
-                <li><a href="mailto:support@genesis.com" className="hover:text-white transition">Email Support</a></li>
+                <li><a href="mailto:contact@bhusoft.com" className="hover:text-white transition">Email Support</a></li>
               </ul>
             </div>
             <div>
               <h4 className="font-bold text-white mb-4">Legal</h4>
               <ul className="space-y-2 text-sm text-teal-300">
-                <li><a href="#privacy" className="hover:text-white transition">Privacy</a></li>
-                <li><a href="#terms" className="hover:text-white transition">Terms</a></li>
-                <li><a href="#security" className="hover:text-white transition">Security</a></li>
+                <li><a href="/privacy" className="hover:text-white transition">Privacy</a></li>
+                <li><a href="/terms" className="hover:text-white transition">Terms</a></li>
+                <li><a href="/help" className="hover:text-white transition">Security</a></li>
               </ul>
             </div>
           </div>

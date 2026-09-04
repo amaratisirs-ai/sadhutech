@@ -23,12 +23,16 @@ function getMetaMask(): MetaMaskEthereum | undefined {
 type Platform = "desktop" | "mobile";
 type State = "detecting" | "ready" | "installing" | "done" | "error";
 
+const GATE_URL = process.env.NEXT_PUBLIC_GATE_URL || "https://genesis-gate.onrender.com";
+const CONSENT_VERSION = "2026-09";
+
 export default function SnapInstallPage() {
   const [platform, setPlatform] = useState<Platform>("desktop");
   const [state, setState] = useState<State>("detecting");
   const [hasMetaMask, setHasMetaMask] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [showQR, setShowQR] = useState(false);
+  const [agreedToTerms, setAgreedToTerms] = useState(false);
 
   useEffect(() => {
     // Detect platform
@@ -54,10 +58,33 @@ export default function SnapInstallPage() {
   }, []);
 
   const handleInstallClick = async () => {
+    if (!agreedToTerms) return;
     if (!getMetaMask()?.isMetaMask) {
       setState("error");
       setErrorMsg("MetaMask not detected. Please install MetaMask extension first.");
       return;
+    }
+
+    // Best-effort consent record — never blocks install if it fails or the wallet isn't unlocked yet.
+    try {
+      const accounts = (await getMetaMask()!.request({ method: "eth_accounts" })) as string[] | undefined;
+      fetch(`${GATE_URL}/v1/consent`, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          address: accounts?.[0],
+          type: "snap-install",
+          version: CONSENT_VERSION,
+          context: "snap-install-page",
+        }),
+      }).catch(() => {});
+    } catch {
+      // no accounts available yet — still record the acceptance itself, just without an address.
+      fetch(`${GATE_URL}/v1/consent`, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ type: "snap-install", version: CONSENT_VERSION, context: "snap-install-page" }),
+      }).catch(() => {});
     }
 
     setState("installing");
@@ -193,9 +220,24 @@ export default function SnapInstallPage() {
                   </div>
                 </div>
 
+                <label className="flex items-start gap-2 text-xs text-slate-400 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={agreedToTerms}
+                    onChange={(e) => setAgreedToTerms(e.target.checked)}
+                    className="mt-0.5 accent-teal-400"
+                  />
+                  <span>
+                    I have read and agree to the{" "}
+                    <a href="/terms" target="_blank" className="text-teal-300 underline">Terms of Service</a> and{" "}
+                    <a href="/privacy" target="_blank" className="text-teal-300 underline">Privacy Policy</a>.
+                  </span>
+                </label>
+
                 <button
                   onClick={handleInstallClick}
-                  className="w-full px-6 py-4 bg-gradient-to-r from-teal-500 to-teal-400 text-slate-950 font-bold rounded-xl hover:shadow-xl hover:shadow-teal-500/50 transition-all text-lg"
+                  disabled={!agreedToTerms}
+                  className="w-full px-6 py-4 bg-gradient-to-r from-teal-500 to-teal-400 text-slate-950 font-bold rounded-xl hover:shadow-xl hover:shadow-teal-500/50 transition-all text-lg disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:shadow-none"
                 >
                   + Install GENESIS Snap
                 </button>

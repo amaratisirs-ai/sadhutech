@@ -35,6 +35,14 @@ export class AuditLogService {
         error TEXT,
         created_at TIMESTAMPTZ DEFAULT NOW()
       );
+      CREATE TABLE IF NOT EXISTS consent_log (
+        id SERIAL PRIMARY KEY,
+        address TEXT,
+        type TEXT NOT NULL,
+        version TEXT NOT NULL,
+        context TEXT,
+        created_at TIMESTAMPTZ DEFAULT NOW()
+      );
     `);
   }
 
@@ -74,6 +82,18 @@ export class AuditLogService {
       await this.pool.query(`INSERT INTO integration_failures (integration, error) VALUES ($1, $2)`, [integration, error]);
     } catch (err) {
       console.error("[audit-log] Failed to record integration failure:", err instanceof Error ? err.message : String(err));
+    }
+  }
+
+  /** Records acceptance of Terms/Privacy at a key touchpoint (wallet connect, Snap install, Snap authorization). */
+  async logConsent(address: string | undefined, type: string, version: string, context?: string): Promise<void> {
+    try {
+      await this.pool.query(
+        `INSERT INTO consent_log (address, type, version, context) VALUES ($1, $2, $3, $4)`,
+        [address ? address.toLowerCase() : null, type, version, context ?? null]
+      );
+    } catch (err) {
+      console.error("[audit-log] Failed to record consent:", err instanceof Error ? err.message : String(err));
     }
   }
 }

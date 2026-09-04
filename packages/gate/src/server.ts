@@ -300,6 +300,30 @@ app.get<{ Params: { address: string } }>("/v1/pro/status/:address", async (reque
   return { ...s, premium: premiumAvailable() };
 });
 
+// ============================================================================
+// POST /v1/consent - Record acceptance of Terms/Privacy at a key touchpoint
+// (wallet connect, Snap install, Snap one-time authorization).
+// ============================================================================
+const CONSENT_TYPES = ["wallet-connect", "snap-install", "snap-onboarding"];
+app.post<{ Body: { address?: string; type?: string; version?: string; context?: string } }>(
+  "/v1/consent",
+  { onRequest: createRateLimitMiddleware(rateLimiter) },
+  async (request, reply) => {
+    const { address, type, version, context } = request.body ?? {};
+    if (!type || !CONSENT_TYPES.includes(type)) {
+      return reply.status(400).send({ error: `type must be one of ${CONSENT_TYPES.join(", ")}` });
+    }
+    if (address !== undefined && !isAddress(address)) {
+      return reply.status(400).send({ error: "Invalid wallet address." });
+    }
+    if (!auditLogService) {
+      return reply.status(503).send({ error: "Consent logging isn't available right now." });
+    }
+    await auditLogService.logConsent(address, type, version || "2026-09", context);
+    return { ok: true };
+  }
+);
+
 // GET /v1/threats/latest - Recent threats for /news page feed (paginated)
 // ============================================================================
 app.get("/v1/threats/latest", async (request, reply) => {

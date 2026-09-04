@@ -38,7 +38,7 @@ const TIERS = [
     cadence: "/month",
     tagline: "For wallets, dapps, and security teams.",
     highlight: false,
-    cta: { label: "Contact us", href: "mailto:support@sadhutech.com", disabled: false },
+    cta: { label: "Contact us", href: "mailto:contact@bhusoft.com", disabled: false },
     features: [
       "REST API with quota + SLA",
       "Full ChainAbuse-powered intel",
