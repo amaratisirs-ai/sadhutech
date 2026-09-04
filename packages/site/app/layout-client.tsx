@@ -4,6 +4,7 @@ import { useEffect, useState, type ReactNode } from "react";
 import { ThemeProvider } from "./theme-provider";
 import { Web3Provider } from "./web3-provider";
 import { Icon } from "@/components/Icon";
+import { GateStatusProvider, useGateStatus } from "@/src/gate-status";
 
 export function LayoutClient({ children }: { children: ReactNode }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -20,6 +21,7 @@ export function LayoutClient({ children }: { children: ReactNode }) {
 
   return (
     <Web3Provider>
+    <GateStatusProvider>
     <ThemeProvider>
       {/* Modern Sticky Nav  -  Dark with Teal Border */}
       <nav className="bg-slate-950 backdrop-blur-xl border-b-2 border-teal-500 sticky top-0 z-50 shadow-lg">
@@ -50,10 +52,7 @@ export function LayoutClient({ children }: { children: ReactNode }) {
 
             {/* Status Badge & CTA & Hamburger */}
             <div className="flex items-center gap-2 md:gap-3">
-              <div className="hidden sm:flex items-center gap-2 px-3 py-1 bg-teal-500/30 text-teal-200 text-xs font-semibold rounded-full border border-teal-400/50 backdrop-blur-sm">
-                <span className="w-2 h-2 bg-teal-400 rounded-full animate-pulse"></span>
-                Live
-              </div>
+              <GateStatusBadge />
               <a
                 href="/check"
                 className="hidden sm:inline px-3 py-1.5 text-xs font-bold text-slate-950 bg-teal-400 hover:bg-teal-300 rounded-lg transition-all hover:shadow-lg hover:shadow-teal-500/50"
@@ -191,7 +190,20 @@ export function LayoutClient({ children }: { children: ReactNode }) {
         </div>
       </footer>
     </ThemeProvider>
+    </GateStatusProvider>
     </Web3Provider>
+  );
+}
+
+function GateStatusBadge() {
+  const status = useGateStatus();
+  const label = status === "waking" ? "Waking up…" : status === "checking" ? "Connecting…" : "Live";
+  const dotColor = status === "waking" ? "bg-amber-400" : status === "checking" ? "bg-slate-400" : "bg-teal-400";
+  return (
+    <div className="hidden sm:flex items-center gap-2 px-3 py-1 bg-teal-500/30 text-teal-200 text-xs font-semibold rounded-full border border-teal-400/50 backdrop-blur-sm">
+      <span className={`w-2 h-2 rounded-full animate-pulse ${dotColor}`}></span>
+      {label}
+    </div>
   );
 }
 

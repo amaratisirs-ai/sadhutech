@@ -7,6 +7,7 @@ import { useSendTransaction, useSwitchChain } from "wagmi";
 import { useWallet } from "@/src/wallet/useWallet";
 import { friendlyWalletError } from "@/src/wallet/errors";
 import { DEEP_CHECK_ENABLED } from "@/src/pro-status";
+import { useGateStatus } from "@/src/gate-status";
 
 const GATE_URL = process.env.NEXT_PUBLIC_GATE_URL || "https://genesis-gate.onrender.com";
 const PAYMENT_ADDRESS = (process.env.NEXT_PUBLIC_PAYMENT_ADDRESS || "").toLowerCase() as `0x${string}`;
@@ -20,6 +21,7 @@ function short(a: string) {
 
 export default function ProPage() {
   const { address, isConnected, chainId, connect, disconnect } = useWallet();
+  const gateStatus = useGateStatus();
   const { switchChainAsync } = useSwitchChain();
   const { sendTransactionAsync } = useSendTransaction();
 
@@ -118,6 +120,9 @@ export default function ProPage() {
           Pay what you like (min {MIN_USDC} USDC) in USDC on Base — {CREDITS_PER_USDC} check{CREDITS_PER_USDC === 1 ? "" : "s"} per
           USDC. No subscription, no account, just your wallet.
         </p>
+        {gateStatus === "waking" && (
+          <p className="text-xs text-amber-300">The server is waking up from idle — the first request may take up to a minute.</p>
+        )}
       </header>
 
       {!isConnected || !address ? (

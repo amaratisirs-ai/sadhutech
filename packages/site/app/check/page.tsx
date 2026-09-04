@@ -7,6 +7,7 @@ import { Icon } from "@/components/Icon";
 import { useWallet } from "@/src/wallet/useWallet";
 import { friendlyWalletError } from "@/src/wallet/errors";
 import { DEEP_CHECK_ENABLED } from "@/src/pro-status";
+import { useGateStatus } from "@/src/gate-status";
 
 const GATE_URL = process.env.NEXT_PUBLIC_GATE_URL || "https://genesis-gate.onrender.com";
 const ADDRESS_RE = /^0x[0-9a-fA-F]{40}$/;
@@ -113,6 +114,7 @@ function VerdictCard({ result }: { result: Result }) {
 
 export default function CheckPage() {
   const { address, isConnected, connect } = useWallet();
+  const gateStatus = useGateStatus();
   const { signMessageAsync } = useSignMessage();
   const [mode, setMode] = useState<Mode>("address");
   const [addressInput, setAddressInput] = useState("");
@@ -301,6 +303,9 @@ export default function CheckPage() {
           Paste a crypto address or a transaction and GENESIS screens it against community threat intel  -  a plain-English
           verdict in seconds. No wallet connection, no signup.
         </p>
+        {gateStatus === "waking" && (
+          <p className="text-xs text-amber-300">The checker is waking up from idle — your first check may take up to a minute.</p>
+        )}
       </header>
 
       {/* Mode toggle */}
