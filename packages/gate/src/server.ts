@@ -7,6 +7,7 @@ import { TESTER_HTML } from "./ui.js";
 import { initSyncService } from "./sync-external-threats.js";
 import type { ThreatIntelPostgres } from "./intel-postgres.js";
 import { ContributorsService } from "./contributors.js";
+import { ProAccessService } from "./pro-access.js";
 import {
   loadApiKeys,
   createApiKeyMiddleware,
@@ -27,6 +28,8 @@ const rateLimiter = new SimpleRateLimiter(100, 15 * 60 * 1000);
 
 // Contributors service (initialized during startup)
 let contributorsService: ContributorsService | null = null;
+// Pro access service (wallet-based crypto payments; initialized during startup)
+let proAccessService: ProAccessService | null = null;
 
 // ============================================================================
 // SECURITY MIDDLEWARE
@@ -169,6 +172,32 @@ app.post<{ Body: ReportRequest }>("/v1/report",
     }
   }
 );
+
+// ============================================================================
+// Pro access (wallet-based crypto payments)
+// ============================================================================
+app.post<{ Body: { address?: string } }>("/v1/pro/verify", async (request, reply) => {
+  const address = request.body?.address ?? "";
+  if (!isAddress(address)) {
+    return reply.status(400).send({ ok: false, error: "Invalid wallet address." });
+  }
+  if (!proAccessService) {
+    return reply.status(503).send({ ok: false, error: "Payments aren't available right now." });
+  }
+  const result = await proAccessService.verifyPayment(address);
+  return reply.status(result.ok ? 200 : 400).send(result);
+});
+
+app.get<{ Params: { address: string } }>("/v1/pro/status/:address", async (request, reply) => {
+  const address = request.params.address;
+  if (!isAddress(address)) {
+    return reply.status(400).send({ error: "Invalid wallet address." });
+  }
+  if (!proAccessService) {
+    return reply.status(503).send({ error: "Pro status unavailable." });
+  }
+  return proAccessService.getStatus(address);
+});
 
 // GET /v1/threats/latest - Recent threats for /news page feed (paginated)
 // ============================================================================
@@ -495,6 +524,8 @@ async function start(): Promise<void> {
         await postgresIntel.initialize();
         contributorsService = new ContributorsService(postgresIntel.pool);
         await contributorsService.initialize();
+        proAccessService = new ProAccessService(postgresIntel.pool);
+        await proAccessService.initialize();
         console.log("[startup] Contributors service initialized");
       } catch (err) {
         console.warn("[startup] Contributors service failed to initialize:", err);
