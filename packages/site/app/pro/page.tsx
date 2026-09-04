@@ -155,9 +155,14 @@ export default function ProPage() {
           Pay-as-you-go deep checks  -  pay only for what you use, straight from your wallet, powered by ChainAbuse for
           cross-chain coverage. We'll flip it on shortly.
         </p>
-        <a href="/check" className="inline-block px-6 py-3 rounded-lg bg-teal-500 text-slate-950 font-bold hover:bg-teal-400 transition">
-          Try a free check
-        </a>
+        <div className="flex flex-wrap justify-center gap-3">
+          <a href="/check" className="inline-block px-6 py-3 rounded-lg bg-teal-500 text-slate-950 font-bold hover:bg-teal-400 transition">
+            Try a free check
+          </a>
+          <a href="/check" className="inline-block px-6 py-3 rounded-lg border border-amber-400/50 bg-amber-400/10 text-amber-200 font-bold hover:bg-amber-400/20 transition">
+            Test deep check flow
+          </a>
+        </div>
       </div>
     );
   }
