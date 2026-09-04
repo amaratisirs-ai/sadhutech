@@ -18,18 +18,18 @@ const TIERS = [
   },
   {
     name: "Pro",
-    price: "$19",
-    cadence: "/month",
-    tagline: "Deeper, cross-chain protection.",
+    price: "From 1 USDC",
+    cadence: "/ check",
+    tagline: "Pay only for what you check.",
     highlight: true,
-    cta: { label: "Go Pro", href: "/pro", disabled: false },
+    cta: { label: "Buy checks", href: "/pro", disabled: false },
     features: [
       "Everything in Free",
-      "ChainAbuse-enriched threat feed",
+      "Deep checks powered by ChainAbuse",
       "Cross-chain coverage (BTC, Solana & more)",
-      "Higher rate limits",
-      "Drain & approval alerts (on the way)",
-      "Check history",
+      "Pay-as-you-go — no subscription, no account",
+      "Pay what you like, min 1 USDC",
+      "Checks tied to your wallet",
     ],
   },
   {
@@ -118,8 +118,8 @@ export default function PricingPage() {
         <h3 className="text-lg font-bold text-white">How Free vs Pro works</h3>
         <p className="text-sm text-slate-300">
           <strong className="text-white">Free</strong> checks against our community threat feed — thousands of
-          scam addresses reported and confirmed by the community. <strong className="text-white">Pro</strong> adds
-          ChainAbuse's premium threat intel for cross-chain coverage the free feed doesn't have yet.
+          scam addresses reported and confirmed by the community. <strong className="text-white">Pro</strong> is
+          pay-as-you-go: buy checks with USDC from your wallet and get ChainAbuse's premium, cross-chain intel per check.
         </p>
         <p className="text-xs text-slate-400">
           We will never paywall basic safety or charge you to report a scam — that's what keeps everyone protected.
