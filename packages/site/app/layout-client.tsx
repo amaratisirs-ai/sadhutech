@@ -28,6 +28,7 @@ export function LayoutClient({ children }: { children: ReactNode }) {
                 <NavLink href="/threats">Threats Hub</NavLink>
                 <NavLink href="/community">Community</NavLink>
                 <NavLink href="/report">Report</NavLink>
+                <NavLink href="/pricing">Pricing</NavLink>
                 <NavLink href="/whitepaper">Vision</NavLink>
                 <NavLink href="/help">Help</NavLink>
               </div>
@@ -85,6 +86,7 @@ export function LayoutClient({ children }: { children: ReactNode }) {
                 <MobileNavLink href="/threats" onClick={() => setMobileMenuOpen(false)}>Threats Hub</MobileNavLink>
                 <MobileNavLink href="/community" onClick={() => setMobileMenuOpen(false)}>Community</MobileNavLink>
                 <MobileNavLink href="/report" onClick={() => setMobileMenuOpen(false)}>Report</MobileNavLink>
+                <MobileNavLink href="/pricing" onClick={() => setMobileMenuOpen(false)}>Pricing</MobileNavLink>
                 <MobileNavLink href="/whitepaper" onClick={() => setMobileMenuOpen(false)}>Vision</MobileNavLink>
                 <MobileNavLink href="/help" onClick={() => setMobileMenuOpen(false)}>Help</MobileNavLink>
                 <a
