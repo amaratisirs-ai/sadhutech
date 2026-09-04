@@ -183,7 +183,7 @@ export function LayoutClient({ children }: { children: ReactNode }) {
             <p className="mt-2 text-xs text-teal-300">
               Powered by <a href="https://bhusoft.com" className="text-teal-300 hover:text-teal-100 underline transition">Bhusoft LLC</a> • <a href="https://github.com/amaratisirs-ai" className="text-teal-300 hover:text-teal-100 underline transition">Open Source</a>
             </p>
-            <p className="mt-1 text-xs text-slate-400">&copy; 2026 Bhusoft LLC. GENESIS is a Bhusoft product.</p>
+            <p className="mt-1 text-xs text-slate-400">&copy; 2026 Bhusoft LLC. All rights reserved.</p>
           </div>
         </div>
       </footer>
