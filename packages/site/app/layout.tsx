@@ -1,18 +1,23 @@
 import type { ReactNode } from "react";
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { LayoutClient } from "./layout-client";
 
 export const metadata: Metadata = {
   title: "GENESIS Firewall — Pre-sign Gate Dashboard | Bhusoft",
   description: "Community-powered transaction risk intelligence for crypto wallets. A Bhusoft LLC product.",
-  viewport: "width=device-width, initial-scale=1, maximum-scale=5",
   openGraph: {
     type: "website",
     title: "GENESIS Firewall — Pre-sign Gate Dashboard",
     description: "Community-powered transaction risk intelligence for crypto wallets. By Bhusoft LLC.",
     url: "https://sadhutech.com",
   },
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
 };
 
 export default function RootLayout({

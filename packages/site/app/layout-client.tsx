@@ -120,7 +120,7 @@ export function LayoutClient({ children }: { children: ReactNode }) {
 
       {/* Footer */}
       <footer className="border-t-2 border-teal-500 bg-slate-950 backdrop-blur-xl mt-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-28 md:pb-8">
           <div className="grid md:grid-cols-4 gap-8 mb-8">
             <div>
               <h4 className="font-bold text-white mb-4">Product</h4>

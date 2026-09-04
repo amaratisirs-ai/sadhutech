@@ -232,7 +232,7 @@ export default function CommunityPage() {
             )}
 
             {/* Load More Button */}
-            {hasMore && (
+            {hasMore && contributors.length > 0 && (
               <div className="p-4 border-t border-slate-200 dark:border-slate-700 flex justify-center">
                 <button
                   onClick={handleLoadMore}

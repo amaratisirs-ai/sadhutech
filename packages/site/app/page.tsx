@@ -91,10 +91,10 @@ export default function Home() {
         <div className="absolute top-0 right-0 w-96 h-96 bg-teal-900/30 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob"></div>
         <div className="absolute bottom-0 left-0 w-96 h-96 bg-indigo-900/30 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000"></div>
 
-        <div className="relative px-8 py-20">
+        <div className="relative px-4 sm:px-8 py-12 sm:py-20">
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div className="space-y-6">
-              <h1 className="text-6xl md:text-7xl font-black text-white leading-tight">
+              <h1 className="text-4xl sm:text-5xl md:text-7xl font-black text-white leading-tight break-words">
                 Milliseconds Matter
               </h1>
 
