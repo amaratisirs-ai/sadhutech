@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Icon } from "@/components/Icon";
+import { QRCodeCanvas } from "qrcode.react";
 
 const GATE_URL = process.env.NEXT_PUBLIC_GATE_URL || "https://genesis-gate.onrender.com";
 const PAYMENT_ADDRESS = (process.env.NEXT_PUBLIC_PAYMENT_ADDRESS || "").toLowerCase();
@@ -26,6 +27,7 @@ export default function ProPage() {
   const [busy, setBusy] = useState<"idle" | "connecting" | "paying" | "verifying">("idle");
   const [message, setMessage] = useState<string>("");
   const [error, setError] = useState<string>("");
+  const [walletConnectUri, setWalletConnectUri] = useState<string | null>(null);
 
   const eth = (): WalletProvider | null => (typeof window !== "undefined" ? (window as any).ethereum ?? null : null);
 
@@ -53,7 +55,9 @@ export default function ProPage() {
           icons: ["https://sadhutech.com/images/genesis-icon.png"],
         },
       });
-      return provider.session ? (provider as unknown as WalletProvider) : null;
+      provider.on("display_uri", (uri: string) => setWalletConnectUri(uri));
+      provider.on("connect", () => setWalletConnectUri(null));
+      return provider as unknown as WalletProvider;
     } catch {
       return null;
     }
@@ -89,12 +93,14 @@ export default function ProPage() {
     }
     setBusy("connecting");
     setError("");
+    setWalletConnectUri(null);
     try {
       const accts = await e.request({ method: "eth_requestAccounts" });
       if (!Array.isArray(accts)) throw new Error("Wallet did not return an account.");
       const addr = (accts?.[0] || "").toLowerCase();
       if (!addr) throw new Error("Wallet did not return an account.");
       setAccount(addr);
+      setWalletConnectUri(null);
       await loadCredits(addr);
     } catch (err: any) {
       setError(err?.message || "Couldn't connect wallet.");
@@ -237,6 +243,14 @@ export default function ProPage() {
           >
             {busy === "connecting" ? "Connecting…" : "Connect wallet"}
           </button>
+          {walletConnectUri && (
+            <div className="mx-auto max-w-xs space-y-3 rounded-xl border border-teal-500/30 bg-white p-4 text-slate-900">
+              <p className="text-sm font-bold">Scan with your mobile wallet</p>
+              <QRCodeCanvas value={walletConnectUri} size={190} level="H" includeMargin />
+              <p className="text-xs text-slate-600">Approve the connection, then return here to continue.</p>
+            </div>
+          )}
+          <p className="text-xs text-slate-500">Already connected through WalletConnect? This page will restore that session automatically.</p>
         </div>
       ) : (
         <div className="bg-slate-900/60 border-2 border-teal-500/40 rounded-2xl p-6 space-y-4">
