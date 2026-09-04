@@ -153,14 +153,14 @@ export default function WalletConnect() {
       localStorage.removeItem("genesis_wallet_session");
       return;
     }
+    if (isSafeReturnPath(params.get("returnTo"))) {
+      // The caller already determined no usable connection exists; always show the
+      // picker instead of trusting a possibly-stale local session flag.
+      return;
+    }
     const stored = localStorage.getItem("genesis_wallet_session");
     const parsedStored = stored ? JSON.parse(stored) : null;
     if (parsedStored?.status === "connected" && parsedStored.account) {
-      const returnTo = params.get("returnTo");
-      if (isSafeReturnPath(returnTo)) {
-        router.replace(returnTo);
-        return;
-      }
       const walletName = parsedStored.wallet || "WalletConnect";
       const target = `/connected?wallet=${encodeURIComponent(walletName)}&account=${encodeURIComponent(parsedStored.account)}&chainId=${encodeURIComponent(parsedStored.chainId ?? 1)}`;
       router.replace(target);

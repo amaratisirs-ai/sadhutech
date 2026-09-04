@@ -425,24 +425,13 @@ export default function CheckPage() {
           <div className="flex items-center gap-3 shrink-0">
             {credits !== null && <span className="text-xs text-slate-400">{credits} left</span>}
             <button
-              onClick={runDeepCheck}
+              onClick={wallet ? runDeepCheck : connectForDeepCheck}
               disabled={deepBusy}
               className="px-4 py-2 rounded-lg bg-amber-400 text-slate-950 text-sm font-bold hover:bg-amber-300 disabled:opacity-50 transition whitespace-nowrap"
             >
               {deepBusy ? "Working…" : wallet ? "Deep check (1 credit)" : "Connect & deep check"}
             </button>
           </div>
-        </div>
-      )}
-      {deepMsg === "connect-wallet" && (
-        <div className="flex flex-col items-center gap-2">
-          <p className="text-xs text-amber-300 text-center">Connect a wallet to run a deep check.</p>
-          <button
-            onClick={connectForDeepCheck}
-            className="px-4 py-2 rounded-lg bg-amber-400 text-slate-950 text-sm font-bold hover:bg-amber-300 transition"
-          >
-            Connect wallet
-          </button>
         </div>
       )}
       {deepMsg && deepMsg !== "no-credits" && deepMsg !== "connect-wallet" && (
