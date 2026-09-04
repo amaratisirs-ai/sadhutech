@@ -63,6 +63,36 @@ function getEth(): Eth | null {
   return (window as unknown as { ethereum?: Eth }).ethereum ?? null;
 }
 
+async function getWalletProvider(): Promise<Eth | null> {
+  const injected = getEth();
+  if (injected) return injected;
+
+  const projectId = process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID;
+  if (!projectId) return null;
+
+  try {
+    const { EthereumProvider } = await import("@walletconnect/ethereum-provider");
+    const provider = await EthereumProvider.init({
+      projectId,
+      chains: [1],
+      optionalChains: [137, 42161, 10, 43114],
+      showQrModal: false,
+      methods: ["eth_accounts", "personal_sign"],
+      optionalMethods: ["eth_chainId", "eth_sign", "eth_signTypedData", "eth_signTypedData_v4"],
+      events: ["chainChanged", "accountsChanged"],
+      metadata: {
+        name: "GENESIS Firewall",
+        description: "Community-powered transaction security firewall",
+        url: typeof window !== "undefined" ? window.location.origin : "https://sadhutech.com",
+        icons: ["https://sadhutech.com/images/genesis-icon.png"],
+      },
+    });
+    return provider.session ? (provider as unknown as Eth) : null;
+  } catch {
+    return null;
+  }
+}
+
 function VerdictCard({ result }: { result: Result }) {
   if (result.error) {
     return (
@@ -218,9 +248,9 @@ export default function CheckPage() {
   const runDeepCheck = async () => {
     setDeepMsg(null);
     if (!lastTx) return;
-    const eth = getEth();
+    const eth = await getWalletProvider();
     if (!eth) {
-      setDeepMsg("No wallet found. Install a browser wallet (e.g. MetaMask) to use deep checks.");
+      setDeepMsg("Connect a wallet first using MetaMask or WalletConnect, then return here to run a deep check.");
       return;
     }
     setDeepBusy(true);
