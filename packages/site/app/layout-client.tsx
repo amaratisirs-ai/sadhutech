@@ -4,6 +4,7 @@ import { useEffect, useState, type ReactNode } from "react";
 import { ThemeProvider } from "./theme-provider";
 import { Web3Provider } from "./web3-provider";
 import { Icon } from "@/components/Icon";
+import { AccountWidget } from "@/components/AccountWidget";
 import { GateStatusProvider, useGateStatus } from "@/src/gate-status";
 
 export function LayoutClient({ children }: { children: ReactNode }) {
@@ -53,6 +54,7 @@ export function LayoutClient({ children }: { children: ReactNode }) {
             {/* Status Badge & CTA & Hamburger */}
             <div className="flex items-center gap-2 md:gap-3">
               <GateStatusBadge />
+              <AccountWidget />
               <a
                 href="/check"
                 className="hidden sm:inline px-3 py-1.5 text-xs font-bold text-slate-950 bg-teal-400 hover:bg-teal-300 rounded-lg transition-all hover:shadow-lg hover:shadow-teal-500/50"

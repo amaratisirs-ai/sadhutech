@@ -4,6 +4,11 @@
  * Usage: pnpm --filter @genesis/gate sync
  * Useful for testing or forcing an immediate sync without waiting 6 hours
  */
+try {
+  process.loadEnvFile(new URL("../../../.env", import.meta.url));
+} catch {
+  // no root .env file
+}
 
 import { ThreatIntelPostgres } from "./intel-postgres.js";
 import { syncExternalThreats } from "./sync-external-threats.js";

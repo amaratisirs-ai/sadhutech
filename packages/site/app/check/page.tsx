@@ -412,7 +412,7 @@ export default function CheckPage() {
         <p className="text-xs text-amber-300 text-center">{deepMsg}</p>
       )}
       {deepMsg === "no-credits" && (
-        <p className="text-xs text-amber-300 text-center">You&apos;re out of checks. <button type="button" onClick={goBuyChecks} className="underline font-semibold">Buy more →</button></p>
+        <p className="text-xs text-amber-300 text-center">You&apos;re out of credits. <button type="button" onClick={goBuyChecks} className="underline font-semibold">Buy credits →</button></p>
       )}
 
       {/* Examples */}

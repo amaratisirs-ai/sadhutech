@@ -22,7 +22,7 @@ const TIERS = [
     cadence: "/ check",
     tagline: "Pay only for what you check.",
     highlight: true,
-    cta: { label: "Buy checks", href: "/pro", disabled: false },
+    cta: { label: "Buy credits", href: "/pro", disabled: false },
     features: [
       "Everything in Free",
       "Deep checks powered by ChainAbuse",
@@ -119,7 +119,7 @@ export default function PricingPage() {
         <p className="text-sm text-slate-300">
           <strong className="text-white">Free</strong> checks against our community threat feed  -  thousands of
           scam addresses reported and confirmed by the community. <strong className="text-white">Pro</strong> is
-          pay-as-you-go: buy checks with USDC from your wallet and get ChainAbuse's premium, cross-chain intel per check.
+          pay-as-you-go: buy credits with USDC from your wallet and get ChainAbuse's premium, cross-chain intel per check.
         </p>
         <p className="text-xs text-slate-400">
           We will never paywall basic safety or charge you to report a scam  -  that's what keeps everyone protected.

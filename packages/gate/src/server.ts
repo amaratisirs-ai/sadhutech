@@ -1,7 +1,12 @@
 import Fastify from "fastify";
+try {
+  process.loadEnvFile(new URL("../../../.env", import.meta.url));
+} catch {
+  // no root .env file (e.g. production, where Render sets env vars directly)
+}
 import { isAddress, recoverMessageAddress } from "viem";
-import type { AnalyzeRequest, ReportRequest } from "@genesis/shared";
-import { analyze } from "./analyze.js";
+import type { AnalyzeRequest, AnalyzeSignatureRequest, ReportRequest } from "@genesis/shared";
+import { analyze, analyzeSignature } from "./analyze.js";
 import { createIntelAsync } from "./index.js";
 import { TESTER_HTML } from "./ui.js";
 import { initSyncService } from "./sync-external-threats.js";
@@ -16,6 +21,7 @@ import {
   createSecurityHeadersMiddleware,
   SimpleRateLimiter,
   validateAnalyzeRequest,
+  validateSignatureRequest,
   validateReportRequest,
 } from "./security.js";
 
@@ -95,9 +101,11 @@ app.post<{ Body: AnalyzeRequest }>("/v1/analyze",
 
     // Optional Pro "deep check": signed by the wallet, spends 1 credit, adds ChainAbuse intel.
     let proMeta: { creditsLeft: number; flagged: boolean; category?: string; reports?: number } | null = null;
-    const proReq = (request.body as any).pro as { wallet?: string; message?: string; signature?: string } | undefined;
+    const proReq = (request.body as any).pro as
+      | { wallet?: string; message?: string; signature?: string; source?: string }
+      | undefined;
     if (proReq && premiumAvailable() && proAccessService) {
-      const { wallet, message, signature } = proReq;
+      const { wallet, message, signature, source } = proReq;
       if (!wallet || !isAddress(wallet) || !message || !signature) {
         return reply.status(400).send({ error: "Invalid deep-check request." });
       }
@@ -109,7 +117,10 @@ app.post<{ Body: AnalyzeRequest }>("/v1/analyze",
       }
       const tsMatch = /ts:\s*(\S+)/.exec(message);
       const timestamp = tsMatch?.[1];
-      const fresh = timestamp ? Math.abs(Date.now() - Date.parse(timestamp)) < 10 * 60 * 1000 : false;
+      // Snap-originated requests reuse a one-time-signed credential (see onHomePage),
+      // so they get a much longer freshness window than the web's per-request signature.
+      const freshnessWindowMs = source === "snap" ? 24 * 60 * 60 * 1000 : 10 * 60 * 1000;
+      const fresh = timestamp ? Math.abs(Date.now() - Date.parse(timestamp)) < freshnessWindowMs : false;
       if (signer.toLowerCase() !== wallet.toLowerCase() || !fresh || !message.toLowerCase().includes(wallet.toLowerCase())) {
         return reply.status(401).send({ error: "Invalid or expired signature." });
       }
@@ -117,7 +128,7 @@ app.post<{ Body: AnalyzeRequest }>("/v1/analyze",
       const hit = tx.to ? await lookupChainAbuse(tx.to) : null;
       const remaining = await proAccessService.consume(wallet.toLowerCase(), 1);
       if (remaining === null) {
-        return reply.status(402).send({ error: "No checks left. Buy more at /pro." });
+        return reply.status(402).send({ error: "No credits left. Buy more at /pro." });
       }
       proMeta = { creditsLeft: remaining, flagged: !!hit?.flagged, category: hit?.category, reports: hit?.reports };
     }
@@ -142,6 +153,35 @@ app.post<{ Body: AnalyzeRequest }>("/v1/analyze",
       request.log.error(err);
       return reply.status(400).send({
         error: "Could not analyze transaction",
+        message: err instanceof Error ? err.message : "Unknown error",
+      });
+    }
+  }
+);
+
+// ============================================================================
+// POST /v1/analyze-signature - Analyze an off-chain signature request before signing
+// ============================================================================
+app.post<{ Body: AnalyzeSignatureRequest }>("/v1/analyze-signature",
+  {
+    onRequest: createRateLimitMiddleware(rateLimiter),
+  },
+  async (request, reply) => {
+    const validationErrors = validateSignatureRequest(request.body);
+    if (validationErrors.length > 0) {
+      return reply.status(400).send({
+        error: "Invalid request",
+        details: validationErrors,
+      });
+    }
+
+    const intel = await createIntelAsync();
+    try {
+      return await analyzeSignature(request.body, intel);
+    } catch (err) {
+      request.log.error(err);
+      return reply.status(400).send({
+        error: "Could not analyze signature request",
         message: err instanceof Error ? err.message : "Unknown error",
       });
     }

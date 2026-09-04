@@ -1,5 +1,5 @@
 {
-  "version": "0.0.2",
+  "version": "0.0.4",
   "description": "GENESIS pre-sign transaction firewall — A Bhusoft LLC product",
   "proposedName": "GENESIS Firewall (Bhusoft)",
   "repository": {
@@ -8,7 +8,7 @@
     "directory": "packages/snap"
   },
   "source": {
-    "shasum": "YMOX63uVTB2MuFajxrqu5l597Po0hR/GuB7vIw2kzVQ=",
+    "shasum": "b25bfD58a2BTjns98GyR+p83Gx/xvN6pVRcIsLgsBxs=",
     "location": {
       "npm": {
         "filePath": "dist/bundle.js",
@@ -22,7 +22,13 @@
     "endowment:transaction-insight": {
       "allowTransactionOrigin": true
     },
-    "endowment:network-access": {}
+    "endowment:signature-insight": {
+      "allowSignatureOrigin": true
+    },
+    "endowment:network-access": {},
+    "endowment:page-home": {},
+    "endowment:ethereum-provider": {},
+    "snap_manageState": {}
   },
   "platformVersion": "6.24.0",
   "manifestVersion": "0.1"

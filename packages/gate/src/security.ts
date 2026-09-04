@@ -174,6 +174,62 @@ export function validateAnalyzeRequest(body: unknown): ValidationError[] {
 }
 
 /**
+ * Validate off-chain signature request body (personal_sign / eth_signTypedData*).
+ */
+export function validateSignatureRequest(body: unknown): ValidationError[] {
+  const errors: ValidationError[] = [];
+
+  if (!body || typeof body !== "object") {
+    errors.push({ field: "body", error: "Request body must be a JSON object" });
+    return errors;
+  }
+
+  const req = body as any;
+
+  if (!req.sig || typeof req.sig !== "object") {
+    errors.push({ field: "sig", error: "sig field is required and must be an object" });
+    return errors;
+  }
+
+  const sig = req.sig;
+
+  if (!isValidChainId(sig.chainId)) {
+    errors.push({ field: "sig.chainId", error: "chainId must be a positive integer" });
+  }
+
+  if (!isValidEthAddress(sig.from)) {
+    errors.push({
+      field: "sig.from",
+      error: `Invalid 'from' address: must be 0x-prefixed 40 hex chars. Got: ${sig.from ?? "(missing)"}`,
+    });
+  }
+
+  const validMethods = ["personal_sign", "eth_signTypedData", "eth_signTypedData_v3", "eth_signTypedData_v4"];
+  if (typeof sig.method !== "string" || !validMethods.includes(sig.method)) {
+    errors.push({
+      field: "sig.method",
+      error: `Invalid method: must be one of ${validMethods.join(", ")}. Got: ${sig.method ?? "(missing)"}`,
+    });
+  }
+
+  if (typeof sig.data !== "string" || sig.data.length === 0) {
+    errors.push({ field: "sig.data", error: "data is required and must be a non-empty string" });
+  } else if (sig.data.length > 20000) {
+    errors.push({ field: "sig.data", error: `data too long: max 20000 chars. Got: ${sig.data.length}` });
+  }
+
+  if (sig.origin !== undefined && sig.origin !== null) {
+    if (typeof sig.origin !== "string") {
+      errors.push({ field: "sig.origin", error: `Invalid origin: must be a string. Got: ${typeof sig.origin}` });
+    } else if (sig.origin.length > 2000) {
+      errors.push({ field: "sig.origin", error: `origin too long: max 2000 chars. Got: ${sig.origin.length}` });
+    }
+  }
+
+  return errors;
+}
+
+/**
  * Validate threat report body.
  */
 export function validateReportRequest(body: unknown): ValidationError[] {

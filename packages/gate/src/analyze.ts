@@ -1,12 +1,16 @@
 import type {
   AnalyzeRequest,
+  AnalyzeSignatureRequest,
   RiskAssessment,
   RiskFinding,
+  SimulationResult,
   Verdict,
 } from "@genesis/shared";
 import { SEVERITY_SCORE } from "@genesis/shared";
 import { decodeTransaction } from "./decode.js";
+import { decodeSignature } from "./decode-signature.js";
 import { evaluate } from "./rules.js";
+import { lookupPhishingSite } from "./goplus-lookup.js";
 import type { ThreatIntel } from "./intel.js";
 import type { ThreatIntelPostgres } from "./intel-postgres.js";
 
@@ -20,7 +24,43 @@ export async function analyze(
   intel: ThreatIntel | ThreatIntelPostgres
 ): Promise<RiskAssessment> {
   const simulation = await decodeTransaction(req.tx);
-  const findings = await evaluate(simulation, intel);
+  return finalize(simulation, intel, req.tx.chainId);
+}
+
+/**
+ * Signature-side counterpart to analyze(): screens eth_signTypedData/personal_sign
+ * requests, since most modern drainers steal funds via a blind signature (permit,
+ * Permit2, Seaport order) rather than an on-chain transaction.
+ */
+export async function analyzeSignature(
+  req: AnalyzeSignatureRequest,
+  intel: ThreatIntel | ThreatIntelPostgres
+): Promise<RiskAssessment> {
+  const simulation = decodeSignature(req.sig);
+
+  const extraFindings: RiskFinding[] = [];
+  if (req.sig.origin) {
+    const phishing = await lookupPhishingSite(req.sig.origin);
+    if (phishing?.flagged) {
+      extraFindings.push({
+        id: "goplus.phishing-site",
+        severity: "critical",
+        title: "This site is a known phishing site",
+        description: `${req.sig.origin} is flagged by GoPlus Security as a phishing site. Do not sign anything here.`,
+      });
+    }
+  }
+
+  return finalize(simulation, intel, req.sig.chainId, extraFindings);
+}
+
+async function finalize(
+  simulation: SimulationResult,
+  intel: ThreatIntel | ThreatIntelPostgres,
+  chainId: number,
+  extraFindings: RiskFinding[] = []
+): Promise<RiskAssessment> {
+  const findings = [...extraFindings, ...(await evaluate(simulation, intel, chainId))];
   const score = scoreOf(findings);
   const verdict = verdictOf(findings, score);
   return {
@@ -78,7 +118,7 @@ function explain(
     if (ap.kind === "erc721-all") {
       parts.push(`This lets ${who} move ALL of your NFTs in this collection.`);
     } else if (ap.unlimited) {
-      const gasless = ap.kind === "permit" ? " without an on-chain transaction" : "";
+      const gasless = ap.kind === "permit" || ap.kind === "permit2" ? " without an on-chain transaction" : "";
       parts.push(`This lets ${who} spend an UNLIMITED amount of your tokens${gasless}.`);
     } else {
       parts.push(`This lets ${who} spend up to ${ap.amount} of your tokens.`);
@@ -94,6 +134,14 @@ function explain(
 
   if (sim.method === "multicall") {
     parts.push("It also bundles hidden actions whose real effect isn't shown.");
+  }
+
+  if (sim.method === "OrderComponents") {
+    parts.push("You're signing a marketplace order — check the item and price carefully.");
+  }
+
+  if (sim.method === "unknown-typed-data") {
+    parts.push("This signs data we couldn't fully decode — verify the site before signing.");
   }
 
   if (parts.length === 0) {

@@ -29,7 +29,7 @@ export type Verdict = "allow" | "warn" | "block";
 /** Graduated autonomy — how strictly the client should act on the verdict. */
 export type Autonomy = "observe" | "warn" | "enforce";
 
-export type ApprovalKind = "erc20" | "erc721-all" | "permit";
+export type ApprovalKind = "erc20" | "erc721-all" | "permit" | "permit2";
 
 /** A spend authorization the tx would grant. The #1 drainer vector. */
 export interface Approval {
@@ -87,6 +87,22 @@ export interface RiskAssessment {
 
 export interface AnalyzeRequest {
   tx: TxRequest;
+  autonomy?: Autonomy;
+}
+
+/** An off-chain signature request the wallet is about to sign, as seen at the wallet boundary. */
+export interface SignatureRequest {
+  chainId: ChainId;
+  from: Address;
+  method: "personal_sign" | "eth_signTypedData" | "eth_signTypedData_v3" | "eth_signTypedData_v4";
+  /** Raw message for personal_sign; JSON-encoded EIP-712 typed data otherwise. */
+  data: string;
+  /** Origin of the site requesting the signature, when the wallet exposes it (e.g. Snap's signatureOrigin). */
+  origin?: string;
+}
+
+export interface AnalyzeSignatureRequest {
+  sig: SignatureRequest;
   autonomy?: Autonomy;
 }
 

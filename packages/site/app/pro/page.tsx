@@ -127,7 +127,7 @@ export default function ProPage() {
 
       {!isConnected || !address ? (
         <div className="bg-slate-900/60 border-2 border-teal-500/40 rounded-2xl p-6 text-center space-y-4">
-          <p className="text-slate-300 text-sm">Connect your wallet to buy checks.</p>
+          <p className="text-slate-300 text-sm">Connect your wallet to buy credits.</p>
           <button
             onClick={connect}
             className="px-6 py-3 rounded-lg bg-teal-500 text-slate-950 font-bold hover:bg-teal-400 transition"
