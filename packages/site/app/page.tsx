@@ -33,6 +33,57 @@ export default function Home() {
     },
   ];
 
+  const personas = [
+    {
+      icon: "dollar",
+      title: "DeFi Traders",
+      desc: "Swap, stake, and farm with confidence. GENESIS checks approvals before you risk your funds.",
+      badge: "bg-teal-100 dark:bg-teal-500/20 text-teal-600 dark:text-teal-400",
+      blob: "bg-teal-400/25 dark:bg-teal-400/10",
+      hoverBorder: "hover:border-teal-300 dark:hover:border-teal-500",
+    },
+    {
+      icon: "photo",
+      title: "NFT Collectors",
+      desc: "Protect your valuable collections. GENESIS blocks approvals to known NFT thieves.",
+      badge: "bg-purple-100 dark:bg-purple-500/20 text-purple-600 dark:text-purple-400",
+      blob: "bg-purple-400/25 dark:bg-purple-400/10",
+      hoverBorder: "hover:border-purple-300 dark:hover:border-purple-500",
+    },
+    {
+      icon: "shield",
+      title: "Crypto Beginners",
+      desc: "New to crypto? GENESIS explains transactions in plain English, not jargon.",
+      badge: "bg-blue-100 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400",
+      blob: "bg-blue-400/25 dark:bg-blue-400/10",
+      hoverBorder: "hover:border-blue-300 dark:hover:border-blue-500",
+    },
+    {
+      icon: "rocket",
+      title: "Power Users",
+      desc: "Complex transactions? GENESIS decodes bundled actions and shows what each one really does.",
+      badge: "bg-orange-100 dark:bg-orange-500/20 text-orange-600 dark:text-orange-400",
+      blob: "bg-orange-400/25 dark:bg-orange-400/10",
+      hoverBorder: "hover:border-orange-300 dark:hover:border-orange-500",
+    },
+    {
+      icon: "wrench",
+      title: "Developers",
+      desc: "Build safer wallets and apps. Our API returns a clear verdict for any transaction.",
+      badge: "bg-indigo-100 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400",
+      blob: "bg-indigo-400/25 dark:bg-indigo-400/10",
+      hoverBorder: "hover:border-indigo-300 dark:hover:border-indigo-500",
+    },
+    {
+      icon: "search",
+      title: "Security Teams",
+      desc: "Community-verified threat intelligence  -  confirmed by multiple independent reporters before it counts.",
+      badge: "bg-rose-100 dark:bg-rose-500/20 text-rose-600 dark:text-rose-400",
+      blob: "bg-rose-400/25 dark:bg-rose-400/10",
+      hoverBorder: "hover:border-rose-300 dark:hover:border-rose-500",
+    },
+  ] as const;
+
   const faqItems = [
     {
       title: "What's an 'approval'?",
@@ -474,53 +525,21 @@ export default function Home() {
         </div>
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          <div className="bg-white dark:bg-slate-800 rounded-lg border-2 border-slate-200 dark:border-slate-700 p-6 space-y-3 hover:border-indigo-300 dark:hover:border-indigo-500 transition">
-            <div className="text-teal-500 dark:text-teal-400"><Icon name="dollar" className="w-8 h-8" /></div>
-            <h3 className="font-bold text-slate-900 dark:text-white">DeFi Traders</h3>
-            <p className="text-sm text-slate-700 dark:text-slate-300">
-              Swap, stake, and farm with confidence. GENESIS checks approvals before you risk your funds.
-            </p>
-          </div>
-
-          <div className="bg-white dark:bg-slate-800 rounded-lg border-2 border-slate-200 dark:border-slate-700 p-6 space-y-3 hover:border-indigo-300 dark:hover:border-indigo-500 transition">
-            <div className="text-teal-500 dark:text-teal-400"><Icon name="photo" className="w-8 h-8" /></div>
-            <h3 className="font-bold text-slate-900 dark:text-white">NFT Collectors</h3>
-            <p className="text-sm text-slate-700 dark:text-slate-300">
-              Protect your valuable collections. GENESIS blocks approvals to known NFT thieves.
-            </p>
-          </div>
-
-          <div className="bg-white dark:bg-slate-800 rounded-lg border-2 border-slate-200 dark:border-slate-700 p-6 space-y-3 hover:border-indigo-300 dark:hover:border-indigo-500 transition">
-            <div className="text-teal-500 dark:text-teal-400"><Icon name="shield" className="w-8 h-8" /></div>
-            <h3 className="font-bold text-slate-900 dark:text-white">Crypto Beginners</h3>
-            <p className="text-sm text-slate-700 dark:text-slate-300">
-              New to crypto? GENESIS explains transactions in plain English, not jargon.
-            </p>
-          </div>
-
-          <div className="bg-white dark:bg-slate-800 rounded-lg border-2 border-slate-200 dark:border-slate-700 p-6 space-y-3 hover:border-indigo-300 dark:hover:border-indigo-500 transition">
-            <div className="text-teal-500 dark:text-teal-400"><Icon name="rocket" className="w-8 h-8" /></div>
-            <h3 className="font-bold text-slate-900 dark:text-white">Power Users</h3>
-            <p className="text-sm text-slate-700 dark:text-slate-300">
-              Complex transactions? GENESIS decodes bundled actions and shows what each one really does.
-            </p>
-          </div>
-
-          <div className="bg-white dark:bg-slate-800 rounded-lg border-2 border-slate-200 dark:border-slate-700 p-6 space-y-3 hover:border-indigo-300 dark:hover:border-indigo-500 transition">
-            <div className="text-teal-500 dark:text-teal-400"><Icon name="wrench" className="w-8 h-8" /></div>
-            <h3 className="font-bold text-slate-900 dark:text-white">Developers</h3>
-            <p className="text-sm text-slate-700 dark:text-slate-300">
-              Build safer wallets and apps. Our API returns a clear verdict for any transaction.
-            </p>
-          </div>
-
-          <div className="bg-white dark:bg-slate-800 rounded-lg border-2 border-slate-200 dark:border-slate-700 p-6 space-y-3 hover:border-indigo-300 dark:hover:border-indigo-500 transition">
-            <div className="text-teal-500 dark:text-teal-400"><Icon name="search" className="w-8 h-8" /></div>
-            <h3 className="font-bold text-slate-900 dark:text-white">Security Teams</h3>
-            <p className="text-sm text-slate-700 dark:text-slate-300">
-              Community-verified threat intelligence  -  confirmed by multiple independent reporters before it counts.
-            </p>
-          </div>
+          {personas.map((p, i) => (
+            <div
+              key={i}
+              className={`relative overflow-hidden bg-white dark:bg-slate-800 rounded-xl border-2 border-slate-200 dark:border-slate-700 p-6 space-y-3 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl ${p.hoverBorder}`}
+            >
+              <div className={`absolute -top-10 -right-10 w-28 h-28 rounded-full blur-2xl pointer-events-none ${p.blob}`} />
+              <div className="relative space-y-3">
+                <div className={`inline-flex w-12 h-12 rounded-xl items-center justify-center ${p.badge}`}>
+                  <Icon name={p.icon} className="w-6 h-6" />
+                </div>
+                <h3 className="font-bold text-slate-900 dark:text-white text-lg">{p.title}</h3>
+                <p className="text-sm text-slate-700 dark:text-slate-300">{p.desc}</p>
+              </div>
+            </div>
+          ))}
         </div>
       </section>
 
@@ -533,8 +552,9 @@ export default function Home() {
 
         <div className="space-y-6">
           {/* Phase 1: MVP */}
-          <div className="bg-white dark:bg-slate-800 rounded-lg border-2 border-slate-200 dark:border-slate-700 p-8 space-y-4 hover:border-emerald-300 dark:hover:border-emerald-500 transition">
-            <div className="flex items-start justify-between">
+          <div className="relative overflow-hidden bg-white dark:bg-slate-800 rounded-lg border-2 border-slate-200 dark:border-slate-700 p-8 space-y-4 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:border-emerald-300 dark:hover:border-emerald-500">
+            <div className="absolute -bottom-12 -right-12 w-48 h-48 rounded-full blur-3xl pointer-events-none bg-emerald-400/20 dark:bg-emerald-400/10" />
+            <div className="relative flex items-start justify-between">
               <div>
                 <div className="inline-flex items-center gap-2 px-3 py-1 bg-emerald-100 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 rounded-full text-xs font-bold mb-3">
                   <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" /></svg>
@@ -548,7 +568,7 @@ export default function Home() {
               </div>
             </div>
 
-            <div className="space-y-3">
+            <div className="relative space-y-3">
               <p className="text-slate-700 dark:text-slate-300">
                 We've built a working gate that checks crypto transactions before you sign. It blocks known scams, warns you about risky moves, and explains everything in plain English - no crypto jargon.
               </p>
@@ -562,8 +582,9 @@ export default function Home() {
           </div>
 
           {/* Phase 2: Adoption */}
-          <div className="bg-white dark:bg-slate-800 rounded-lg border-2 border-slate-200 dark:border-slate-700 p-8 space-y-4 hover:border-indigo-300 dark:hover:border-indigo-500 transition">
-            <div className="flex items-start justify-between">
+          <div className="relative overflow-hidden bg-white dark:bg-slate-800 rounded-lg border-2 border-slate-200 dark:border-slate-700 p-8 space-y-4 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:border-indigo-300 dark:hover:border-indigo-500">
+            <div className="absolute -bottom-12 -right-12 w-48 h-48 rounded-full blur-3xl pointer-events-none bg-indigo-400/20 dark:bg-indigo-400/10" />
+            <div className="relative flex items-start justify-between">
               <div>
                 <div className="inline-flex items-center gap-2 px-3 py-1 bg-indigo-100 dark:bg-indigo-500/20 text-indigo-700 dark:text-indigo-300 rounded-full text-xs font-bold mb-3">
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
@@ -577,7 +598,7 @@ export default function Home() {
               </div>
             </div>
 
-            <div className="space-y-3">
+            <div className="relative space-y-3">
               <p className="text-slate-700 dark:text-slate-300">
                 Install GENESIS as a MetaMask Snap and get real-time protection every time you sign. No copy-pasting addresses or leaving your wallet - just one-click safety.
               </p>
@@ -588,8 +609,9 @@ export default function Home() {
           </div>
 
           {/* Phase 3: Scale */}
-          <div className="bg-white dark:bg-slate-800 rounded-lg border-2 border-slate-200 dark:border-slate-700 p-8 space-y-4 hover:border-orange-300 dark:hover:border-orange-500 transition">
-            <div className="flex items-start justify-between">
+          <div className="relative overflow-hidden bg-white dark:bg-slate-800 rounded-lg border-2 border-slate-200 dark:border-slate-700 p-8 space-y-4 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:border-orange-300 dark:hover:border-orange-500">
+            <div className="absolute -bottom-12 -right-12 w-48 h-48 rounded-full blur-3xl pointer-events-none bg-orange-400/20 dark:bg-orange-400/10" />
+            <div className="relative flex items-start justify-between">
               <div>
                 <div className="inline-flex items-center gap-2 px-3 py-1 bg-orange-100 dark:bg-orange-500/20 text-orange-700 dark:text-orange-300 rounded-full text-xs font-bold mb-3">
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
@@ -603,7 +625,7 @@ export default function Home() {
               </div>
             </div>
 
-            <div className="space-y-3">
+            <div className="relative space-y-3">
               <p className="text-slate-700 dark:text-slate-300">
                 Threat intel is stronger when the community contributes. We're building tools for security researchers, white-hats, and everyday users to report scams and vote on what's dangerous.
               </p>
