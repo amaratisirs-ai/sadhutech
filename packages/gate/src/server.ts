@@ -492,7 +492,10 @@ async function start(): Promise<void> {
       
       // Initialize contributors service for leaderboard & gamification
       try {
+        // Ensure threat_intel exists first (ledger references it), then contributor tables.
+        await postgresIntel.initialize();
         contributorsService = new ContributorsService(postgresIntel.pool);
+        await contributorsService.initialize();
         console.log("[startup] Contributors service initialized");
       } catch (err) {
         console.warn("[startup] Contributors service failed to initialize:", err);

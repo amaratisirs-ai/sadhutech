@@ -33,11 +33,6 @@ CREATE INDEX IF NOT EXISTS idx_threat_intel_trusted
 CREATE INDEX IF NOT EXISTS idx_threat_intel_last_seen 
   ON threat_intel(last_seen DESC);
 
--- Partial index for active threats (recent activity)
-CREATE INDEX IF NOT EXISTS idx_threat_intel_active 
-  ON threat_intel(last_seen DESC) 
-  WHERE last_seen > NOW() - INTERVAL '30 days';
-
 -- Comment for schema documentation
 COMMENT ON TABLE threat_intel IS 'Community threat intelligence with Sybil-resistant quorum. Supports multi-instance deployment via Neon DB.';
 COMMENT ON COLUMN threat_intel.reporters IS 'Distinct reporter IDs. Count of array elements determines quorum level.';

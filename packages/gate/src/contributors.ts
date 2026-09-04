@@ -33,6 +33,45 @@ export class ContributorsService {
     this.pool = pool;
   }
 
+  /** Create contributor tables/indexes if missing. Idempotent; requires threat_intel to exist first. */
+  async initialize(): Promise<void> {
+    await this.pool.query(`
+      CREATE TABLE IF NOT EXISTS contributors (
+        reporter_id TEXT PRIMARY KEY,
+        display_name TEXT DEFAULT NULL,
+        avatar TEXT DEFAULT '🛡️',
+        total_reports INT NOT NULL DEFAULT 0,
+        reputation_score INT DEFAULT 50,
+        badges TEXT[] DEFAULT '{}',
+        status TEXT DEFAULT 'active' CHECK (status IN ('active', 'inactive', 'banned')),
+        email TEXT DEFAULT NULL,
+        created_at TIMESTAMPTZ DEFAULT NOW(),
+        last_report_at TIMESTAMPTZ DEFAULT NULL,
+        metadata JSONB DEFAULT '{}'
+      );
+      CREATE TABLE IF NOT EXISTS threat_reports_ledger (
+        id BIGSERIAL PRIMARY KEY,
+        address CHAR(42) NOT NULL,
+        reporter_id TEXT NOT NULL REFERENCES contributors(reporter_id) ON DELETE CASCADE,
+        category TEXT NOT NULL CHECK (category IN ('drainer', 'malicious-contract', 'decoy-tripwire', 'sanctioned', 'phishing')),
+        description TEXT DEFAULT NULL,
+        evidence_url TEXT DEFAULT NULL,
+        victim_count INT DEFAULT NULL,
+        impacted_chains TEXT[] DEFAULT '{}',
+        reporter_email TEXT DEFAULT NULL,
+        self_assessed_severity TEXT DEFAULT 'medium' CHECK (self_assessed_severity IN ('low', 'medium', 'high', 'critical')),
+        community_upvotes INT DEFAULT 0,
+        community_downvotes INT DEFAULT 0,
+        admin_verified BOOLEAN DEFAULT NULL,
+        reported_at TIMESTAMPTZ DEFAULT NOW()
+      );
+      CREATE INDEX IF NOT EXISTS idx_contributors_reputation ON contributors(reputation_score DESC, total_reports DESC);
+      CREATE INDEX IF NOT EXISTS idx_contributors_last_report ON contributors(last_report_at DESC);
+      CREATE INDEX IF NOT EXISTS idx_threat_reports_ledger_address ON threat_reports_ledger(address);
+      CREATE INDEX IF NOT EXISTS idx_threat_reports_ledger_reporter ON threat_reports_ledger(reporter_id);
+    `);
+  }
+
   /**
    * Record a new threat report and update contributor stats.
    */

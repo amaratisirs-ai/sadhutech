@@ -7,35 +7,31 @@ export default function HelpPage() {
 
   const faqItems = [
     {
-      category: "Installation",
+      category: "Getting started",
       questions: [
         {
-          q: "Where do I install GENESIS Snap?",
-          a: "If you use MetaMask, go to /snap-install. If you use a supported mobile wallet, go to /wallet-connect. For a real transaction test, use /transaction-check.",
+          q: "How do I use GENESIS?",
+          a: "Go to Check, paste a crypto address or a transaction, and you get a plain-English verdict in seconds. No install, no signup.",
         },
         {
-          q: "Which onboarding path should I use?",
-          a: "MetaMask users should install the Snap. WalletConnect users should start with the wallet-connect flow. Developers can use the transaction check to test real requests.",
+          q: "Do I need to connect my wallet?",
+          a: "No. GENESIS never connects to your wallet and never touches your keys or funds. You simply paste the address or transaction you want to check.",
         },
         {
-          q: "What are the system requirements?",
-          a: "For the MetaMask Snap, you need MetaMask on a desktop browser. For WalletConnect onboarding, you need a compatible mobile wallet on a supported device.",
+          q: "What can I check?",
+          a: "Any EVM address or transaction — Ethereum, Polygon, Arbitrum, Optimism, and Avalanche.",
         },
         {
-          q: "Is GENESIS Snap free?",
-          a: "Completely free. No payment, no subscription. GENESIS is open source.",
+          q: "Is GENESIS free?",
+          a: "Completely free to check. No payment, no subscription. GENESIS is open source.",
         },
         {
           q: "How much does it cost to use?",
-          a: "Zero cost. Analysis happens on your device, no gas fees, no charges.",
+          a: "Zero cost. Checking a transaction or address is free — no gas fees, no charges.",
         },
         {
-          q: "Snap installation failed. What do I do?",
-          a: "Try: (1) Refresh MetaMask, (2) Refresh the website, (3) Clear browser cache, (4) Restart browser. If error persists, email support@genesis.com with screenshot.",
-        },
-        {
-          q: "I uninstalled MetaMask. Is my data safe?",
-          a: "Yes. GENESIS never stores your data on servers. All analysis happens locally on your device.",
+          q: "Is my data safe?",
+          a: "Yes. GENESIS has no accounts and never sees your keys or funds. We only receive the address or transaction you choose to check.",
         },
       ],
     },
@@ -43,36 +39,20 @@ export default function HelpPage() {
       category: "Using GENESIS",
       questions: [
         {
-          q: "Where do I see GENESIS analysis in MetaMask?",
-          a: "When you're about to sign a transaction, look for the 'Insights' section at the top of the confirmation screen (above the Sign button). That's where GENESIS shows its verdict.",
+          q: "How do I read the result?",
+          a: "ALLOW (✅) = safe, no risks detected. WARN (⚠️) = potential risk, review carefully. BLOCK (🚫) = likely dangerous, don't sign.",
         },
         {
-          q: "What's the difference between ALLOW, WARN, and BLOCK?",
-          a: "ALLOW (✅) = Safe, no risks detected. WARN (⚠️) = Potential risk, review carefully. BLOCK (🚫) = Likely dangerous, do not sign.",
+          q: "Why did it show WARN for something I trust?",
+          a: "GENESIS errs on the side of caution. Common examples: new contracts, staking, or broad approvals. Read the specific finding to understand why.",
         },
         {
-          q: "Can I override a BLOCK verdict?",
-          a: "Yes, MetaMask lets you sign anyway if you choose to. But if GENESIS blocks something, there's usually a good reason. Proceed at your own risk.",
+          q: "Does it work on all blockchains?",
+          a: "It supports EVM chains — Ethereum, Polygon, Arbitrum, Optimism, and Avalanche.",
         },
         {
-          q: "Why did it show WARN for a transaction I trust?",
-          a: "GENESIS errs on the side of caution. Common false positives: DAO voting, staking, or new contracts. Always read the specific finding to understand the risk.",
-        },
-        {
-          q: "Will GENESIS block my legitimate transaction?",
-          a: "GENESIS only warns/blocks if it detects specific risk patterns (drainers, unlimited approvals, known scams). Legitimate transactions should show ✅ ALLOW. If not, review the finding and decide.",
-        },
-        {
-          q: "Does GENESIS work on all blockchains?",
-          a: "Yes! GENESIS supports EVM chains in the Snap and WalletConnect flows, and the API/demo can analyze transactions directly as well.",
-        },
-        {
-          q: "Can I disable GENESIS for certain transactions?",
-          a: "You can skip the analysis by rejecting and trying again, but that's cumbersome. Better: email support if you find a false positive.",
-        },
-        {
-          q: "How fast is GENESIS analysis?",
-          a: "Analysis happens in <200ms. You won't notice any delay.",
+          q: "How fast is a check?",
+          a: "A few seconds. Paste, check, decide.",
         },
       ],
     },
@@ -81,15 +61,15 @@ export default function HelpPage() {
       questions: [
         {
           q: "Does GENESIS see my private keys?",
-          a: "Never. GENESIS is sandboxed in MetaMask and has no access to your keys, recovery phrase, or private data.",
+          a: "Never. GENESIS has no wallet connection and never sees your keys, recovery phrase, or funds.",
         },
         {
           q: "Does GENESIS track my transactions?",
-          a: "No. All analysis happens locally on your device. GENESIS does not log or store your transactions.",
+          a: "No. We don't log or store what you check — the transaction details are used only to produce a verdict.",
         },
         {
           q: "Does GENESIS collect my address/wallet data?",
-          a: "No. Your addresses are never sent to GENESIS servers. All threat analysis uses only transaction details, not identifiers.",
+          a: "Only what you paste. To produce a verdict we send the address or transaction you're checking to our server — nothing else. No accounts, no keys, no tracking, and we don't store it.",
         },
         {
           q: "Is GENESIS open source?",
@@ -97,11 +77,11 @@ export default function HelpPage() {
         },
         {
           q: "Who maintains the threat database?",
-          a: "The community. Security researchers and users report threats, and consensus voting (quorum) verifies them.",
+          a: "The community. Security researchers and users report threats, and multiple independent reporters confirm them before they count.",
         },
         {
           q: "What's in the threat database?",
-          a: "Known drainers, phishing contracts, honeypots, and exploit addresses. Community-verified via Sybil-resistant voting.",
+          a: "Known drainers, phishing contracts, honeypots, and exploit addresses. Each is confirmed by multiple independent reporters before it's trusted.",
         },
       ],
     },
@@ -109,28 +89,16 @@ export default function HelpPage() {
       category: "Troubleshooting",
       questions: [
         {
-          q: "Snap shows 'Error: Cannot connect to gate'",
-          a: "GENESIS backend is temporarily down. Check status at github.com/amaratisirs-ai/sadhutech/issues. Try again in 5 minutes. You can still sign (analysis just won't show).",
+          q: "The checker says it's unavailable",
+          a: "The backend is briefly down or waking up. Wait a minute and try again. Status: github.com/amaratisirs-ai/sadhutech/issues.",
         },
         {
-          q: "Snap doesn't appear in MetaMask after install",
-          a: "Try: (1) Refresh MetaMask, (2) Go to Settings → Extensions → Snaps, check if GENESIS Firewall is listed, (3) Restart browser.",
+          q: "I got a rate-limit or 'Forbidden' error",
+          a: "You've sent a lot of requests in a short time. Wait a few minutes and try again.",
         },
         {
-          q: "Got 'E403 Forbidden' error",
-          a: "This usually means rate limiting. Wait 15 minutes and try again. If persistent, contact support.",
-        },
-        {
-          q: "Snap installed but not showing analysis",
-          a: "Make sure you're signing a transaction (not just viewing). The Insights panel only shows when you click 'Sign' in MetaMask.",
-        },
-        {
-          q: "Is GENESIS Snap safe?",
-          a: "Yes. Runs in MetaMask's secure sandbox, open source, audited by community. No access to keys or funds.",
-        },
-        {
-          q: "I lost my MetaMask wallet. Is GENESIS affected?",
-          a: "No. GENESIS has no data about you. Import your backup seed phrase into MetaMask, reinstall snap, and you're set.",
+          q: "My address shows no result",
+          a: "Make sure it's a valid EVM address — 0x followed by 40 characters. ENS names aren't supported yet.",
         },
       ],
     },

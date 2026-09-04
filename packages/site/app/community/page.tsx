@@ -21,6 +21,7 @@ export default function CommunityPage() {
   const [offset, setOffset] = useState(0);
   const [hasMore, setHasMore] = useState(true);
   const [totalCount, setTotalCount] = useState(0);
+  const [threatCount, setThreatCount] = useState<number | null>(null);
   const [sortBy, setSortBy] = useState<"score" | "reports" | "verified" | "latest">("score");
 
   const ITEMS_PER_PAGE = 20;
@@ -59,18 +60,9 @@ export default function CommunityPage() {
       const errorMsg = err instanceof Error ? err.message : "Failed to load leaderboard";
       console.error("Failed to fetch contributors:", err);
       setError(errorMsg);
-      // Fallback to mock data
-      const mockContributors: Contributor[] = [
-        { address: "0x1234...5678", username: "SecurityPro", reports: 156, threats: 412, verified: 89, score: 8940, joinedAt: "2024-01-15" },
-        { address: "0x2345...6789", username: "ThreatHunter", reports: 134, threats: 378, verified: 76, score: 7650, joinedAt: "2024-02-01" },
-        { address: "0x3456...7890", username: "PhishDetector", reports: 98, threats: 245, verified: 62, score: 5890, joinedAt: "2024-03-10" },
-        { address: "0x4567...8901", username: "BlockchainSafe", reports: 87, threats: 201, verified: 54, score: 4920, joinedAt: "2024-03-20" },
-        { address: "0x5678...9012", username: "CryptoGuard", reports: 76, threats: 189, verified: 48, score: 4100, joinedAt: "2024-04-05" },
-      ];
+      // No fabricated data — show an honest empty state when the feed is unavailable.
       if (fetchOffset === 0) {
-        setContributors(mockContributors);
-      } else {
-        setContributors((prev) => [...prev, ...mockContributors]);
+        setContributors([]);
       }
       setHasMore(false);
     } finally {
@@ -84,6 +76,16 @@ export default function CommunityPage() {
     setContributors([]);
     setHasMore(true);
     fetchContributors(0);
+
+    // Real count of threat addresses already tracked in the community feed.
+    const gateUrl = process.env.NEXT_PUBLIC_GATE_URL || "https://genesis-gate.onrender.com";
+    fetch(`${gateUrl}/v1/threats/latest?limit=1&hours=1000000`)
+      .then((r) => (r.ok ? r.json() : null))
+      .then((j) => {
+        const total = j?.stats?.total ?? j?.pagination?.total;
+        if (typeof total === "number") setThreatCount(total);
+      })
+      .catch(() => {});
   }, []);
 
   const handleLoadMore = () => {
@@ -101,7 +103,7 @@ export default function CommunityPage() {
           <h1 className="text-4xl font-bold text-slate-900 dark:text-white">Security Community</h1>
         </div>
         <p className="text-slate-600 dark:text-slate-400 mt-2">
-          Join thousands of security researchers reporting and verifying threats
+          Report and verify scam addresses so GENESIS can protect everyone. The more reports, the stronger the shield.
         </p>
       </div>
 
@@ -130,22 +132,16 @@ export default function CommunityPage() {
       {activeTab === "leaderboard" && (
         <div className="space-y-4">
           {/* Stats */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="bg-slate-50 dark:bg-slate-900/30 rounded-lg border border-slate-200 dark:border-slate-700 p-4">
-              <div className="text-sm text-slate-600 dark:text-slate-400 mb-1">Active Contributors</div>
-              <div className="text-3xl font-bold text-slate-900 dark:text-white">2,847</div>
+              <div className="text-sm text-slate-600 dark:text-slate-400 mb-1">Threats tracked</div>
+              <div className="text-3xl font-bold text-slate-900 dark:text-white">{threatCount !== null ? threatCount.toLocaleString() : "—"}</div>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Malicious addresses in the community threat feed.</p>
             </div>
             <div className="bg-slate-50 dark:bg-slate-900/30 rounded-lg border border-slate-200 dark:border-slate-700 p-4">
-              <div className="text-sm text-slate-600 dark:text-slate-400 mb-1">Total Reports</div>
-              <div className="text-3xl font-bold text-slate-900 dark:text-white">45.2K</div>
-            </div>
-            <div className="bg-slate-50 dark:bg-slate-900/30 rounded-lg border border-slate-200 dark:border-slate-700 p-4">
-              <div className="text-sm text-slate-600 dark:text-slate-400 mb-1">Verified Threats</div>
-              <div className="text-3xl font-bold text-slate-900 dark:text-white">38.1K</div>
-            </div>
-            <div className="bg-slate-50 dark:bg-slate-900/30 rounded-lg border border-slate-200 dark:border-slate-700 p-4">
-              <div className="text-sm text-slate-600 dark:text-slate-400 mb-1">Total Rewards Distributed</div>
-              <div className="text-3xl font-bold text-emerald-600">$127K</div>
+              <div className="text-sm text-slate-600 dark:text-slate-400 mb-1">Community contributors</div>
+              <div className="text-3xl font-bold text-slate-900 dark:text-white">{totalCount ? totalCount.toLocaleString() : "—"}</div>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Grows as verified reports come in. Rewards program coming soon.</p>
             </div>
           </div>
 
@@ -228,6 +224,13 @@ export default function CommunityPage() {
               </table>
             </div>
 
+            {!loading && contributors.length === 0 && (
+              <div className="p-10 text-center text-slate-500 dark:text-slate-400">
+                <p className="font-semibold text-slate-700 dark:text-slate-300">No contributors yet.</p>
+                <p className="text-sm mt-1">The leaderboard fills up as verified reports come in. <a href="/report" className="text-emerald-600 hover:underline">Be the first to report a threat.</a></p>
+              </div>
+            )}
+
             {/* Load More Button */}
             {hasMore && (
               <div className="p-4 border-t border-slate-200 dark:border-slate-700 flex justify-center">
@@ -288,7 +291,7 @@ export default function CommunityPage() {
                 {
                   step: "4",
                   title: "Community Votes",
-                  desc: "Other security researchers review and vote on your report. Consensus through quorum voting ensures accuracy.",
+                  desc: "Other security researchers review your report. It only counts once multiple independent reporters agree — so accuracy stays high.",
                   icon: "🗳️",
                 },
                 {
@@ -370,7 +373,7 @@ Content-Type: application/json
                 </div>
                 <div>
                   <div className="font-semibold text-slate-900 dark:text-white mb-1">Verification Bonus</div>
-                  <p className="text-slate-600 dark:text-slate-400">Report verified by quorum: +25 points, Monthly bonus pool: $1,000 distributed</p>
+                  <p className="text-slate-600 dark:text-slate-400">Report confirmed by the community: +25 points, Monthly bonus pool: $1,000 distributed</p>
                 </div>
                 <div>
                   <div className="font-semibold text-slate-900 dark:text-white mb-1">Leaderboard Rewards</div>

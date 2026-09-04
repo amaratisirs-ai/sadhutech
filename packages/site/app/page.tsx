@@ -108,16 +108,16 @@ export default function Home() {
 
               <div className="flex gap-4 flex-wrap pt-2">
                 <a
-                  href="/add-to-wallet"
+                  href="/check"
                   className="px-8 py-4 bg-gradient-to-r from-teal-500 to-teal-400 text-slate-950 rounded-lg font-bold hover:shadow-xl transition-all hover:shadow-teal-500/50 text-lg"
                 >
-                  🔐 Connect Wallet
+                  🔎 Check a transaction — free
                 </a>
                 <a
-                  href="/transaction-check"
+                  href="/threats"
                   className="px-8 py-4 bg-slate-800 text-white rounded-lg font-bold border-2 border-teal-500 hover:border-teal-400 hover:shadow-lg transition-all"
                 >
-                  Check a Transaction
+                  See live threats
                 </a>
               </div>
             </div>
@@ -264,10 +264,10 @@ export default function Home() {
               <p className="text-sm font-semibold text-slate-200">✓ Instant results</p>
             </div>
             <a
-              href="/post"
+              href="/check"
               className="inline-block mt-2 px-6 py-3 bg-teal-600 hover:bg-teal-500 text-white rounded-lg font-bold transition shadow-lg shadow-teal-900/30"
             >
-              Verify Now →
+              Check now →
             </a>
           </div>
 
@@ -278,18 +278,18 @@ export default function Home() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
               </svg>
             </div>
-            <h3 className="text-2xl font-bold text-white">Wallet Protection</h3>
-            <p className="text-sm text-slate-300 font-medium">Add GENESIS to your wallet for automatic threat detection on every transaction.</p>
+            <h3 className="text-2xl font-bold text-white">Automatic protection</h3>
+            <p className="text-sm text-slate-300 font-medium">Coming soon: real-time checks built into your browser and wallet, so every transaction is screened as you sign.</p>
             <div className="pt-2 space-y-2">
-              <p className="text-sm font-semibold text-slate-200">✓ Multi-wallet support</p>
-              <p className="text-sm font-semibold text-slate-200">✓ One-click installation</p>
-              <p className="text-sm font-semibold text-slate-200">✓ Available now</p>
+              <p className="text-sm font-semibold text-slate-200">✓ Browser extension (in progress)</p>
+              <p className="text-sm font-semibold text-slate-200">✓ In-wallet protection</p>
+              <p className="text-sm font-semibold text-slate-200">✓ Same community threat feed</p>
             </div>
             <a
-              href="/add-to-wallet"
+              href="/whitepaper"
               className="inline-block mt-2 px-6 py-3 bg-slate-800 border border-slate-600 hover:border-teal-400 text-white rounded-lg font-bold transition"
             >
-              Get Started →
+              See the roadmap →
             </a>
           </div>
 
@@ -314,39 +314,6 @@ export default function Home() {
               Check a Transaction →
             </a>
           </div>
-        </div>
-      </section>
-      <section className="space-y-8">
-        <div className="text-center">
-          <h2 className="text-4xl md:text-5xl font-black text-white mb-4">How it works in 3 steps</h2>
-          <p className="text-slate-200 text-lg font-medium">Simple, fast, and transparent</p>
-        </div>
-
-        {/* Visual Flow Diagram */}
-        <div className="grid md:grid-cols-3 gap-6 md:gap-4">
-          {flowSteps.map((item, i) => (
-            <div key={i} className="relative">
-              {/* Step Card */}
-              <div className="bg-slate-900 p-8 rounded-xl border-2 border-teal-500/50 hover:border-teal-400 transition text-center space-y-4">
-                <div className="flex justify-center text-teal-400">
-                  {item.icon}
-                </div>
-                <p className="text-slate-200 font-bold whitespace-pre-line text-lg">{item.label}</p>
-                <div className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-teal-500/20 text-teal-400 font-bold text-lg">
-                  {item.step}
-                </div>
-              </div>
-
-              {/* Arrow */}
-              {i < 2 && (
-                <div className="hidden md:flex absolute right-0 top-1/2 transform translate-x-1/2 -translate-y-1/2 z-10">
-                  <svg className="w-8 h-8 text-teal-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 5l7 7m0 0l-7 7m7-7H6" />
-                  </svg>
-                </div>
-              )}
-            </div>
-          ))}
         </div>
       </section>
 
@@ -418,76 +385,19 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ===== FOUR PILLARS ARCHITECTURE ===== */}
-      <section className="space-y-12 py-8">
+      {/* ===== THE BIGGER PICTURE ===== */}
+      <section className="space-y-6 py-8">
         <div className="text-center">
-          <h2 className="text-4xl md:text-5xl font-black text-white mb-4">Built on Nature's Security Principles</h2>
-          <p className="text-slate-400 text-lg">GENESIS uses four natural defense mechanisms, proven by billions of years of evolution</p>
+          <h2 className="text-4xl md:text-5xl font-black text-white mb-4">The bigger picture</h2>
+          <p className="text-slate-300 text-lg max-w-2xl mx-auto">Checking crypto transactions is step one. Underneath, GENESIS is a simple idea: catch a risky action and explain it in plain English <em>before</em> you commit to it.</p>
         </div>
-
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {/* Hive */}
-          <div className="group bg-slate-900 rounded-xl p-8 border-2 border-amber-500/50 hover:border-amber-400 hover:shadow-lg hover:shadow-amber-500/20 transition space-y-4">
-            <div className="text-5xl mb-2">🐝</div>
-            <h3 className="text-2xl font-black text-white">Hive</h3>
-            <p className="text-sm text-slate-300 leading-relaxed font-medium">
-              Swarm Detection. Many agents scan transactions independently. No single point of failure. Threat verdicts emerge from quorum, not a central algorithm.
-            </p>
-            <div className="pt-2 border-t border-amber-500/30">
-              <p className="text-xs text-amber-400 font-bold">→ Many agents, emergent intelligence</p>
-            </div>
-          </div>
-
-          {/* Nucleus */}
-          <div className="group bg-slate-900 rounded-xl p-8 border-2 border-purple-500/50 hover:border-purple-400 hover:shadow-lg hover:shadow-purple-500/20 transition space-y-4">
-            <div className="text-5xl mb-2">⚛️</div>
-            <h3 className="text-2xl font-black text-white">Nucleus</h3>
-            <p className="text-sm text-slate-300 leading-relaxed font-medium">
-              Layered Protection. Crown jewels protected by discrete shells. Each layer requires a separate auth. Auto-rotation ensures stolen keys become useless.
-            </p>
-            <div className="pt-2 border-t border-purple-500/30">
-              <p className="text-xs text-purple-400 font-bold">→ Quantum shells, quantized access</p>
-            </div>
-          </div>
-
-          {/* Entanglement Fabric */}
-          <div className="group bg-slate-900 rounded-xl p-8 border-2 border-cyan-500/50 hover:border-cyan-400 hover:shadow-lg hover:shadow-cyan-500/20 transition space-y-4">
-            <div className="text-5xl mb-2">🔗</div>
-            <h3 className="text-2xl font-black text-white">Entanglement Fabric</h3>
-            <p className="text-sm text-slate-300 leading-relaxed font-medium">
-              Unbreakable Trust. Credentials are unclonable (hardware-bound). Channels are tamper-evident. Post-quantum cryptography defeats future attacks.
-            </p>
-            <div className="pt-2 border-t border-cyan-500/30">
-              <p className="text-xs text-cyan-400 font-bold">→ No-cloning + post-quantum</p>
-            </div>
-          </div>
-
-          {/* Multiverse */}
-          <div className="group bg-slate-900 rounded-xl p-8 border-2 border-indigo-500/50 hover:border-indigo-400 hover:shadow-lg hover:shadow-indigo-500/20 transition space-y-4">
-            <div className="text-5xl mb-2">🌀</div>
-            <h3 className="text-2xl font-black text-white">Multiverse</h3>
-            <p className="text-sm text-slate-300 leading-relaxed font-medium">
-              Deception & Recovery. Risky sessions fork into honeypot decoys. Real assets untouched. Compromised branches rollback automatically.
-            </p>
-            <div className="pt-2 border-t border-indigo-500/30">
-              <p className="text-xs text-indigo-400 font-bold">→ Parallel universes, self-healing</p>
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-slate-900 border-2 border-teal-500/50 rounded-xl p-8 space-y-4">
-          <h3 className="text-xl font-bold text-white">How They Work Together</h3>
+        <div className="bg-slate-900 border-2 border-teal-500/50 rounded-xl p-8 text-center space-y-4 max-w-3xl mx-auto">
           <p className="text-slate-300 leading-relaxed">
-            When you submit a transaction, the <strong>Hive</strong> swarm votes on risk. If risky, the <strong>Nucleus</strong> evaluates your privilege level. The <strong>Entanglement Fabric</strong> verifies all trust bonds are genuine. And if something looks very wrong, the <strong>Multiverse</strong> forks the session into a decoy. Together, they create a security system with no single point of failure.
+            The same safety check can protect far more than wallets. Curious where we're headed and how it works under the hood?
           </p>
-          <div className="flex gap-4 pt-2">
-            <a href="/whitepaper" className="px-6 py-2 bg-teal-600 hover:bg-teal-500 text-white rounded-lg font-bold text-sm transition">
-              Read the Whitepaper →
-            </a>
-            <a href="/laymans-ppt" className="px-6 py-2 bg-slate-800 border-2 border-teal-500 hover:border-teal-400 text-white rounded-lg font-bold text-sm transition">
-              Layman's PPT →
-            </a>
-          </div>
+          <a href="/whitepaper" className="inline-block px-6 py-2 bg-teal-600 hover:bg-teal-500 text-white rounded-lg font-bold text-sm transition">
+            Read the vision →
+          </a>
         </div>
       </section>
 
@@ -594,7 +504,7 @@ export default function Home() {
             <div className="text-3xl">🚀</div>
             <h3 className="font-bold text-slate-900 dark:text-white">Power Users</h3>
             <p className="text-sm text-slate-700 dark:text-slate-300">
-              Complex transactions? Fork simulation decodes multicalls with surgical precision.
+              Complex transactions? GENESIS decodes bundled actions and shows what each one really does.
             </p>
           </div>
 
@@ -602,7 +512,7 @@ export default function Home() {
             <div className="text-3xl">🔧</div>
             <h3 className="font-bold text-slate-900 dark:text-white">Developers</h3>
             <p className="text-sm text-slate-700 dark:text-slate-300">
-              Build safer wallets and dapps. HTTP API integrates in minutes.
+              Build safer wallets and apps. Our API returns a clear verdict for any transaction.
             </p>
           </div>
 
@@ -610,7 +520,7 @@ export default function Home() {
             <div className="text-3xl">🔍</div>
             <h3 className="font-bold text-slate-900 dark:text-white">Security Teams</h3>
             <p className="text-sm text-slate-700 dark:text-slate-300">
-              Threat intelligence + community quorum voting. Sybil-resistant by design.
+              Community-verified threat intelligence — confirmed by multiple independent reporters before it counts.
             </p>
           </div>
         </div>
@@ -652,8 +562,8 @@ export default function Home() {
               <p className="text-emerald-950 dark:text-slate-300">
                 Try it with real transactions on our demo. The system learns from community reports, so it gets smarter over time.
               </p>
-              <a href="/demo" className="inline-flex items-center gap-2 text-green-600 dark:text-green-400 font-semibold hover:underline">
-                → Try the interactive demo
+              <a href="/check" className="inline-flex items-center gap-2 text-green-600 dark:text-green-400 font-semibold hover:underline">
+                → Try the free checker
               </a>
             </div>
           </div>
@@ -734,7 +644,7 @@ export default function Home() {
               <p className="font-medium text-red-600">❌ We won't</p>
               <ul className="mt-2 space-y-1">
                 <li>Custody your funds</li>
-                <li>Gate features behind paywalls</li>
+                <li>Lock basic safety behind a paywall</li>
                 <li>Trace user wallets</li>
               </ul>
             </div>
@@ -756,10 +666,10 @@ export default function Home() {
         <p className="text-slate-600 dark:text-slate-400 text-lg">Join thousands of crypto users already using GENESIS</p>
         <div className="flex gap-4 justify-center flex-wrap">
           <a
-            href="/transaction-check"
+            href="/check"
             className="px-8 py-4 bg-gradient-to-r from-indigo-600 to-indigo-600 text-white rounded-lg font-semibold hover:shadow-xl transition-all hover:scale-105"
           >
-            Check a Transaction
+            Check a transaction — free
           </a>
           <a
             href="https://github.com/amaratisirs-ai/sadhutech"

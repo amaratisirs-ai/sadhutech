@@ -129,8 +129,15 @@ function ConnectedContent() {
 
   const checkAddress = async () => {
     const addr = addressInput.trim();
+    if (addr.toLowerCase().endsWith(".eth")) {
+      setResult({ title: "Address check", error: "ENS names aren't supported yet — paste the 0x address it points to." });
+      return;
+    }
     if (!ADDRESS_RE.test(addr)) {
-      setResult({ title: "Address check", error: "Enter a valid address — 0x followed by 40 characters." });
+      const msg = addr.startsWith("0x")
+        ? "That looks incomplete — an address is 0x followed by 40 characters."
+        : "We currently check EVM addresses (Ethereum, Polygon, Arbitrum, Optimism, Avalanche). Paste a 0x… address.";
+      setResult({ title: "Address check", error: msg });
       return;
     }
     setChecking(true);
@@ -231,21 +238,16 @@ function ConnectedContent() {
         </div>
       </section>
 
-      {/* What now */}
-      <section className="space-y-3">
-        <h2 className="text-2xl font-bold text-white">What now?</h2>
-        <p className="text-slate-300 text-sm">
-          Any time you're about to approve a contract or send funds, check it here first. Paste the address you're about to
-          trust and GENESIS will screen it against community threat intel — before you sign anything in your wallet.
-        </p>
-      </section>
-
       {/* Primary tool: check an address */}
       <section className="bg-slate-900/60 border-2 border-teal-500/40 rounded-2xl p-6 space-y-4">
         <div>
-          <h3 className="text-xl font-bold text-white">🔎 Check before you approve</h3>
+          <h3 className="text-xl font-bold text-white">🔎 Check any address before you approve it</h3>
           <p className="text-sm text-slate-300 mt-1">
-            Paste the contract, dApp, or wallet address you're about to interact with.
+            About to approve a contract, connect to a dApp, or send funds? Paste that address here first and GENESIS screens
+            it against community threat intel — before you sign anything in your wallet.
+          </p>
+          <p className="text-xs text-slate-400 mt-2">
+            Checking on <span className="text-teal-300 font-semibold">{chainName(session.chainId)}</span> · supports EVM chains (Ethereum, Polygon, Arbitrum, Optimism, Avalanche).
           </p>
         </div>
         <div className="flex flex-col sm:flex-row gap-3">
@@ -287,21 +289,13 @@ function ConnectedContent() {
         </div>
       </section>
 
-      {/* Honest note + dev link */}
-      <section className="bg-gradient-to-br from-indigo-900/30 to-slate-900 border border-indigo-500/40 rounded-2xl p-6 space-y-3">
-        <h3 className="text-lg font-bold text-white">Want automatic protection on every transaction?</h3>
+      {/* Honest roadmap note */}
+      <section className="bg-slate-900/50 border border-slate-700 rounded-2xl p-6 space-y-2">
+        <h3 className="text-lg font-bold text-white">Coming soon: hands-free protection</h3>
         <p className="text-sm text-slate-300">
-          This page is a manual pre-sign checker. For hands-free protection that pops up inside your wallet as you sign,
-          install the MetaMask Snap on desktop.
+          Right now, paste-to-check keeps you safe before you approve anything. Automatic protection that pops up inside
+          your wallet as you sign is in progress — we'll let you know when it's ready.
         </p>
-        <div className="flex flex-wrap gap-3">
-          <a href="/snap-install" className="px-4 py-2 rounded-lg bg-slate-800 border border-slate-600 hover:border-teal-400 text-white text-sm font-semibold transition">
-            Install MetaMask Snap →
-          </a>
-          <a href="/transaction-check" className="px-4 py-2 rounded-lg bg-slate-800 border border-slate-600 hover:border-teal-400 text-slate-300 text-sm font-semibold transition">
-            Developer tools →
-          </a>
-        </div>
       </section>
     </div>
   );

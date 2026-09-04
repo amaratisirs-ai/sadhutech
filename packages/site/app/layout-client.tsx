@@ -24,13 +24,12 @@ export function LayoutClient({ children }: { children: ReactNode }) {
               {/* Desktop Nav */}
               <div className="hidden md:flex gap-1">
                 <NavLink href="/">Home</NavLink>
-                <NavLink href="/#how-it-works">How It Works</NavLink>
-                <NavLink href="/add-to-wallet">Get Protected</NavLink>
+                <NavLink href="/check">Check</NavLink>
                 <NavLink href="/threats">Threats Hub</NavLink>
                 <NavLink href="/community">Community</NavLink>
                 <NavLink href="/report">Report</NavLink>
+                <NavLink href="/whitepaper">Vision</NavLink>
                 <NavLink href="/help">Help</NavLink>
-                <NavLink href="/transaction-check">Transaction Check</NavLink>
               </div>
             </div>
 
@@ -41,10 +40,10 @@ export function LayoutClient({ children }: { children: ReactNode }) {
                 Live
               </div>
               <a
-                href="/add-to-wallet"
+                href="/check"
                 className="hidden sm:inline px-3 py-1.5 text-xs font-bold text-slate-950 bg-teal-400 hover:bg-teal-300 rounded-lg transition-all hover:shadow-lg hover:shadow-teal-500/50"
               >
-                + Get Started
+                Check a transaction
               </a>
               <a
                 href="https://github.com/amaratisirs-ai/sadhutech"
@@ -82,18 +81,18 @@ export function LayoutClient({ children }: { children: ReactNode }) {
               <div className="space-y-2">
                 <MobileNavLink href="/" onClick={() => setMobileMenuOpen(false)}>Home</MobileNavLink>
                 <MobileNavLink href="/#how-it-works" onClick={() => setMobileMenuOpen(false)}>How It Works</MobileNavLink>
-                <MobileNavLink href="/add-to-wallet" onClick={() => setMobileMenuOpen(false)}>Get Protected</MobileNavLink>
+                <MobileNavLink href="/check" onClick={() => setMobileMenuOpen(false)}>Check</MobileNavLink>
                 <MobileNavLink href="/threats" onClick={() => setMobileMenuOpen(false)}>Threats Hub</MobileNavLink>
                 <MobileNavLink href="/community" onClick={() => setMobileMenuOpen(false)}>Community</MobileNavLink>
                 <MobileNavLink href="/report" onClick={() => setMobileMenuOpen(false)}>Report</MobileNavLink>
+                <MobileNavLink href="/whitepaper" onClick={() => setMobileMenuOpen(false)}>Vision</MobileNavLink>
                 <MobileNavLink href="/help" onClick={() => setMobileMenuOpen(false)}>Help</MobileNavLink>
-                <MobileNavLink href="/transaction-check" onClick={() => setMobileMenuOpen(false)}>Transaction Check</MobileNavLink>
                 <a
-                  href="/add-to-wallet"
+                  href="/check"
                   className="block w-full px-4 py-2.5 text-sm font-bold text-slate-950 bg-teal-400 hover:bg-teal-300 rounded-lg transition-all text-center mt-4"
                   onClick={() => setMobileMenuOpen(false)}
                 >
-                  + Get Started
+                  Check a transaction
                 </a>
               </div>
             </div>
@@ -111,7 +110,7 @@ export function LayoutClient({ children }: { children: ReactNode }) {
         <div className="flex justify-around items-center h-20">
           <BottomNavLink href="/" label="Home" icon={<HomeIcon />} />
           <BottomNavLink href="/threats" label="Threats" icon={<ThreatsIcon />} />
-          <BottomNavLink href="/add-to-wallet" label="Protect" icon={<ProtectIcon />} />
+          <BottomNavLink href="/check" label="Check" icon={<ProtectIcon />} />
           <BottomNavLink href="/report" label="Report" icon={<ReportIcon />} />
           <BottomNavLink href="/help" label="Help" icon={<HelpIcon />} />
         </div>
@@ -124,7 +123,7 @@ export function LayoutClient({ children }: { children: ReactNode }) {
             <div>
               <h4 className="font-bold text-white mb-4">Product</h4>
               <ul className="space-y-2 text-sm text-teal-300">
-                <li><a href="/add-to-wallet" className="hover:text-white transition">Get Started</a></li>
+                <li><a href="/check" className="hover:text-white transition">Check a transaction</a></li>
                 <li><a href="/after-install" className="hover:text-white transition">Getting Started</a></li>
                 <li><a href="/threats" className="hover:text-white transition">Threats Hub</a></li>
               </ul>
@@ -141,7 +140,7 @@ export function LayoutClient({ children }: { children: ReactNode }) {
               <h4 className="font-bold text-white mb-4">Support</h4>
               <ul className="space-y-2 text-sm text-teal-300">
                 <li><a href="/help" className="hover:text-white transition">Help Center</a></li>
-                <li><a href="/transaction-check" className="hover:text-white transition">Transaction Check</a></li>
+                <li><a href="/whitepaper" className="hover:text-white transition">Vision &amp; roadmap</a></li>
                 <li><a href="mailto:support@genesis.com" className="hover:text-white transition">Email Support</a></li>
               </ul>
             </div>

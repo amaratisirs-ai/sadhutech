@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 
 const THREAT_CATEGORIES = [
@@ -9,14 +9,63 @@ const THREAT_CATEGORIES = [
   { value: 'malicious-contract', label: '⚠️ Malicious Contract' },
   { value: 'decoy-tripwire', label: '🪤 Honeypot' },
 ];
+const TURNSTILE_SITE_KEY = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || '';
 
+// Cloudflare Turnstile bot-check widget (renders only when a site key is configured).
+function Turnstile({ onToken }: { onToken: (t: string) => void }) {
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (!TURNSTILE_SITE_KEY || typeof window === 'undefined') return;
+    const SCRIPT_ID = 'cf-turnstile-script';
+    const render = () => {
+      const w = window as any;
+      if (w.turnstile && ref.current && !ref.current.dataset.rendered) {
+        ref.current.dataset.rendered = '1';
+        w.turnstile.render(ref.current, {
+          sitekey: TURNSTILE_SITE_KEY,
+          callback: (t: string) => onToken(t),
+          'error-callback': () => onToken(''),
+          'expired-callback': () => onToken(''),
+        });
+      }
+    };
+    if (!document.getElementById(SCRIPT_ID)) {
+      const s = document.createElement('script');
+      s.id = SCRIPT_ID;
+      s.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';
+      s.async = true;
+      s.defer = true;
+      s.onload = render;
+      document.head.appendChild(s);
+    } else {
+      render();
+    }
+  }, [onToken]);
+  if (!TURNSTILE_SITE_KEY) return null;
+  return <div ref={ref} className="mt-2" />;
+}
 export default function ReportPage() {
   const [address, setAddress] = useState('');
   const [category, setCategory] = useState('drainer');
   const [description, setDescription] = useState('');
+  const [email, setEmail] = useState('');
+  const [reporterName, setReporterName] = useState('');
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState<'idle' | 'success' | 'error'>('idle');
   const [message, setMessage] = useState('');
+  const [threatCount, setThreatCount] = useState<number | null>(null);
+  const [turnstileToken, setTurnstileToken] = useState('');
+
+  useEffect(() => {
+    const gateUrl = process.env.NEXT_PUBLIC_GATE_URL || 'https://genesis-gate.onrender.com';
+    fetch(`${gateUrl}/v1/threats/latest?limit=1&hours=1000000`)
+      .then((r) => (r.ok ? r.json() : null))
+      .then((j) => {
+        const total = j?.stats?.total ?? j?.pagination?.total;
+        if (typeof total === 'number') setThreatCount(total);
+      })
+      .catch(() => {});
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -24,16 +73,17 @@ export default function ReportPage() {
     setStatus('idle');
 
     try {
-      const gateUrl =
-        process.env.NEXT_PUBLIC_GATE_URL || 'https://genesis-gate.onrender.com';
-      const response = await fetch(`${gateUrl}/v1/report`, {
+      // Posts to our server-side proxy, which adds the gate API key and derives a stable reporter id from the email.
+      const response = await fetch(`/api/report`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           address: address.toLowerCase(),
           category: category as any,
-          reporterId: `reporter-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`,
           description: description || undefined,
+          email: email.trim().toLowerCase(),
+          reporterName: reporterName.trim() || undefined,
+          turnstileToken,
         }),
       });
 
@@ -41,13 +91,12 @@ export default function ReportPage() {
         throw new Error(`API error: ${response.status}`);
       }
 
-      const result = await response.json();
+      await response.json().catch(() => ({}));
       setStatus('success');
-      setMessage(`✅ Threat reported! It's now in the GENESIS database protecting ${result.totalThreats || '0'} users.`);
+      setMessage(`✅ Almost there — we've emailed ${email}. Click the confirmation link to submit your report.`);
       setAddress('');
       setDescription('');
-      setCategory('drainer');
-    } catch (error) {
+      setCategory('drainer');    } catch (error) {
       setStatus('error');
       setMessage(
         error instanceof Error
@@ -131,10 +180,51 @@ export default function ReportPage() {
               />
             </div>
 
+            {/* Email */}
+            <div>
+              <label htmlFor="email" className="block text-sm font-medium text-slate-200 mb-2">
+                Your Email <span className="text-red-400">*</span>
+              </label>
+              <input
+                id="email"
+                type="email"
+                placeholder="you@example.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                className="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+              <p className="text-xs text-slate-400 mt-1">
+                Used to credit your report and build your reporter reputation. Kept private — never shown publicly or shared.
+              </p>
+            </div>
+
+            {/* Display name */}
+            <div>
+              <label htmlFor="reporterName" className="block text-sm font-medium text-slate-200 mb-2">
+                Display Name (Optional)
+              </label>
+              <input
+                id="reporterName"
+                type="text"
+                placeholder="How you appear on the leaderboard"
+                value={reporterName}
+                onChange={(e) => setReporterName(e.target.value)}
+                className="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+            </div>
+
+            {/* Bot check */}
+            {TURNSTILE_SITE_KEY && (
+              <div>
+                <Turnstile onToken={setTurnstileToken} />
+              </div>
+            )}
+
             {/* Submit Button */}
             <button
               type="submit"
-              disabled={loading || !address}
+              disabled={loading || !address || !email || (!!TURNSTILE_SITE_KEY && !turnstileToken)}
               className="w-full px-6 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-slate-600 disabled:cursor-not-allowed text-white font-medium rounded-lg transition"
             >
               {loading ? 'Reporting...' : '🚨 Report Threat'}
@@ -159,26 +249,16 @@ export default function ReportPage() {
           <h2 className="text-lg font-semibold text-white mb-3">How It Works</h2>
           <ul className="space-y-2 text-slate-300 text-sm">
             <li>✅ <strong>Submit:</strong> Report a malicious address (Ethereum, Polygon, Arbitrum, Optimism, etc.)</li>
-            <li>✅ <strong>Verify:</strong> Our analysis engine scores the threat</li>
-            <li>✅ <strong>Protect:</strong> GENESIS gates block this address for all users</li>
-            <li>✅ <strong>Track:</strong> See your report's impact on the dashboard</li>
+            <li>✅ <strong>Confirm:</strong> Click the link we email you — this proves the report is genuine</li>
+            <li>✅ <strong>Protect:</strong> Once confirmed by the community, GENESIS blocks the address for everyone</li>
+            <li>✅ <strong>Track:</strong> Build your reporter reputation on the community leaderboard</li>
           </ul>
         </div>
 
-        {/* Community Stats (Placeholder for future connection) */}
-        <div className="mt-8 grid grid-cols-3 gap-4">
-          <div className="bg-slate-700 rounded-lg p-4 text-center">
-            <div className="text-3xl font-bold text-blue-400">12</div>
-            <div className="text-sm text-slate-400">Verified Threats</div>
-          </div>
-          <div className="bg-slate-700 rounded-lg p-4 text-center">
-            <div className="text-3xl font-bold text-green-400">0</div>
-            <div className="text-sm text-slate-400">Community Reports</div>
-          </div>
-          <div className="bg-slate-700 rounded-lg p-4 text-center">
-            <div className="text-3xl font-bold text-purple-400">∞</div>
-            <div className="text-sm text-slate-400">Protected Users</div>
-          </div>
+        {/* Real community stat */}
+        <div className="mt-8 bg-slate-700 rounded-lg p-6 text-center">
+          <div className="text-4xl font-bold text-blue-400">{threatCount !== null ? threatCount.toLocaleString() : '—'}</div>
+          <div className="text-sm text-slate-400 mt-1">Malicious addresses in the community threat feed</div>
         </div>
       </div>
     </div>
