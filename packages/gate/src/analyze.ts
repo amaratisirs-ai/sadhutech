@@ -13,6 +13,7 @@ import { evaluate } from "./rules.js";
 import { lookupPhishingSite } from "./goplus-lookup.js";
 import type { ThreatIntel } from "./intel.js";
 import type { ThreatIntelPostgres } from "./intel-postgres.js";
+import type { AuditLogService } from "./audit-log.js";
 
 /**
  * The Chakravyuha pre-sign gate: decode → evaluate against community intel →
@@ -21,10 +22,11 @@ import type { ThreatIntelPostgres } from "./intel-postgres.js";
  */
 export async function analyze(
   req: AnalyzeRequest,
-  intel: ThreatIntel | ThreatIntelPostgres
+  intel: ThreatIntel | ThreatIntelPostgres,
+  auditLog?: AuditLogService
 ): Promise<RiskAssessment> {
   const simulation = await decodeTransaction(req.tx);
-  return finalize(simulation, intel, req.tx.chainId);
+  return finalize(simulation, intel, req.tx.chainId, [], auditLog);
 }
 
 /**
@@ -34,13 +36,16 @@ export async function analyze(
  */
 export async function analyzeSignature(
   req: AnalyzeSignatureRequest,
-  intel: ThreatIntel | ThreatIntelPostgres
+  intel: ThreatIntel | ThreatIntelPostgres,
+  auditLog?: AuditLogService
 ): Promise<RiskAssessment> {
   const simulation = decodeSignature(req.sig);
 
   const extraFindings: RiskFinding[] = [];
   if (req.sig.origin) {
-    const phishing = await lookupPhishingSite(req.sig.origin);
+    const phishing = await lookupPhishingSite(req.sig.origin, (reason) =>
+      void auditLog?.logIntegrationFailure("goplus-phishing", reason)
+    );
     if (phishing?.flagged) {
       extraFindings.push({
         id: "goplus.phishing-site",
@@ -48,19 +53,21 @@ export async function analyzeSignature(
         title: "This site is a known phishing site",
         description: `${req.sig.origin} is flagged by GoPlus Security as a phishing site. Do not sign anything here.`,
       });
+      void auditLog?.logSecurityEvent("goplus.phishing-site", req.sig.origin, "critical", {});
     }
   }
 
-  return finalize(simulation, intel, req.sig.chainId, extraFindings);
+  return finalize(simulation, intel, req.sig.chainId, extraFindings, auditLog);
 }
 
 async function finalize(
   simulation: SimulationResult,
   intel: ThreatIntel | ThreatIntelPostgres,
   chainId: number,
-  extraFindings: RiskFinding[] = []
+  extraFindings: RiskFinding[] = [],
+  auditLog?: AuditLogService
 ): Promise<RiskAssessment> {
-  const findings = [...extraFindings, ...(await evaluate(simulation, intel, chainId))];
+  const findings = [...extraFindings, ...(await evaluate(simulation, intel, chainId, auditLog))];
   const score = scoreOf(findings);
   const verdict = verdictOf(findings, score);
   return {

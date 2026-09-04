@@ -81,12 +81,19 @@ export function goplusAvailable(): boolean {
   return !!(process.env.GOPLUS_APP_KEY && process.env.GOPLUS_APP_SECRET);
 }
 
-export async function lookupMaliciousAddress(address: string, chainId: number): Promise<GoPlusHit | null> {
+export async function lookupMaliciousAddress(
+  address: string,
+  chainId: number,
+  onFailure?: (reason: string) => void
+): Promise<GoPlusHit | null> {
   if (!goplusAvailable()) return null;
 
   try {
     const token = await getAccessToken();
-    if (!token) return null;
+    if (!token) {
+      reportFailure("goplus-address", "could not obtain access token", onFailure);
+      return null;
+    }
 
     // GoPlus's access_token already includes the "Bearer " prefix in the string itself.
     const authHeader = token.startsWith("Bearer ") ? token : `Bearer ${token}`;
@@ -97,15 +104,22 @@ export async function lookupMaliciousAddress(address: string, chainId: number): 
         signal: AbortSignal.timeout(GOPLUS_TIMEOUT_MS),
       }
     );
-    if (!res.ok) return null;
+    if (!res.ok) {
+      reportFailure("goplus-address", `HTTP ${res.status}`, onFailure);
+      return null;
+    }
 
     const data = (await res.json()) as { code?: number; result?: Record<string, unknown> };
     const result = data?.result;
-    if (!result || typeof result !== "object") return null;
+    if (!result || typeof result !== "object") {
+      reportFailure("goplus-address", "unexpected response shape", onFailure);
+      return null;
+    }
 
     const reasons = MALICIOUS_FLAGS.filter((flag) => result[flag] === "1");
     return { flagged: reasons.length > 0, reasons };
-  } catch {
+  } catch (err) {
+    reportFailure("goplus-address", err instanceof Error ? err.message : String(err), onFailure);
     return null; // network error, timeout, or unexpected shape — fail open
   }
 }
@@ -115,12 +129,15 @@ export async function lookupMaliciousAddress(address: string, chainId: number): 
  * https://docs.gopluslabs.io/reference/phishingsiteusingget
  * Same signed access_token auth as lookupMaliciousAddress().
  */
-export async function lookupPhishingSite(url: string): Promise<GoPlusHit | null> {
+export async function lookupPhishingSite(url: string, onFailure?: (reason: string) => void): Promise<GoPlusHit | null> {
   if (!goplusAvailable()) return null;
 
   try {
     const token = await getAccessToken();
-    if (!token) return null;
+    if (!token) {
+      reportFailure("goplus-phishing", "could not obtain access token", onFailure);
+      return null;
+    }
 
     const authHeader = token.startsWith("Bearer ") ? token : `Bearer ${token}`;
     const res = await fetch(
@@ -130,14 +147,24 @@ export async function lookupPhishingSite(url: string): Promise<GoPlusHit | null>
         signal: AbortSignal.timeout(GOPLUS_TIMEOUT_MS),
       }
     );
-    if (!res.ok) return null;
+    if (!res.ok) {
+      reportFailure("goplus-phishing", `HTTP ${res.status}`, onFailure);
+      return null;
+    }
 
     const data = (await res.json()) as { code?: number; result?: { phishing_site?: number | string } };
     const flagged = String(data?.result?.phishing_site) === "1";
     return { flagged, reasons: flagged ? ["phishing_site"] : [] };
-  } catch {
+  } catch (err) {
+    reportFailure("goplus-phishing", err instanceof Error ? err.message : String(err), onFailure);
     return null; // network error, timeout, or unexpected shape — fail open
   }
+}
+
+/** Logs a real integration failure to the console and, if provided, a durable audit sink. */
+function reportFailure(integration: string, reason: string, onFailure?: (reason: string) => void): void {
+  console.error(`[${integration}] failure: ${reason}`);
+  onFailure?.(reason);
 }
 
 /** Test-only: reset the cached access token between test cases. */

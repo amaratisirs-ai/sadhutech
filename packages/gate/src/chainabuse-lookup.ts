@@ -9,7 +9,7 @@ export function premiumAvailable(): boolean {
   return !!process.env.CHAINABUSE_API_KEY;
 }
 
-export async function lookupChainAbuse(address: string): Promise<ChainAbuseHit | null> {
+export async function lookupChainAbuse(address: string, onFailure?: (reason: string) => void): Promise<ChainAbuseHit | null> {
   const key = process.env.CHAINABUSE_API_KEY;
   if (!key) return null; // premium not configured — caller treats as "unavailable"
   try {
@@ -18,12 +18,19 @@ export async function lookupChainAbuse(address: string): Promise<ChainAbuseHit |
       `https://api.chainabuse.com/v0/reports?address=${encodeURIComponent(address)}&perPage=5`,
       { headers: { Authorization: `Basic ${auth}`, "User-Agent": "GENESIS-Gate/1.0" } }
     );
-    if (!res.ok) return null;
+    if (!res.ok) {
+      console.error(`[chainabuse] failure: HTTP ${res.status}`);
+      onFailure?.(`HTTP ${res.status}`);
+      return null;
+    }
     const data = (await res.json()) as { reports?: { scamCategory?: string }[]; count?: number };
     const reports = data.reports ?? [];
     if (reports.length === 0) return { flagged: false };
     return { flagged: true, category: reports[0]?.scamCategory, reports: data.count ?? reports.length };
-  } catch {
+  } catch (err) {
+    const reason = err instanceof Error ? err.message : String(err);
+    console.error(`[chainabuse] failure: ${reason}`);
+    onFailure?.(reason);
     return null;
   }
 }

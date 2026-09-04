@@ -17,8 +17,11 @@ plain-English explanation. It never holds keys or funds.
 This is the fast-path first slice of a larger vision (Hive / Nucleus / Entanglement
 Fabric / Multiverse / Sutra). See [vision.md](vision.md) and [roadmap.md](roadmap.md).
 
-**Status:** core built, 9/9 tests passing, runnable locally (web UI + CLI). Integration
-pieces (MetaMask Snap build, real threat feed, persistence, fork simulation) are pending.
+**Status:** core built, 31/31 tests passing, runnable locally (web UI + CLI) and deployed
+(Render + Vercel). MetaMask Snap shipped (npm `genesis-snap`, tx + signature insight,
+GoPlus cross-checks, credit auto-consume) but not yet MetaMask-Directory-listed. Real
+threat feeds live (Blockaid/ScamSniffer/CryptoScamDB/GoPlus + curated seed). Persistence
+via Postgres (Neon). Fork-backed multicall simulation still pending (needs Tenderly key).
 
 ---
 
@@ -141,10 +144,18 @@ try/catch.
 **`demo.ts`** — `pnpm demo` CLI runner over realistic scenarios.
 
 ### 5.3 `@genesis/snap` — `packages/snap/`
-MetaMask transaction-insight Snap. `src/index.ts` exports `onTransaction`, which POSTs the
-tx to `GATE_URL` (default `http://localhost:8787/v1/analyze`) and renders the verdict.
-`snap.manifest.json` requests `endowment:transaction-insight` + `endowment:network-access`.
-**Skeleton** — needs `@metamask/snaps-cli` (`mm-snap build`) + MetaMask Flask to run.
+MetaMask Snap, published to npm as `genesis-snap` (currently 0.0.4). `src/index.ts` exports:
+- `onTransaction` — POSTs to `GATE_URL` (`/v1/analyze`), renders the verdict.
+- `onSignature` — POSTs to `/v1/analyze-signature` for personal_sign/eth_signTypedData*
+  requests (catches blind-signature drains: Permit, Permit2, Seaport orders).
+- `onHomePage` — one-time `personal_sign` authorization for auto-consuming Pro deep-check
+  credits (cached via `snap_manageState`, 24h TTL); shows live credit balance, gates
+  auto-consume behind a 10-credit minimum (`SNAP_MIN_CREDITS`).
+`snap.manifest.json` requests `endowment:transaction-insight`, `endowment:signature-insight`,
+`endowment:network-access`, `endowment:page-home`, `endowment:ethereum-provider`,
+`snap_manageState` (all open permissions — no MetaMask allowlist review needed for these
+alone). Not yet Directory-listed — install via `npm:genesis-snap` still errors for regular
+users until submitted/approved.
 
 ---
 
@@ -154,11 +165,16 @@ tx to `GATE_URL` (default `http://localhost:8787/v1/analyze`) and renders the ve
 |--------|------|------|---------|
 | GET | `/` | — | HTML tester UI |
 | GET | `/health` | — | `{ status, service }` |
-| POST | `/v1/analyze` | `AnalyzeRequest` (`{ tx, autonomy? }`) | `RiskAssessment` |
+| POST | `/v1/analyze` | `AnalyzeRequest` (`{ tx, autonomy?, pro? }`) | `RiskAssessment` |
+| POST | `/v1/analyze-signature` | `AnalyzeSignatureRequest` (`{ sig, autonomy? }`) | `RiskAssessment` |
 | POST | `/v1/report` | `ReportRequest` (`{ address, category, reporterId }`) | `ThreatEntry` |
+| GET | `/v1/pro/status/:address` | — | `{ credits, premium }` |
+| POST | `/v1/pro/verify` | `{ address }` | `VerifyResult` (scans USDC-on-Base payment) |
+| GET | `/v1/threats/latest` | `?limit&offset&hours` | paginated `ThreatEntry[]` |
 
 `RiskAssessment` = `{ verdict, score, findings[], simulation, summary, plainEnglish }`.
-Errors return `{ error: string }` with HTTP 400.
+Errors return `{ error: string }` with HTTP 400. Full endpoint list (including
+admin/debug routes) lives in `docs/internal/API-REFERENCE.md` (gitignored, not here).
 
 ---
 
@@ -172,7 +188,12 @@ Errors return `{ error: string }` with HTTP 400.
 | `approval.unlimited` | high | unlimited ERC-20 / Permit2 allowance |
 | `approval.limited` | low | bounded allowance |
 | `approval.permit` | medium | gasless permit (off-chain approval) |
+| `approval.permit2` | medium | off-chain Permit2 signature (allowance or one-shot transfer) |
 | `call.multicall` | medium | batched call hides sub-actions |
+| `signature.marketplace-order` | medium | Seaport/OpenSea order signature (price/recipient not verifiable) |
+| `signature.unknown-typed-data` | low | EIP-712 typed data we couldn't decode |
+| `goplus.malicious-address` | high | GoPlus Security flags a counterparty address |
+| `goplus.phishing-site` | critical | GoPlus flags the signature-requesting origin as phishing |
 
 To add a detector: decode the pattern in `decode.ts`, emit a finding with a **new stable
 id** in `rules.ts`, and add a `vitest` case. Keep severities consistent with `SEVERITY_SCORE`.
@@ -192,7 +213,9 @@ id** in `rules.ts`, and add a `vitest` case. Keep severities consistent with `SE
 
 ## 9. Backlog / next steps (ordered)
 
-1. **MetaMask Snap build** — `mm-snap build`, load in Flask, verify inline verdict.
+1. **MetaMask Snap** — shipped, published (`genesis-snap` on npm), covers tx + signature
+   insight + credit auto-consume. Remaining: MetaMask Directory allowlist submission
+   (protected `endowment:network-access` permission blocks regular-user install until then).
 2. **Real threat feed** — import curated drainer lists into `createIntel()`; scheduled refresh.
 3. **Persistent/shared intel store** — replace in-memory `ThreatIntel` (DB / KV) so quorum
    survives restarts and is shared across nodes.

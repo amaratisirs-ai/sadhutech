@@ -398,7 +398,7 @@ export default function SnapInstallPage() {
         <div className="bg-indigo-500/10 border-2 border-indigo-500/30 rounded-2xl p-12">
           <h2 className="text-2xl font-bold text-white mb-6">About Snap Permissions</h2>
           <p className="text-slate-300 mb-8">
-            When you install GENESIS, MetaMask asks for two permissions. Here's why we need them and how they keep you safe:
+            When you install GENESIS, MetaMask asks for a few permissions. Here's why we need them and how they keep you safe:
           </p>
 
           <div className="grid md:grid-cols-2 gap-8">
@@ -431,6 +431,30 @@ export default function SnapInstallPage() {
 
             <div className="space-y-4">
               <div className="bg-slate-900/50 rounded-lg p-6 border border-indigo-500/20">
+                <h3 className="text-lg font-bold text-white mb-3 flex items-center gap-2"><Icon name="shield" className="w-5 h-5 text-teal-400" /> Signature Insight</h3>
+                <p className="text-slate-300 mb-4">
+                  This lets GENESIS <strong>screen signature requests</strong> too — not just transactions. Most modern
+                  drainers steal funds through a blind signature (a "permit" or marketplace order) rather than an
+                  on-chain transaction, so this closes that gap.
+                </p>
+                <div className="bg-slate-800/50 rounded p-3 text-sm text-slate-400 space-y-2">
+                  <p>
+                    <strong>GENESIS checks:</strong>
+                  </p>
+                  <ul className="list-disc list-inside space-y-1">
+                    <li>Gasless "permit" approvals (EIP-2612, Permit2)</li>
+                    <li>Marketplace orders (e.g. Seaport/OpenSea)</li>
+                    <li>Whether the requesting site is a known phishing domain</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-8 mt-8">
+
+            <div className="space-y-4">
+              <div className="bg-slate-900/50 rounded-lg p-6 border border-indigo-500/20">
                 <h3 className="text-lg font-bold text-white mb-3 flex items-center gap-2"><Icon name="globe" className="w-5 h-5 text-teal-400" /> Network Access</h3>
                 <p className="text-slate-300 mb-4">
                   This lets GENESIS <strong>fetch the latest threat database</strong> from our servers so it has current threat intel.
@@ -459,7 +483,16 @@ export default function SnapInstallPage() {
 
           <div className="mt-8 p-6 bg-teal-500/10 border border-teal-500/30 rounded-lg">
             <p className="text-teal-200">
-              <strong>Your security:</strong> GENESIS runs in MetaMask's sandbox. It can't access your keys, funds, or personal info. All analysis happens locally on your device.
+              <strong>Your security:</strong> GENESIS runs in MetaMask's sandbox. It can't access your keys, funds, or personal info. Risk analysis is performed by the GENESIS gate service over the network (that's what Network Access is for) — nothing is analyzed by a third party beyond that.
+            </p>
+          </div>
+
+          <div className="mt-6 p-6 bg-indigo-500/10 border border-indigo-500/30 rounded-lg">
+            <p className="text-slate-300">
+              <strong>Optional: deeper checks.</strong> If you've bought deep-check credits at
+              <a href="/pro" className="text-teal-300 hover:underline"> sadhutech.com/pro</a>, opening the Snap's home page
+              once lets you authorize automatic deeper screening (an extra ChainAbuse lookup) — no repeated prompts
+              after that. This is entirely optional and only spends credits you've already purchased.
             </p>
           </div>
         </div>

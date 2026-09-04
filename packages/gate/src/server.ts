@@ -13,6 +13,7 @@ import { initSyncService } from "./sync-external-threats.js";
 import type { ThreatIntelPostgres } from "./intel-postgres.js";
 import { ContributorsService } from "./contributors.js";
 import { ProAccessService } from "./pro-access.js";
+import { AuditLogService } from "./audit-log.js";
 import { premiumAvailable, lookupChainAbuse } from "./chainabuse-lookup.js";
 import {
   loadApiKeys,
@@ -37,6 +38,8 @@ const rateLimiter = new SimpleRateLimiter(100, 15 * 60 * 1000);
 let contributorsService: ContributorsService | null = null;
 // Pro access service (wallet-based crypto payments; initialized during startup)
 let proAccessService: ProAccessService | null = null;
+// Audit log service (credit consumption + security-event trail; initialized during startup)
+let auditLogService: AuditLogService | null = null;
 
 // ============================================================================
 // SECURITY MIDDLEWARE
@@ -125,7 +128,9 @@ app.post<{ Body: AnalyzeRequest }>("/v1/analyze",
         return reply.status(401).send({ error: "Invalid or expired signature." });
       }
       // Perform the premium lookup (the value the credit buys), then spend the credit.
-      const hit = tx.to ? await lookupChainAbuse(tx.to) : null;
+      const hit = tx.to
+        ? await lookupChainAbuse(tx.to, (reason) => void auditLogService?.logIntegrationFailure("chainabuse", reason))
+        : null;
       const remaining = await proAccessService.consume(wallet.toLowerCase(), 1);
       if (remaining === null) {
         return reply.status(402).send({ error: "No credits left. Buy more at /pro." });
@@ -134,7 +139,7 @@ app.post<{ Body: AnalyzeRequest }>("/v1/analyze",
     }
 
     try {
-      const result = await analyze(body, intel);
+      const result = await analyze(body, intel, auditLogService ?? undefined);
       if (proMeta) {
         (result as any).creditsLeft = proMeta.creditsLeft;
         if (proMeta.flagged) {
@@ -146,7 +151,18 @@ app.post<{ Body: AnalyzeRequest }>("/v1/analyze",
             subject: tx.to!,
           });
           (result as any).verdict = "block";
+          void auditLogService?.logSecurityEvent("chainabuse.flagged", tx.to, "critical", {
+            category: proMeta.category,
+            reports: proMeta.reports,
+          });
         }
+        void auditLogService?.logCreditConsumption(
+          proReq!.wallet!.toLowerCase(),
+          1,
+          (result as any).verdict,
+          proMeta.flagged,
+          proReq!.source
+        );
       }
       return result;
     } catch (err) {
@@ -177,7 +193,7 @@ app.post<{ Body: AnalyzeSignatureRequest }>("/v1/analyze-signature",
 
     const intel = await createIntelAsync();
     try {
-      return await analyzeSignature(request.body, intel);
+      return await analyzeSignature(request.body, intel, auditLogService ?? undefined);
     } catch (err) {
       request.log.error(err);
       return reply.status(400).send({
@@ -611,6 +627,8 @@ async function start(): Promise<void> {
         await contributorsService.initialize();
         proAccessService = new ProAccessService(postgresIntel.pool);
         await proAccessService.initialize();
+        auditLogService = new AuditLogService(postgresIntel.pool);
+        await auditLogService.initialize();
         console.log("[startup] Contributors service initialized");
       } catch (err) {
         console.warn("[startup] Contributors service failed to initialize:", err);

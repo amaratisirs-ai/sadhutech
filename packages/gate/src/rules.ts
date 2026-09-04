@@ -2,6 +2,7 @@ import type { RiskFinding, SimulationResult } from "@genesis/shared";
 import { ThreatIntel } from "./intel.js";
 import { ThreatIntelPostgres } from "./intel-postgres.js";
 import { lookupMaliciousAddress } from "./goplus-lookup.js";
+import type { AuditLogService } from "./audit-log.js";
 
 /**
  * Derives risk findings from a decoded transaction plus community intel.
@@ -12,7 +13,8 @@ import { lookupMaliciousAddress } from "./goplus-lookup.js";
 export async function evaluate(
   sim: SimulationResult,
   intel: ThreatIntel | ThreatIntelPostgres,
-  chainId: number
+  chainId: number,
+  auditLog?: AuditLogService
 ): Promise<RiskFinding[]> {
   const findings: RiskFinding[] = [];
 
@@ -53,7 +55,9 @@ export async function evaluate(
     // Free GoPlus Security cross-check (skipped if our own intel already confirmed
     // this address as critical — no need to spend an external call on it).
     if (!confirmedCritical) {
-      const goplus = await lookupMaliciousAddress(cp, chainId);
+      const goplus = await lookupMaliciousAddress(cp, chainId, (reason) =>
+        void auditLog?.logIntegrationFailure("goplus-address", reason)
+      );
       if (goplus?.flagged) {
         findings.push({
           id: "goplus.malicious-address",
@@ -62,6 +66,7 @@ export async function evaluate(
           description: `${cp} is flagged by GoPlus Security (${goplus.reasons.join(", ")}). Proceed with caution.`,
           subject: cp,
         });
+        void auditLog?.logSecurityEvent("goplus.malicious-address", cp, "high", { reasons: goplus.reasons });
       }
     }
   }
