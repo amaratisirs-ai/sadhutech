@@ -98,6 +98,30 @@ export default function WalletConnect() {
     router.push(target);
   };
 
+  useEffect(() => {
+    const stored = typeof window !== "undefined" ? localStorage.getItem("genesis_wallet_session") : null;
+    const parsedStored = stored ? JSON.parse(stored) : null;
+    if (parsedStored?.status === "connected" && parsedStored.account) {
+      const walletName = parsedStored.wallet || "WalletConnect";
+      const target = `/api-explorer?wallet=${encodeURIComponent(walletName)}&account=${encodeURIComponent(parsedStored.account)}&chainId=${encodeURIComponent(parsedStored.chainId ?? 1)}`;
+      router.replace(target);
+    }
+  }, [router]);
+
+  const finalizeWalletConnection = (wallet: WalletOption, account: string | null) => {
+    persistWalletSession(wallet, account, 1, "connected");
+    setIsConnecting(false);
+    setConnectionState((prev) => ({
+      ...prev,
+      connectionApproved: true,
+      error: null,
+    }));
+
+    window.setTimeout(() => {
+      continueToExplorer(wallet, account);
+    }, 1000);
+  };
+
   // Detect mobile on mount
   useEffect(() => {
     const checkMobile = () => {
@@ -144,7 +168,13 @@ export default function WalletConnect() {
 
         ethereumProvider.on("connect", () => {
           console.log("✅ Provider connected");
-          setConnectionState((prev) => ({ ...prev, connectionApproved: true }));
+          const accounts = (ethereumProvider as any)?.accounts ?? (ethereumProvider as any)?.session?.accounts ?? [];
+          const connectedAccount = Array.isArray(accounts) ? accounts[0] : null;
+          if (selectedWallet) {
+            finalizeWalletConnection(selectedWallet, connectedAccount);
+          } else {
+            setConnectionState((prev) => ({ ...prev, connectionApproved: true, error: null }));
+          }
         });
 
         ethereumProvider.on("disconnect", () => {
@@ -155,7 +185,6 @@ export default function WalletConnect() {
         ethereumProvider.on("display_uri", (uri: string) => {
           console.log("📱 QR URI:", uri);
           setConnectionState((prev) => ({ ...prev, uri }));
-          // On mobile, don't auto-open - let user tap button to control which wallet opens
         });
 
         setConnectionState((prev) => ({ ...prev, isInitialized: true }));
@@ -191,7 +220,10 @@ export default function WalletConnect() {
       const connectedAccount = Array.isArray(accounts) ? accounts[0] : accounts?.[0] ?? null;
       console.log("Connected:", accounts);
 
-      persistWalletSession(wallet, connectedAccount, 1, "connected");
+      if (connectedAccount) {
+        finalizeWalletConnection(wallet, connectedAccount);
+        return;
+      }
 
       setIsConnecting(false);
       setConnectionState((prev) => ({
@@ -199,7 +231,7 @@ export default function WalletConnect() {
         connectionApproved: true,
       }));
 
-      setTimeout(() => {
+      window.setTimeout(() => {
         continueToExplorer(wallet, connectedAccount);
       }, 1100);
     } catch (error) {
@@ -209,6 +241,14 @@ export default function WalletConnect() {
       setIsConnecting(false);
     }
   };
+
+  useEffect(() => {
+    if (!isMobile || !selectedWallet || !connectionState.uri || connectionState.connectionApproved || isConnecting) {
+      return;
+    }
+
+    window.location.href = getWalletLaunchUrl(selectedWallet, connectionState.uri);
+  }, [isMobile, selectedWallet, connectionState.uri, connectionState.connectionApproved, isConnecting]);
 
   return (
     <div className="space-y-12">
@@ -255,8 +295,8 @@ export default function WalletConnect() {
         <div className="space-y-4">
           <h2 className="text-2xl font-bold text-white mb-4">📱 Available Wallets</h2>
           <div className="mb-3 rounded-xl border border-teal-500/30 bg-teal-500/10 p-4 text-sm text-slate-100">
-            <p className="font-semibold text-white">Recommended starting wallet: Trust Wallet</p>
-            <p>Use Trust Wallet first, then choose from the other supported WalletConnect wallets below if you want to expand the path.</p>
+            <p className="font-semibold text-white">Recommended path: WalletConnect</p>
+            <p>Connect a supported mobile wallet, then continue to the transaction review flow once approval is complete.</p>
           </div>
           <div className="grid grid-cols-2 gap-3 max-h-96 overflow-y-auto pr-2">
             {walletOptions.map((wallet) => (
@@ -280,7 +320,7 @@ export default function WalletConnect() {
               {isMobile ? (
                 <>
                   <li>1. Tap your wallet above</li>
-                  <li>2. Tap Open in {selectedWallet?.name ?? "wallet"} to launch the wallet</li>
+                  <li>2. Tap Open in {selectedWallet?.name ?? "your wallet"} to launch the wallet</li>
                   <li>3. Approve the connection in the wallet</li>
                   <li>4. Return to this browser tab and continue to the transaction check</li>
                 </>
@@ -344,7 +384,7 @@ export default function WalletConnect() {
                   </div>
                 </div>
                 {isConnecting && !connectionState.connectionApproved && (
-                  <p className="text-xs text-teal-200">Waiting for wallet approval... Return to this browser tab after approving in {selectedWallet.name}.</p>
+                  <p className="text-xs text-teal-200">Waiting for wallet approval... Return to this browser tab after approving the connection in {selectedWallet.name}.</p>
                 )}
                 {connectionState.connectionApproved && (
                     <div className="space-y-3">
@@ -430,7 +470,7 @@ export default function WalletConnect() {
                 >
                   {supportsWalletDeepLink(selectedWallet) ? `Open in ${selectedWallet.name}` : `Open ${selectedWallet.name}`}
                 </button>
-                <p className="text-xs text-slate-300 text-center">After approving in the wallet, return to this browser tab and continue to the transaction check.</p>
+                <p className="text-xs text-slate-300 text-center">After approving the connection in the wallet, return to this browser tab and continue to the transaction check.</p>
               </div>
               <button
                 onClick={() => {

@@ -6,7 +6,7 @@ import { resolveDecisionOutcome } from "../../src/decision";
 
 function APIExplorerContent() {
   const searchParams = useSearchParams();
-  const [gateUrl, setGateUrl] = useState("http://localhost:8787");
+  const [gateUrl, setGateUrl] = useState("https://genesis-gate.onrender.com");
   const [connectedWallet, setConnectedWallet] = useState<{ wallet: string; account: string; chainId: number } | null>(null);
   const [request, setRequest] = useState(
     JSON.stringify(
@@ -64,8 +64,29 @@ function APIExplorerContent() {
     }
 
     if (parsedStored && parsedStored.status === "pending") {
+      if (parsedStored.account) {
+        setConnectedWallet({ wallet: finalWallet, account: parsedStored.account, chainId: finalChainId });
+        setRequest(
+          JSON.stringify(
+            {
+              tx: {
+                chainId: finalChainId,
+                from: parsedStored.account,
+                to: "0x2222222222222222222222222222222222222222",
+                data: "0x095ea7b30000000000000000000000003333333333333333333333333333333333333333ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+              },
+            },
+            null,
+            2
+          )
+        );
+        setResponse("");
+        setError("");
+        return;
+      }
+
       setConnectedWallet(null);
-      setError("Wallet approval is still pending. Please return to Trust Wallet and approve the connection, then come back here.");
+      setError("Wallet approval is still pending. Please return to your wallet and approve the connection, then come back here.");
       return;
     }
 
@@ -184,9 +205,9 @@ function APIExplorerContent() {
           className="w-full px-4 py-3 border-2 border-teal-500/30 bg-slate-800 rounded-lg text-sm font-mono focus:border-teal-400 focus:ring-2 focus:ring-teal-500/30 text-white"
         />
         <p className="text-xs text-slate-400">
-          💡 Development: <code className="bg-slate-800 px-2 py-1 rounded text-teal-400">http://localhost:8787</code>
+          💡 Default: <code className="bg-slate-800 px-2 py-1 rounded text-teal-400">https://genesis-gate.onrender.com</code>
           <br />
-          Production: <code className="bg-slate-800 px-2 py-1 rounded text-teal-400">https://genesis-gate.onrender.com</code>
+          Override only for local development if needed.
         </p>
       </div>
 
@@ -290,7 +311,7 @@ function APIExplorerContent() {
       {!connectedWallet && (
         <div className="bg-amber-900/20 border border-amber-500/40 rounded-xl p-4 text-sm text-amber-100">
           <p className="font-semibold text-white">Wallet connection still pending.</p>
-          <p className="mt-1 text-amber-200">If you just approved Trust Wallet, return to this tab and continue. If not, connect a wallet first to begin the transaction check.</p>
+          <p className="mt-1 text-amber-200">If you just approved your wallet, return to this tab and continue. If not, connect a wallet first to begin the transaction check.</p>
           <div className="mt-3">
             <a href="/wallet-connect" className="inline-block px-4 py-2 rounded-lg bg-amber-500 text-slate-900 font-semibold hover:bg-amber-400 transition">
               Go back to wallet connection
@@ -567,7 +588,7 @@ function APIExplorerContent() {
               <div>
                 <p className="font-bold text-slate-900 mb-2">JavaScript/Web</p>
                 <pre className="bg-slate-800 text-slate-100 p-3 rounded text-xs font-mono overflow-auto max-h-32">{`const tx = { chainId: 1, from: "...", to: "...", data: "0x..." };
-const res = await fetch("http://localhost:8787/v1/analyze", {
+const res = await fetch("https://genesis-gate.onrender.com/v1/analyze", {
   method: "POST",
   headers: { "content-type": "application/json" },
   body: JSON.stringify({ tx })
@@ -576,7 +597,7 @@ const verdict = await res.json();`}</pre>
               </div>
               <div>
                 <p className="font-bold text-slate-900 mb-2">cURL</p>
-                <pre className="bg-slate-800 text-slate-100 p-3 rounded text-xs font-mono overflow-auto max-h-32">{`curl -X POST http://localhost:8787/v1/analyze \\
+                <pre className="bg-slate-800 text-slate-100 p-3 rounded text-xs font-mono overflow-auto max-h-32">{`curl -X POST https://genesis-gate.onrender.com/v1/analyze \\
   -H "content-type: application/json" \\
   -d '{"tx":{"chainId":1,"from":"0x...","to":"0x...","data":"0x..."}}'`}</pre>
               </div>
