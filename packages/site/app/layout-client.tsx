@@ -1,11 +1,14 @@
 "use client";
 
 import { useEffect, useRef, useState, type ReactNode } from "react";
+import { Dancing_Script } from "next/font/google";
 import { ThemeProvider } from "./theme-provider";
 import { Web3Provider } from "./web3-provider";
 import { Icon } from "@/components/Icon";
 import { AccountWidget } from "@/components/AccountWidget";
 import { GateStatusProvider, useGateStatus } from "@/src/gate-status";
+
+const dancingScript = Dancing_Script({ subsets: ["latin"], weight: "700" });
 
 export function LayoutClient({ children }: { children: ReactNode }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -32,8 +35,8 @@ export function LayoutClient({ children }: { children: ReactNode }) {
               {/* Logo */}
               <a href="/" className="flex items-center gap-3 group" onClick={() => setMobileMenuOpen(false)}>
                 <img src="/logo.png" alt="GENESIS" className="w-14 h-14 object-contain" />
-                <span className="text-2xl font-black italic tracking-wide hidden sm:inline bg-gradient-to-r from-white via-slate-200 to-teal-300 bg-clip-text text-transparent">
-                  GENESIS
+                <span className={`${dancingScript.className} text-3xl tracking-wide hidden sm:inline bg-gradient-to-r from-white via-slate-200 to-teal-300 bg-clip-text text-transparent`}>
+                  Genesis
                 </span>
               </a>
 
