@@ -21,8 +21,10 @@ export default function PrivacyPage() {
         <h2 className="text-xl font-bold text-white">1. What we collect</h2>
         <ul className="list-disc list-inside space-y-1">
           <li><strong>Wallet addresses</strong> — when you check a transaction, connect a wallet, buy deep-check credits, or submit a threat report. Addresses are pseudonymous, public on-chain data.</li>
+          <li><strong>Payment data</strong> — when you buy Pro credits, we record the paying wallet address, amount, and on-chain transaction hash (itself public on Base) to credit your balance and for the audit log described in Section 4. We do not collect card numbers, bank details, or run identity/KYC verification today.</li>
           <li><strong>Email address</strong> — only if you submit a threat report at <a href="/report" className="underline text-teal-300">/report</a>, to send a one-time confirmation link (Sybil-resistance). We store a one-way hash of your email as your reporter identity, not the raw address, once the report is confirmed.</li>
           <li><strong>Transaction/signature data you submit</strong> — to analyze it. This is processed to produce a verdict and is not sold or used for advertising.</li>
+          <li><strong>Consent records</strong> — when you connect a wallet, install the Snap, or authorize the Snap's deep checks, we log that a specific address (where available) accepted a specific version of these Terms/this Policy, so we can demonstrate consent was given.</li>
           <li><strong>Basic request metadata</strong> (IP address, timestamps) for rate-limiting and abuse prevention, and for our security/audit logs (see below).</li>
         </ul>
       </section>
@@ -37,16 +39,15 @@ export default function PrivacyPage() {
 
       <section className="space-y-3">
         <h2 className="text-xl font-bold text-white">3. Third-party processors</h2>
-        <p>Data may pass through the following providers as part of running the Service:</p>
+        <p>Data may pass through the following providers as part of running the Service. We don't control these providers and are not responsible for their independent handling of your data beyond what's described here; see our <a href="/partners" className="underline text-teal-300">Integrations &amp; Partners</a> page for what each one does.</p>
         <ul className="list-disc list-inside space-y-1">
           <li><strong>Resend</strong> — sends the report-confirmation email (sees your email address).</li>
           <li><strong>Cloudflare Turnstile</strong> — bot-check on the report form.</li>
-          <li><strong>GoPlus Security, ChainAbuse (TRM Labs), Blockaid</strong> — receive addresses/origins you check, to look up threat intelligence.</li>
+          <li><strong>GoPlus Security, ChainAbuse (TRM Labs), Blockaid</strong> — receive addresses/origins you check, to look up threat intelligence. These providers, and we, may compare addresses against public sanctions and law-enforcement watchlists as part of that lookup.</li>
           <li><strong>Reown/WalletConnect</strong> — powers the "Connect wallet" flow.</li>
           <li><strong>Neon (PostgreSQL)</strong> — hosts our database (threat intel, credit balances, audit logs).</li>
           <li><strong>Render, Vercel</strong> — host our backend and website.</li>
         </ul>
-        <p className="text-sm text-slate-400">Full descriptions on our <a href="/partners" className="underline text-teal-300">Integrations &amp; Partners</a> page.</p>
       </section>
 
       <section className="space-y-3">
