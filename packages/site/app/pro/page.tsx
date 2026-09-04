@@ -134,6 +134,10 @@ export default function ProPage() {
           >
             Connect wallet
           </button>
+          <p className="text-xs text-slate-500">
+            Scanning the QR with your phone's camera can open the wrong wallet if you have
+            several installed. For best results, open the QR scanner inside your wallet app instead.
+          </p>
         </div>
       ) : (
         <div className="bg-slate-900/60 border-2 border-teal-500/40 rounded-2xl p-6 space-y-4">
