@@ -307,17 +307,23 @@ export default function Home() {
               <p className="text-sm font-semibold text-slate-200">✓ Available now</p>
             </div>
             <a
-              href="/transaction-check"
+              href="/developers"
               className="inline-block mt-2 px-6 py-3 bg-slate-800 border border-slate-600 hover:border-teal-400 text-white rounded-lg font-bold transition"
             >
-              Check a Transaction →
+              Developer docs →
             </a>
           </div>
         </div>
       </section>
 
       {/* ===== VERDICT EXAMPLES ===== */}
-      <section className="grid md:grid-cols-3 gap-6">
+      <section className="space-y-6">
+        <div>
+          <p className="text-xs font-bold uppercase tracking-[0.2em] text-teal-300">Sample outcomes</p>
+          <h2 className="text-3xl font-black text-white mt-2">What the verdicts look like</h2>
+          <p className="text-slate-400 mt-2">These are illustrative examples, not a scan of your wallet or address.</p>
+        </div>
+        <div className="grid md:grid-cols-3 gap-6">
         <div className="bg-slate-900 border-2 border-green-500/50 rounded-xl p-6 space-y-3">
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 bg-green-500/20 rounded-lg flex items-center justify-center">
@@ -327,8 +333,8 @@ export default function Home() {
             </div>
             <div className="text-2xl font-black text-green-400">ALLOW</div>
           </div>
-          <p className="text-green-300 font-bold">Safe to sign</p>
-          <p className="text-sm text-slate-300">A simple transfer to a trusted address. No risks detected.</p>
+          <p className="text-green-300 font-bold">Example: safe to sign</p>
+          <p className="text-sm text-slate-300">A simple transfer with no known risks detected. Run your own check before signing.</p>
         </div>
         <div className="bg-slate-900 border-2 border-yellow-500/50 rounded-xl p-6 space-y-3">
           <div className="flex items-center gap-2">
@@ -339,8 +345,8 @@ export default function Home() {
             </div>
             <div className="text-2xl font-black text-yellow-400">WARN</div>
           </div>
-          <p className="text-yellow-300 font-bold">Caution advised</p>
-          <p className="text-sm text-slate-300">Giving permissions to a new app. Verify you trust it.</p>
+          <p className="text-yellow-300 font-bold">Example: caution advised</p>
+          <p className="text-sm text-slate-300">A new app requests permissions. Verify who receives access before signing.</p>
         </div>
         <div className="bg-slate-900 border-2 border-red-500/50 rounded-xl p-6 space-y-3">
           <div className="flex items-center gap-2">
@@ -351,8 +357,9 @@ export default function Home() {
             </div>
             <div className="text-2xl font-black text-red-400">BLOCK</div>
           </div>
-          <p className="text-red-300 font-bold">Don't sign</p>
-          <p className="text-sm text-slate-300">Detected interaction with a known malicious address.</p>
+          <p className="text-red-300 font-bold">Example: don't sign</p>
+          <p className="text-sm text-slate-300">A known malicious address is detected. Stop and leave the transaction unsigned.</p>
+        </div>
         </div>
       </section>
 
@@ -450,10 +457,10 @@ export default function Home() {
               bot.
             </p>
             <a
-              href="/transaction-check"
+              href="/developers"
               className="inline-block bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-700 dark:hover:bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition"
             >
-              Check a Transaction →
+              Open developer docs →
             </a>
           </div>
         </div>

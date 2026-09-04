@@ -139,6 +139,10 @@ export default function CheckPage() {
 
   const checkAddress = async () => {
     const addr = addressInput.trim();
+    if (!addr) {
+      setResult({ title: "Address check", error: "Paste an EVM address before checking it." });
+      return;
+    }
     if (addr.toLowerCase().endsWith(".eth")) {
       setResult({ title: "Address check", error: "ENS names aren't supported yet  -  paste the 0x address it points to." });
       return;
@@ -296,7 +300,7 @@ export default function CheckPage() {
             <div className="relative flex-1">
               <input
                 value={addressInput}
-                onChange={(e) => setAddressInput(e.target.value)}
+                onChange={(e) => { setAddressInput(e.target.value); setResult(null); }}
                 onKeyDown={(e) => e.key === "Enter" && checkAddress()}
                 placeholder="0x… address"
                 className="w-full px-4 py-3 pr-10 rounded-lg bg-slate-800 border-2 border-slate-600 focus:border-teal-400 text-white font-mono text-sm outline-none"
@@ -361,7 +365,7 @@ export default function CheckPage() {
               disabled={deepBusy}
               className="px-4 py-2 rounded-lg bg-amber-400 text-slate-950 text-sm font-bold hover:bg-amber-300 disabled:opacity-50 transition whitespace-nowrap"
             >
-              {deepBusy ? "Working…" : wallet ? "Deep check (1 credit)" : "Connect &amp; deep check"}
+              {deepBusy ? "Working…" : wallet ? "Deep check (1 credit)" : "Connect & deep check"}
             </button>
           </div>
         </div>

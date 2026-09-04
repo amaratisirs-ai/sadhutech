@@ -40,6 +40,7 @@ export function LayoutClient({ children }: { children: ReactNode }) {
                 <NavLink href="/community">Community</NavLink>
                 <NavLink href="/report">Report</NavLink>
                 <NavLink href="/pricing">Pricing</NavLink>
+                <NavLink href="/developers">Developers</NavLink>
                 <NavLink href="/whitepaper">Vision</NavLink>
                 <NavLink href="/help">Help</NavLink>
               </div>
@@ -98,6 +99,7 @@ export function LayoutClient({ children }: { children: ReactNode }) {
                 <MobileNavLink href="/community" onClick={() => setMobileMenuOpen(false)}>Community</MobileNavLink>
                 <MobileNavLink href="/report" onClick={() => setMobileMenuOpen(false)}>Report</MobileNavLink>
                 <MobileNavLink href="/pricing" onClick={() => setMobileMenuOpen(false)}>Pricing</MobileNavLink>
+                <MobileNavLink href="/developers" onClick={() => setMobileMenuOpen(false)}>Developers</MobileNavLink>
                 <MobileNavLink href="/whitepaper" onClick={() => setMobileMenuOpen(false)}>Vision</MobileNavLink>
                 <MobileNavLink href="/help" onClick={() => setMobileMenuOpen(false)}>Help</MobileNavLink>
                 <a
@@ -163,7 +165,7 @@ export function LayoutClient({ children }: { children: ReactNode }) {
               <h4 className="font-bold text-white mb-4">Support</h4>
               <ul className="space-y-2 text-sm text-teal-300">
                 <li><a href="/help" className="hover:text-white transition">Help Center</a></li>
-                <li><a href="/whitepaper" className="hover:text-white transition">Vision &amp; roadmap</a></li>
+                <li><a href="/whitepaper" className="hover:text-white transition">Vision & roadmap</a></li>
                 <li><a href="mailto:support@genesis.com" className="hover:text-white transition">Email Support</a></li>
               </ul>
             </div>

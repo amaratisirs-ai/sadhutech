@@ -135,6 +135,10 @@ function ConnectedContent() {
 
   const checkAddress = async () => {
     const addr = addressInput.trim();
+    if (!addr) {
+      setResult({ title: "Address check", error: "Paste an EVM address before checking it." });
+      return;
+    }
     if (addr.toLowerCase().endsWith(".eth")) {
       setResult({ title: "Address check", error: "ENS names aren't supported yet  -  paste the 0x address it points to." });
       return;
@@ -259,7 +263,7 @@ function ConnectedContent() {
         <div className="flex flex-col sm:flex-row gap-3">
           <input
             value={addressInput}
-            onChange={(e) => setAddressInput(e.target.value)}
+            onChange={(e) => { setAddressInput(e.target.value); setResult(null); }}
             onKeyDown={(e) => e.key === "Enter" && checkAddress()}
             placeholder="0x… address"
             className="flex-1 px-4 py-3 rounded-lg bg-slate-800 border-2 border-slate-600 focus:border-teal-400 text-white font-mono text-sm outline-none"
