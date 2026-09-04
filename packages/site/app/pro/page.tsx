@@ -4,8 +4,8 @@ import { useEffect, useState } from "react";
 import { encodeFunctionData, erc20Abi } from "viem";
 import { base } from "@reown/appkit/networks";
 import { useSendTransaction, useSwitchChain } from "wagmi";
-import { Icon } from "@/components/Icon";
 import { useWallet } from "@/src/wallet/useWallet";
+import { friendlyWalletError } from "@/src/wallet/errors";
 import { DEEP_CHECK_ENABLED } from "@/src/pro-status";
 
 const GATE_URL = process.env.NEXT_PUBLIC_GATE_URL || "https://genesis-gate.onrender.com";
@@ -66,6 +66,11 @@ export default function ProPage() {
   };
 
   const pay = async () => {
+    if (!DEEP_CHECK_ENABLED) {
+      setError("");
+      setMessage("Payments are launching soon — check back shortly.");
+      return;
+    }
     if (!address) return;
     const amt = Math.max(MIN_USDC, Math.floor(amount || 0));
     setError("");
@@ -87,7 +92,7 @@ export default function ProPage() {
       const ok = await pollVerify(address);
       if (!ok) setMessage("Payment sent. If your checks haven't appeared, tap “Already paid? Add checks” shortly.");
     } catch (err: any) {
-      setError(err?.shortMessage || err?.message || "Payment failed.");
+      setError(friendlyWalletError(err));
     } finally {
       setBusy("idle");
     }
@@ -102,24 +107,6 @@ export default function ProPage() {
     if (!ok) setMessage("No new payment found yet. If you just paid, wait a moment and try again.");
     setBusy("idle");
   };
-
-  if (!DEEP_CHECK_ENABLED) {
-    return (
-      <div className="max-w-xl mx-auto text-center space-y-6 py-16">
-        <div className="flex justify-center text-teal-400"><Icon name="bolt" className="w-16 h-16" /></div>
-        <h1 className="text-4xl font-black text-white">Pro is coming soon</h1>
-        <p className="text-slate-300">
-          Pay-as-you-go deep checks — pay only for what you use, straight from your wallet, powered by ChainAbuse for
-          cross-chain coverage. We&apos;ll flip it on shortly.
-        </p>
-        <div className="flex flex-wrap justify-center gap-3">
-          <a href="/check" className="inline-block px-6 py-3 rounded-lg bg-teal-500 text-slate-950 font-bold hover:bg-teal-400 transition">
-            Try a free check
-          </a>
-        </div>
-      </div>
-    );
-  }
 
   const buyChecks = Math.floor(Math.max(MIN_USDC, amount) * CREDITS_PER_USDC);
 
@@ -191,7 +178,13 @@ export default function ProPage() {
             disabled={busy !== "idle"}
             className="w-full py-3 rounded-lg bg-teal-500 text-slate-950 font-bold hover:bg-teal-400 disabled:opacity-50 transition"
           >
-            {busy === "paying" ? "Confirm in your wallet…" : busy === "verifying" ? "Adding checks…" : `Pay ${Math.max(MIN_USDC, amount)} USDC`}
+            {!DEEP_CHECK_ENABLED
+              ? "Coming soon"
+              : busy === "paying"
+                ? "Confirm in your wallet…"
+                : busy === "verifying"
+                  ? "Adding checks…"
+                  : `Pay ${Math.max(MIN_USDC, amount)} USDC`}
           </button>
           <button
             onClick={verifyNow}

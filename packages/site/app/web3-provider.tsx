@@ -20,7 +20,7 @@ if (projectId) {
       url: typeof window !== "undefined" ? window.location.origin : "https://sadhutech.com",
       icons: ["https://sadhutech.com/images/genesis-icon.png"],
     },
-    features: { analytics: false, email: false, socials: [] },
+    features: { analytics: false, email: false, socials: [], onramp: false, swaps: false },
   });
 }
 

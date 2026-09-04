@@ -6,10 +6,9 @@ import { createHmac } from "node:crypto";
 // which proves they own the email  -  Sybil resistance with no extra storage.
 const RESEND_KEY = process.env.RESEND_API_KEY || process.env.RESENT_API_KEY || "";
 const FROM = process.env.REPORT_FROM_EMAIL || "GENESIS <noreply@sadhutech.com>";
-const SIGNING_SECRET =
-  process.env.REPORT_SIGNING_SECRET ||
-  process.env.GENESIS_REPORT_API_KEY ||
-  (process.env.GENESIS_API_KEYS || "").split(",")[0].trim();
+// Dedicated secret only — never fall back to the shared gate API key or an empty
+// string, since either would let anyone forge a "confirmed" report token.
+const SIGNING_SECRET = process.env.REPORT_SIGNING_SECRET || "";
 const TURNSTILE_SECRET = process.env.TURNSTILE_SECRET_KEY || process.env.TURNSTILE_SECRET || "";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;

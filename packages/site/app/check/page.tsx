@@ -5,6 +5,8 @@ import { useSignMessage } from "wagmi";
 import { resolveDecisionOutcome, type DecisionOutcome } from "../../src/decision";
 import { Icon } from "@/components/Icon";
 import { useWallet } from "@/src/wallet/useWallet";
+import { friendlyWalletError } from "@/src/wallet/errors";
+import { DEEP_CHECK_ENABLED } from "@/src/pro-status";
 
 const GATE_URL = process.env.NEXT_PUBLIC_GATE_URL || "https://genesis-gate.onrender.com";
 const ADDRESS_RE = /^0x[0-9a-fA-F]{40}$/;
@@ -232,6 +234,10 @@ export default function CheckPage() {
   const runDeepCheck = async () => {
     setDeepMsg(null);
     if (!lastTx || !address) return;
+    if (!DEEP_CHECK_ENABLED) {
+      setDeepMsg("Deep checks are launching soon — check back shortly.");
+      return;
+    }
     setDeepBusy(true);
     try {
       const s = await refreshStatus(address);
@@ -256,7 +262,7 @@ export default function CheckPage() {
       }));
       if (typeof data.creditsLeft === "number") setCredits(data.creditsLeft);
     } catch (e: any) {
-      setDeepMsg(e?.shortMessage || (e instanceof Error ? e.message : "Deep check failed."));
+      setDeepMsg(friendlyWalletError(e));
     } finally {
       setDeepBusy(false);
     }

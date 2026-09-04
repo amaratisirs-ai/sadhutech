@@ -4,10 +4,9 @@ import { createHmac, createHash, timingSafeEqual } from "node:crypto";
 // Step 2 of reporting: validate the emailed token, then record the report to the gate.
 const GATE_URL = process.env.GATE_URL || process.env.NEXT_PUBLIC_GATE_URL || "https://genesis-gate.onrender.com";
 const API_KEY = (process.env.GENESIS_REPORT_API_KEY || process.env.GENESIS_API_KEYS || "").split(",")[0].trim();
-const SIGNING_SECRET =
-  process.env.REPORT_SIGNING_SECRET ||
-  process.env.GENESIS_REPORT_API_KEY ||
-  (process.env.GENESIS_API_KEYS || "").split(",")[0].trim();
+// Dedicated secret only — must match /api/report's SIGNING_SECRET exactly; never fall
+// back to the shared gate API key or an empty string (either would make tokens forgeable).
+const SIGNING_SECRET = process.env.REPORT_SIGNING_SECRET || "";
 
 // Best-effort per-instance limiter to blunt token-guessing.
 const ipHits = new Map<string, { count: number; resetAt: number }>();
@@ -25,6 +24,7 @@ function allow(ip: string, max: number, windowMs: number): boolean {
 }
 
 function verifyToken(token: string): any | null {
+  if (!SIGNING_SECRET) return null;
   const [body, sig] = token.split(".");
   if (!body || !sig) return null;
   const expected = createHmac("sha256", SIGNING_SECRET).update(body).digest("base64url");
@@ -49,6 +49,9 @@ export async function POST(req: NextRequest) {
   const { token } = await req.json().catch(() => ({}));
   if (typeof token !== "string") {
     return NextResponse.json({ error: "Missing token." }, { status: 400 });
+  }
+  if (!SIGNING_SECRET) {
+    return NextResponse.json({ error: "Reporting isn't configured yet." }, { status: 503 });
   }
   const payload = verifyToken(token);
   if (!payload) {

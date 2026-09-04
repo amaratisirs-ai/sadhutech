@@ -418,7 +418,7 @@ app.get("/v1/contributors/stats", async (request, reply) => {
 });
 
 // POST /v1/admin/sync - Manually trigger threat sync (debugging only)
-app.post("/v1/admin/sync", async (request, reply) => {
+app.post("/v1/admin/sync", { onRequest: [createRateLimitMiddleware(rateLimiter), createApiKeyMiddleware(authorizedApiKeys)] }, async (request, reply) => {
   try {
     const intel = await createIntelAsync();
     if (!(intel instanceof (await import("./intel-postgres.js")).ThreatIntelPostgres)) {
@@ -445,7 +445,7 @@ app.post("/v1/admin/sync", async (request, reply) => {
 });
 
 // GET /v1/admin/db-count - Check actual database record count (debugging only)
-app.get("/v1/admin/db-count", async (request, reply) => {
+app.get("/v1/admin/db-count", { onRequest: [createRateLimitMiddleware(rateLimiter), createApiKeyMiddleware(authorizedApiKeys)] }, async (request, reply) => {
   try {
     const intel = await createIntelAsync();
     if (!(intel instanceof (await import("./intel-postgres.js")).ThreatIntelPostgres)) {
@@ -485,7 +485,7 @@ app.get("/v1/admin/db-count", async (request, reply) => {
 });
 
 // GET /v1/admin/raw-threats - Raw query without time filtering (debugging only)
-app.get("/v1/admin/raw-threats", async (request, reply) => {
+app.get("/v1/admin/raw-threats", { onRequest: [createRateLimitMiddleware(rateLimiter), createApiKeyMiddleware(authorizedApiKeys)] }, async (request, reply) => {
   try {
     const intel = await createIntelAsync();
     if (!(intel instanceof (await import("./intel-postgres.js")).ThreatIntelPostgres)) {
