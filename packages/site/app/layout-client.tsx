@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { ThemeProvider } from "./theme-provider";
 import { Web3Provider } from "./web3-provider";
 import { Icon } from "@/components/Icon";
@@ -38,16 +38,27 @@ export function LayoutClient({ children }: { children: ReactNode }) {
               </a>
 
               {/* Desktop Nav */}
-              <div className="hidden md:flex gap-1">
-                <NavLink href="/">Home</NavLink>
+              <div className="hidden md:flex items-center gap-1">
                 <NavLink href="/check">Check</NavLink>
                 <NavLink href="/threats">Threats Hub</NavLink>
-                <NavLink href="/community">Community</NavLink>
-                <NavLink href="/report">Report</NavLink>
                 <NavLink href="/pricing">Pricing</NavLink>
-                <NavLink href="/developers">Developers</NavLink>
-                <NavLink href="/whitepaper">Vision</NavLink>
-                <NavLink href="/help">Help</NavLink>
+                <NavDropdown
+                  label="Community"
+                  items={[
+                    { href: "/report", label: "Report a Threat" },
+                    { href: "/community", label: "Community" },
+                    { href: "https://github.com/amaratisirs-ai/sadhutech", label: "GitHub", external: true },
+                  ]}
+                />
+                <NavDropdown
+                  label="Resources"
+                  items={[
+                    { href: "/developers", label: "Developers" },
+                    { href: "/partners", label: "Integrations & Partners" },
+                    { href: "/whitepaper", label: "Vision & Roadmap" },
+                    { href: "/help", label: "Help Center" },
+                  ]}
+                />
               </div>
             </div>
 
@@ -94,24 +105,29 @@ export function LayoutClient({ children }: { children: ReactNode }) {
           {/* Mobile Menu Overlay */}
           {mobileMenuOpen && (
             <div className="md:hidden border-t border-teal-500/20 bg-slate-900 py-4">
-              <div className="space-y-2">
-                <MobileNavLink href="/" onClick={() => setMobileMenuOpen(false)}>Home</MobileNavLink>
-                <MobileNavLink href="/#how-it-works" onClick={() => setMobileMenuOpen(false)}>How It Works</MobileNavLink>
-                <MobileNavLink href="/check" onClick={() => setMobileMenuOpen(false)}>Check</MobileNavLink>
-                <MobileNavLink href="/threats" onClick={() => setMobileMenuOpen(false)}>Threats Hub</MobileNavLink>
-                <MobileNavLink href="/community" onClick={() => setMobileMenuOpen(false)}>Community</MobileNavLink>
-                <MobileNavLink href="/report" onClick={() => setMobileMenuOpen(false)}>Report</MobileNavLink>
-                <MobileNavLink href="/pricing" onClick={() => setMobileMenuOpen(false)}>Pricing</MobileNavLink>
-                <MobileNavLink href="/developers" onClick={() => setMobileMenuOpen(false)}>Developers</MobileNavLink>
-                <MobileNavLink href="/whitepaper" onClick={() => setMobileMenuOpen(false)}>Vision</MobileNavLink>
-                <MobileNavLink href="/help" onClick={() => setMobileMenuOpen(false)}>Help</MobileNavLink>
+              <div className="space-y-1">
                 <a
                   href="/check"
-                  className="block w-full px-4 py-2.5 text-sm font-bold text-slate-950 bg-teal-400 hover:bg-teal-300 rounded-lg transition-all text-center mt-4"
+                  className="block w-full px-4 py-3 text-sm font-bold text-slate-950 bg-teal-400 hover:bg-teal-300 rounded-lg transition-all text-center mb-3"
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   Check a transaction
                 </a>
+
+                <MobileNavLink href="/" onClick={() => setMobileMenuOpen(false)}>Home</MobileNavLink>
+                <MobileNavLink href="/threats" onClick={() => setMobileMenuOpen(false)}>Threats Hub</MobileNavLink>
+                <MobileNavLink href="/pricing" onClick={() => setMobileMenuOpen(false)}>Pricing</MobileNavLink>
+
+                <MobileSectionLabel>Community</MobileSectionLabel>
+                <MobileNavLink href="/report" onClick={() => setMobileMenuOpen(false)}>Report a Threat</MobileNavLink>
+                <MobileNavLink href="/community" onClick={() => setMobileMenuOpen(false)}>Community</MobileNavLink>
+                <MobileNavLink href="https://github.com/amaratisirs-ai/sadhutech" onClick={() => setMobileMenuOpen(false)}>GitHub</MobileNavLink>
+
+                <MobileSectionLabel>Resources</MobileSectionLabel>
+                <MobileNavLink href="/developers" onClick={() => setMobileMenuOpen(false)}>Developers</MobileNavLink>
+                <MobileNavLink href="/partners" onClick={() => setMobileMenuOpen(false)}>Integrations & Partners</MobileNavLink>
+                <MobileNavLink href="/whitepaper" onClick={() => setMobileMenuOpen(false)}>Vision & Roadmap</MobileNavLink>
+                <MobileNavLink href="/help" onClick={() => setMobileMenuOpen(false)}>Help Center</MobileNavLink>
               </div>
             </div>
           )}
@@ -218,6 +234,66 @@ function NavLink({ href, children }: { href: string; children: ReactNode }) {
     >
       {children}
     </a>
+  );
+}
+
+function NavDropdown({
+  label,
+  items,
+}: {
+  label: string;
+  items: { href: string; label: string; external?: boolean }[];
+}) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    const handleClickOutside = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [open]);
+
+  return (
+    <div ref={ref} className="relative" onMouseEnter={() => setOpen(true)} onMouseLeave={() => setOpen(false)}>
+      <button
+        type="button"
+        onClick={() => setOpen(true)}
+        aria-expanded={open}
+        className="px-3 py-2 text-sm font-bold text-teal-300 hover:text-white hover:bg-teal-500/20 rounded-lg transition-all flex items-center gap-1.5"
+      >
+        {label}
+        <svg className={`w-3.5 h-3.5 transition-transform ${open ? "rotate-180" : ""}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+        </svg>
+      </button>
+      {open && (
+        <div className="absolute left-0 top-full pt-2 w-56 z-50">
+          <div className="bg-slate-900 border border-teal-500/30 rounded-xl shadow-xl shadow-black/40 py-2 overflow-hidden">
+            {items.map((item) => (
+              <a
+                key={item.href}
+                href={item.href}
+                target={item.external ? "_blank" : undefined}
+                rel={item.external ? "noopener noreferrer" : undefined}
+                onClick={() => setOpen(false)}
+                className="block px-4 py-2.5 text-sm font-semibold text-teal-200 hover:text-white hover:bg-teal-500/10 transition-all"
+              >
+                {item.label}
+              </a>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function MobileSectionLabel({ children }: { children: ReactNode }) {
+  return (
+    <p className="px-4 pt-4 pb-1 text-xs font-bold uppercase tracking-wider text-teal-500/70">{children}</p>
   );
 }
 
