@@ -109,29 +109,26 @@ export default function AfterInstallPage() {
         </div>
       </section>
 
-      {/* Common Scenarios */}
+      {/* Real-World Signals */}
       <section className="bg-slate-900/50 rounded-2xl border border-teal-500/20 p-12">
-        <h2 className="text-3xl font-bold text-white mb-8">🧪 Test These Scenarios</h2>
-        
+        <h2 className="text-3xl font-bold text-white mb-8">🔎 What GENESIS looks for</h2>
+
         <div className="space-y-4">
           {[
             {
               icon: "✅",
-              title: "Safe: Token Swap on Uniswap",
-              desc: "Go to uniswap.org (real site), swap ETH for USDC. Should show ✅ ALLOW.",
-              expected: "Green verdict, no findings",
+              title: "Safe transactions",
+              desc: "A normal, legitimate transaction with no known issues shows a green verdict and no findings.",
             },
             {
               icon: "⚠️",
-              title: "Risky: Unlimited Token Approval",
-              desc: "Approve a token with unlimited amount (instead of specific amount). Should show ⚠️ WARN.",
-              expected: "Yellow verdict: 'Unlimited approval risk'",
+              title: "Risky permissions",
+              desc: "GENESIS may warn if a transaction requests broad or unnecessary token approvals that could expose your wallet.",
             },
             {
               icon: "🚫",
-              title: "Dangerous: Known Phishing Address",
-              desc: "Try to send tokens to a known scam address (if you have one). Should show 🚫 BLOCK.",
-              expected: "Red verdict: 'Community-flagged address'",
+              title: "Known threats",
+              desc: "If a destination or smart contract matches a known drainer, phishing pattern, or flagged address, GENESIS blocks it before you sign.",
             },
           ].map((scenario, i) => (
             <div key={i} className="bg-slate-800/50 border border-teal-500/10 rounded-lg p-6 space-y-3">
@@ -139,9 +136,6 @@ export default function AfterInstallPage() {
                 {scenario.icon} {scenario.title}
               </h3>
               <p className="text-slate-300">{scenario.desc}</p>
-              <div className="bg-slate-900/50 rounded p-3 text-sm text-teal-300">
-                <strong>Expected:</strong> {scenario.expected}
-              </div>
             </div>
           ))}
         </div>

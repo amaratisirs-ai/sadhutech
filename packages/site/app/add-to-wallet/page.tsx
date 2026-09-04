@@ -23,15 +23,15 @@ export default function AddToWallet() {
     },
     {
       id: "wallet-connect",
-      name: "Trust Wallet via WalletConnect",
-      description: "Connect Trust Wallet first, then expand to other supported wallets if needed.",
+      name: "WalletConnect",
+      description: "Connect supported mobile wallets using WalletConnect and test the real production flow.",
       icon: "🔗",
       badge: "Recommended",
       status: "ready",
       action: () => router.push("/wallet-connect"),
       details: [
         "Primary production path for non-MetaMask users",
-        "Starts with Trust Wallet onboarding",
+        "Works with supported mobile wallets",
         "Use the API Explorer to test real requests",
         "No MetaMask required",
       ],
@@ -42,22 +42,22 @@ export default function AddToWallet() {
     <div className="space-y-12">
       {/* Header */}
       <div className="text-center space-y-4">
-        <h1 className="text-5xl md:text-6xl font-black text-white">🛡️ Choose Your GENESIS Onboarding Path</h1>
+        <h1 className="text-5xl md:text-6xl font-black text-white">� Connect Wallet</h1>
         <p className="text-xl text-teal-200 max-w-2xl mx-auto">
-          Pick the path that matches your wallet: MetaMask Snap for MetaMask, or WalletConnect onboarding for supported mobile wallets starting with Trust Wallet.
+          Choose how you want to connect. MetaMask for desktop or WalletConnect for supported mobile wallets.
         </p>
       </div>
 
       <section className="bg-gradient-to-br from-indigo-900/30 to-slate-900 border-2 border-indigo-500/40 rounded-2xl p-6 max-w-4xl mx-auto space-y-3">
-        <h2 className="text-2xl font-bold text-white">Start here</h2>
+        <h2 className="text-2xl font-bold text-white">Select your wallet path</h2>
         <div className="grid md:grid-cols-2 gap-4 text-sm text-slate-200">
           <div className="rounded-xl border border-slate-700 bg-slate-950/40 p-4 space-y-2">
-            <p className="font-bold text-white">1. MetaMask Snap</p>
-            <p>Use this if you sign in MetaMask and want GENESIS inside the wallet.</p>
+            <p className="font-bold text-white">MetaMask</p>
+            <p>Best for desktop MetaMask users who want GENESIS inside the wallet.</p>
           </div>
           <div className="rounded-xl border border-slate-700 bg-slate-950/40 p-4 space-y-2">
-            <p className="font-bold text-white">2. Trust Wallet via WalletConnect</p>
-            <p>Use this to connect Trust Wallet first, then test the real production flow.</p>
+            <p className="font-bold text-white">WalletConnect</p>
+            <p>Best for mobile wallets like Trust Wallet, Rainbow, and other supported wallets.</p>
           </div>
         </div>
       </section>
@@ -163,7 +163,7 @@ export default function AddToWallet() {
       <section className="bg-slate-900/60 border border-teal-500/30 rounded-2xl p-6 max-w-3xl mx-auto space-y-3">
         <h2 className="text-2xl font-bold text-white">Recommended production flow</h2>
         <p className="text-sm text-slate-200">
-          If you are testing the real-world experience, start with Trust Wallet via WalletConnect. After connection, use the API Explorer to test transaction analysis and then expand to wallet-side integration if you want GENESIS inside the wallet app itself.
+          Use WalletConnect to connect your mobile wallet, then open the API Explorer to test transaction analysis and confirm the verdict before signing.
         </p>
       </section>
     </div>

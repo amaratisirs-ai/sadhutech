@@ -282,8 +282,8 @@ export default function WalletConnect() {
         <h1 className="text-5xl md:text-6xl font-black text-white">🔗 Connect your wallet</h1>
         <p className="text-xl text-teal-200 max-w-2xl mx-auto">
           {isMobile
-            ? "Step 1: connect your wallet. Step 2: review a transaction. Step 3: GENESIS checks it before you sign." 
-            : "Step 1: connect your wallet. Step 2: review the transaction. Step 3: GENESIS checks it before you sign."}
+            ? "Choose WalletConnect, pick your wallet, approve the session, then return to the browser to check the transaction." 
+            : "Choose WalletConnect, pick your wallet, approve the session, then return to the browser to check the transaction."}
         </p>
       </div>
 
@@ -321,8 +321,8 @@ export default function WalletConnect() {
         <div className="space-y-4">
           <h2 className="text-2xl font-bold text-white mb-4">📱 Available Wallets</h2>
           <div className="mb-3 rounded-xl border border-teal-500/30 bg-teal-500/10 p-4 text-sm text-slate-100">
-            <p className="font-semibold text-white">Recommended path: WalletConnect</p>
-            <p>Connect a supported mobile wallet, then continue to the transaction review flow once approval is complete.</p>
+            <p className="font-semibold text-white">WalletConnect path</p>
+            <p>Select your wallet below, approve the connection, and return to the browser to continue with transaction verification.</p>
           </div>
           <div className="grid grid-cols-2 gap-3 max-h-96 overflow-y-auto pr-2">
             {walletOptions.map((wallet) => (

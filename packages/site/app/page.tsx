@@ -111,10 +111,10 @@ export default function Home() {
                   href="/add-to-wallet"
                   className="px-8 py-4 bg-gradient-to-r from-teal-500 to-teal-400 text-slate-950 rounded-lg font-bold hover:shadow-xl transition-all hover:shadow-teal-500/50 text-lg"
                 >
-                  🔐 Choose Your Path
+                  🔐 Connect Wallet
                 </a>
                 <a
-                  href="/demo"
+                  href="/api-explorer"
                   className="px-8 py-4 bg-slate-800 text-white rounded-lg font-bold border-2 border-teal-500 hover:border-teal-400 hover:shadow-lg transition-all"
                 >
                   API Explorer
@@ -250,66 +250,66 @@ export default function Home() {
 
         <div className="grid md:grid-cols-3 gap-6">
           {/* Verify Transactions */}
-          <div className="group bg-gradient-to-br from-teal-900/50 to-slate-900 rounded-xl p-8 border-2 border-teal-400 space-y-4 hover:shadow-2xl hover:shadow-teal-500/40 hover:border-teal-300 transition-all">
-            <div className="w-14 h-14 bg-teal-500/40 rounded-lg flex items-center justify-center group-hover:bg-teal-500/60 transition">
-              <svg className="w-8 h-8 text-teal-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="group bg-slate-900/90 rounded-2xl border border-slate-700 p-8 space-y-5 transition-all hover:border-teal-400 hover:shadow-lg hover:shadow-teal-500/10">
+            <div className="w-14 h-14 bg-teal-500/10 border border-teal-500/30 rounded-xl flex items-center justify-center text-teal-400">
+              <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
               </svg>
             </div>
-            <h3 className="text-2xl font-bold text-teal-100">Verify Transactions</h3>
-            <p className="text-sm text-slate-100 font-medium">Analyze real transactions and get instant verdicts. No signup required.</p>
-            <div className="pt-4 space-y-2">
-              <p className="text-sm font-semibold text-teal-300">✓ Real verdicts</p>
-              <p className="text-sm font-semibold text-teal-300">✓ Any blockchain</p>
-              <p className="text-sm font-semibold text-teal-300">✓ Instant results</p>
+            <h3 className="text-2xl font-bold text-white">Verify Transactions</h3>
+            <p className="text-sm text-slate-300 font-medium">Analyze real transactions and get instant verdicts. No signup required.</p>
+            <div className="pt-2 space-y-2">
+              <p className="text-sm font-semibold text-slate-200">✓ Real verdicts</p>
+              <p className="text-sm font-semibold text-slate-200">✓ Any blockchain</p>
+              <p className="text-sm font-semibold text-slate-200">✓ Instant results</p>
             </div>
             <a
               href="/post"
-              className="inline-block mt-4 px-6 py-3 bg-teal-600 hover:bg-teal-500 text-white rounded-lg font-bold transition shadow-lg hover:shadow-teal-500/50"
+              className="inline-block mt-2 px-6 py-3 bg-teal-600 hover:bg-teal-500 text-white rounded-lg font-bold transition shadow-lg shadow-teal-900/30"
             >
               Verify Now →
             </a>
           </div>
 
           {/* Wallet Protection */}
-          <div className="group bg-gradient-to-br from-orange-900/50 to-slate-900 rounded-xl p-8 border-2 border-orange-400 space-y-4 hover:shadow-2xl hover:shadow-orange-500/40 hover:border-orange-300 transition-all">
-            <div className="w-14 h-14 bg-orange-500/40 rounded-lg flex items-center justify-center group-hover:bg-orange-500/60 transition">
-              <svg className="w-8 h-8 text-orange-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="group bg-slate-900/90 rounded-2xl border border-slate-700 p-8 space-y-5 transition-all hover:border-teal-400 hover:shadow-lg hover:shadow-teal-500/10">
+            <div className="w-14 h-14 bg-slate-800 border border-slate-600 rounded-xl flex items-center justify-center text-teal-400">
+              <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
               </svg>
             </div>
-            <h3 className="text-2xl font-bold text-orange-100">Wallet Protection</h3>
-            <p className="text-sm text-slate-100 font-medium">Add GENESIS to your wallet for automatic threat detection on every transaction.</p>
-            <div className="pt-4 space-y-2">
-              <p className="text-sm font-semibold text-orange-300">✓ Multi-wallet support</p>
-              <p className="text-sm font-semibold text-orange-300">✓ One-click installation</p>
-              <p className="text-sm font-semibold text-green-400">✓ Available now</p>
+            <h3 className="text-2xl font-bold text-white">Wallet Protection</h3>
+            <p className="text-sm text-slate-300 font-medium">Add GENESIS to your wallet for automatic threat detection on every transaction.</p>
+            <div className="pt-2 space-y-2">
+              <p className="text-sm font-semibold text-slate-200">✓ Multi-wallet support</p>
+              <p className="text-sm font-semibold text-slate-200">✓ One-click installation</p>
+              <p className="text-sm font-semibold text-slate-200">✓ Available now</p>
             </div>
             <a
               href="/add-to-wallet"
-              className="inline-block mt-4 px-6 py-3 bg-orange-600 hover:bg-orange-500 text-white rounded-lg font-bold transition shadow-lg hover:shadow-orange-500/50"
+              className="inline-block mt-2 px-6 py-3 bg-slate-800 border border-slate-600 hover:border-teal-400 text-white rounded-lg font-bold transition"
             >
               Get Started →
             </a>
           </div>
 
           {/* API Integration */}
-          <div className="group bg-gradient-to-br from-indigo-900/50 to-slate-900 rounded-xl p-8 border-2 border-indigo-400 space-y-4 hover:shadow-2xl hover:shadow-indigo-500/40 hover:border-indigo-300 transition-all">
-            <div className="w-14 h-14 bg-indigo-500/40 rounded-lg flex items-center justify-center group-hover:bg-indigo-500/60 transition">
-              <svg className="w-8 h-8 text-indigo-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="group bg-slate-900/90 rounded-2xl border border-slate-700 p-8 space-y-5 transition-all hover:border-teal-400 hover:shadow-lg hover:shadow-teal-500/10">
+            <div className="w-14 h-14 bg-slate-800 border border-slate-600 rounded-xl flex items-center justify-center text-teal-400">
+              <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 20l4-16m4 4l4 4m0 0l-4 4m4-4H3" />
               </svg>
             </div>
-            <h3 className="text-2xl font-bold text-indigo-100">API Integration</h3>
-            <p className="text-sm text-slate-100 font-medium">For developers. Build safer wallets and dapps with our HTTP API.</p>
-            <div className="pt-4 space-y-2">
-              <p className="text-sm font-semibold text-indigo-300">✓ Production-ready</p>
-              <p className="text-sm font-semibold text-indigo-300">✓ Full documentation</p>
-              <p className="text-sm font-semibold text-indigo-300">✓ Available now</p>
+            <h3 className="text-2xl font-bold text-white">API Integration</h3>
+            <p className="text-sm text-slate-300 font-medium">For developers. Build safer wallets and dapps with our HTTP API.</p>
+            <div className="pt-2 space-y-2">
+              <p className="text-sm font-semibold text-slate-200">✓ Production-ready</p>
+              <p className="text-sm font-semibold text-slate-200">✓ Full documentation</p>
+              <p className="text-sm font-semibold text-slate-200">✓ Available now</p>
             </div>
             <a
               href="/api-explorer"
-              className="inline-block mt-4 px-6 py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg font-bold transition shadow-lg hover:shadow-indigo-500/50"
+              className="inline-block mt-2 px-6 py-3 bg-slate-800 border border-slate-600 hover:border-teal-400 text-white rounded-lg font-bold transition"
             >
               Explore API →
             </a>
