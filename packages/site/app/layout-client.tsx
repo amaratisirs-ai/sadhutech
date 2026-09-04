@@ -31,11 +31,7 @@ export function LayoutClient({ children }: { children: ReactNode }) {
             <div className="flex items-center gap-4 md:gap-8">
               {/* Logo */}
               <a href="/" className="flex items-center gap-3 group" onClick={() => setMobileMenuOpen(false)}>
-                <img
-                  src="/logo.png"
-                  alt="GENESIS"
-                  className="w-10 h-10 object-contain group-hover:drop-shadow-[0_0_8px_rgba(45,212,191,0.6)] transition-all"
-                />
+                <img src="/logo.png" alt="GENESIS" className="w-14 h-14 object-contain" />
                 <span className="text-xl font-bold text-white hidden sm:inline">GENESIS</span>
               </a>
 
