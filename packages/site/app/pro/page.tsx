@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Icon } from "@/components/Icon";
 import { QRCodeCanvas } from "qrcode.react";
 
@@ -14,7 +14,11 @@ const CONFIGURED = PAYMENT_ADDRESS.length === 42;
 
 type WalletProvider = {
   request: (args: { method: string; params?: unknown[] }) => Promise<unknown>;
+  disconnect?: () => Promise<void>;
+  session?: unknown;
 };
+
+const MANUAL_DISCONNECT_KEY = "genesis_pro_disconnected";
 
 function short(a: string) {
   return a ? `${a.slice(0, 6)}…${a.slice(-4)}` : "";
@@ -29,12 +33,15 @@ export default function ProPage() {
   const [error, setError] = useState<string>("");
   const [walletConnectUri, setWalletConnectUri] = useState<string | null>(null);
   const [verifyAttempt, setVerifyAttempt] = useState(0);
+  const wcProviderRef = useRef<WalletProvider | null>(null);
 
   const eth = (): WalletProvider | null => (typeof window !== "undefined" ? (window as any).ethereum ?? null : null);
 
   const getWalletProvider = async (): Promise<WalletProvider | null> => {
     const injected = eth();
     if (injected) return injected;
+
+    if (wcProviderRef.current) return wcProviderRef.current;
 
     const projectId = process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID;
     if (!projectId) return null;
@@ -58,7 +65,8 @@ export default function ProPage() {
       });
       provider.on("display_uri", (uri: string) => setWalletConnectUri(uri));
       provider.on("connect", () => setWalletConnectUri(null));
-      return provider as unknown as WalletProvider;
+      wcProviderRef.current = provider as unknown as WalletProvider;
+      return wcProviderRef.current;
     } catch {
       return null;
     }
@@ -74,6 +82,7 @@ export default function ProPage() {
   };
 
   useEffect(() => {
+    if (typeof window !== "undefined" && localStorage.getItem(MANUAL_DISCONNECT_KEY) === "1") return;
     getWalletProvider()
       .then((e) => e?.request({ method: "eth_accounts" }))
       .then((accts) => {
@@ -89,7 +98,7 @@ export default function ProPage() {
   const connect = async () => {
     const e = await getWalletProvider();
     if (!e) {
-      window.location.href = "/wallet-connect?change=1&returnTo=%2Fpro";
+      window.location.href = "/wallet-connect?change=1&disconnect=1&returnTo=%2Fpro";
       return;
     }
     setBusy("connecting");
@@ -100,6 +109,7 @@ export default function ProPage() {
       if (!Array.isArray(accts)) throw new Error("Wallet did not return an account.");
       const addr = (accts?.[0] || "").toLowerCase();
       if (!addr) throw new Error("Wallet did not return an account.");
+      localStorage.removeItem(MANUAL_DISCONNECT_KEY);
       setAccount(addr);
       setWalletConnectUri(null);
       await loadCredits(addr);
@@ -165,9 +175,23 @@ export default function ProPage() {
     return false;
   };
 
-  const disconnect = () => {
+  const disconnect = async () => {
+    localStorage.setItem(MANUAL_DISCONNECT_KEY, "1");
     localStorage.removeItem("genesis_wallet_session");
-    window.location.href = "/pro";
+    const wc = wcProviderRef.current;
+    if (wc?.session && wc.disconnect) {
+      try {
+        await wc.disconnect();
+      } catch {
+        // Best-effort; local state is cleared regardless.
+      }
+    }
+    wcProviderRef.current = null;
+    setAccount(null);
+    setCredits(0);
+    setMessage("");
+    setError("");
+    setWalletConnectUri(null);
   };
 
   const pay = async () => {
@@ -267,7 +291,7 @@ export default function ProPage() {
             <span className="text-slate-400">Wallet</span>
             <div className="flex items-center gap-3">
               <span className="font-mono text-white">{short(account)}</span>
-              <a href="/wallet-connect?change=1&returnTo=%2Fpro" className="text-xs font-semibold text-teal-300 hover:text-white hover:underline">Change wallet</a>
+              <a href="/wallet-connect?change=1&disconnect=1&returnTo=%2Fpro" className="text-xs font-semibold text-teal-300 hover:text-white hover:underline">Change wallet</a>
               <button type="button" onClick={disconnect} className="text-xs font-semibold text-rose-300 hover:text-white hover:underline">Disconnect</button>
             </div>
           </div>
