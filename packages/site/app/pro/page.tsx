@@ -167,7 +167,7 @@ export default function ProPage() {
 
   const disconnect = () => {
     localStorage.removeItem("genesis_wallet_session");
-    window.location.href = "/wallet-connect?change=1&disconnect=1";
+    window.location.href = "/wallet-connect?change=1&disconnect=1&returnTo=%2Fpro";
   };
 
   const pay = async () => {
@@ -267,7 +267,7 @@ export default function ProPage() {
             <span className="text-slate-400">Wallet</span>
             <div className="flex items-center gap-3">
               <span className="font-mono text-white">{short(account)}</span>
-              <a href="/wallet-connect?change=1" className="text-xs font-semibold text-teal-300 hover:text-white hover:underline">Change wallet</a>
+              <a href="/wallet-connect?change=1&returnTo=%2Fpro" className="text-xs font-semibold text-teal-300 hover:text-white hover:underline">Change wallet</a>
               <button type="button" onClick={disconnect} className="text-xs font-semibold text-rose-300 hover:text-white hover:underline">Disconnect</button>
             </div>
           </div>

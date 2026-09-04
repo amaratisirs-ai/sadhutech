@@ -128,6 +128,11 @@ export default function WalletConnect() {
   };
 
   const continueToExplorer = (wallet: WalletOption, account: string | null, chainId: number = 1) => {
+    const returnTo = new URLSearchParams(window.location.search).get("returnTo");
+    if (returnTo === "/pro") {
+      router.push("/pro");
+      return;
+    }
     const connectedAccount = account ?? "";
     const target = `/connected?wallet=${encodeURIComponent(wallet.name)}&account=${encodeURIComponent(connectedAccount)}&chainId=${encodeURIComponent(chainId)}`;
     router.push(target);
@@ -147,6 +152,10 @@ export default function WalletConnect() {
     const stored = localStorage.getItem("genesis_wallet_session");
     const parsedStored = stored ? JSON.parse(stored) : null;
     if (parsedStored?.status === "connected" && parsedStored.account) {
+      if (params.get("returnTo") === "/pro") {
+        router.replace("/pro");
+        return;
+      }
       const walletName = parsedStored.wallet || "WalletConnect";
       const target = `/connected?wallet=${encodeURIComponent(walletName)}&account=${encodeURIComponent(parsedStored.account)}&chainId=${encodeURIComponent(parsedStored.chainId ?? 1)}`;
       router.replace(target);
