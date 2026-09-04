@@ -89,7 +89,7 @@ export default function ProPage() {
   const connect = async () => {
     const e = await getWalletProvider();
     if (!e) {
-      setError("No connected wallet found. Connect with WalletConnect first, or open this page in a browser wallet.");
+      window.location.href = "/wallet-connect?change=1&returnTo=%2Fpro";
       return;
     }
     setBusy("connecting");
