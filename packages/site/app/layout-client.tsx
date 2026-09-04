@@ -30,7 +30,7 @@ export function LayoutClient({ children }: { children: ReactNode }) {
                 <NavLink href="/community">Community</NavLink>
                 <NavLink href="/report">Report</NavLink>
                 <NavLink href="/help">Help</NavLink>
-                <NavLink href="/api-explorer">API Docs</NavLink>
+                <NavLink href="/transaction-check">Transaction Check</NavLink>
               </div>
             </div>
 
@@ -87,7 +87,7 @@ export function LayoutClient({ children }: { children: ReactNode }) {
                 <MobileNavLink href="/community" onClick={() => setMobileMenuOpen(false)}>Community</MobileNavLink>
                 <MobileNavLink href="/report" onClick={() => setMobileMenuOpen(false)}>Report</MobileNavLink>
                 <MobileNavLink href="/help" onClick={() => setMobileMenuOpen(false)}>Help</MobileNavLink>
-                <MobileNavLink href="/api-explorer" onClick={() => setMobileMenuOpen(false)}>API Docs</MobileNavLink>
+                <MobileNavLink href="/transaction-check" onClick={() => setMobileMenuOpen(false)}>Transaction Check</MobileNavLink>
                 <a
                   href="/add-to-wallet"
                   className="block w-full px-4 py-2.5 text-sm font-bold text-slate-950 bg-teal-400 hover:bg-teal-300 rounded-lg transition-all text-center mt-4"
@@ -141,7 +141,7 @@ export function LayoutClient({ children }: { children: ReactNode }) {
               <h4 className="font-bold text-white mb-4">Support</h4>
               <ul className="space-y-2 text-sm text-teal-300">
                 <li><a href="/help" className="hover:text-white transition">Help Center</a></li>
-                <li><a href="/api-explorer" className="hover:text-white transition">API Docs</a></li>
+                <li><a href="/transaction-check" className="hover:text-white transition">Transaction Check</a></li>
                 <li><a href="mailto:support@genesis.com" className="hover:text-white transition">Email Support</a></li>
               </ul>
             </div>

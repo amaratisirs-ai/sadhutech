@@ -114,10 +114,10 @@ export default function Home() {
                   🔐 Connect Wallet
                 </a>
                 <a
-                  href="/api-explorer"
+                  href="/transaction-check"
                   className="px-8 py-4 bg-slate-800 text-white rounded-lg font-bold border-2 border-teal-500 hover:border-teal-400 hover:shadow-lg transition-all"
                 >
-                  API Explorer
+                  Check a Transaction
                 </a>
               </div>
             </div>
@@ -308,10 +308,10 @@ export default function Home() {
               <p className="text-sm font-semibold text-slate-200">✓ Available now</p>
             </div>
             <a
-              href="/api-explorer"
+              href="/transaction-check"
               className="inline-block mt-2 px-6 py-3 bg-slate-800 border border-slate-600 hover:border-teal-400 text-white rounded-lg font-bold transition"
             >
-              Explore API →
+              Check a Transaction →
             </a>
           </div>
         </div>
@@ -546,10 +546,10 @@ export default function Home() {
               bot.
             </p>
             <a
-              href="/api-explorer"
+              href="/transaction-check"
               className="inline-block bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-700 dark:hover:bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition"
             >
-              Try API Explorer →
+              Check a Transaction →
             </a>
           </div>
         </div>
@@ -756,10 +756,10 @@ export default function Home() {
         <p className="text-slate-600 dark:text-slate-400 text-lg">Join thousands of crypto users already using GENESIS</p>
         <div className="flex gap-4 justify-center flex-wrap">
           <a
-            href="/api-explorer"
+            href="/transaction-check"
             className="px-8 py-4 bg-gradient-to-r from-indigo-600 to-indigo-600 text-white rounded-lg font-semibold hover:shadow-xl transition-all hover:scale-105"
           >
-            Open API Explorer
+            Check a Transaction
           </a>
           <a
             href="https://github.com/amaratisirs-ai/sadhutech"

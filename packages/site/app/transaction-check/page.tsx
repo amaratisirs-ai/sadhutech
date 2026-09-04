@@ -6,7 +6,8 @@ import { resolveDecisionOutcome } from "../../src/decision";
 
 function APIExplorerContent() {
   const searchParams = useSearchParams();
-  const [gateUrl, setGateUrl] = useState("https://genesis-gate.onrender.com");
+  // Configurable for local dev via env, but not exposed in the UI (adds no user value).
+  const gateUrl = process.env.NEXT_PUBLIC_GATE_URL || "https://genesis-gate.onrender.com";
   const [connectedWallet, setConnectedWallet] = useState<{ wallet: string; account: string; chainId: number } | null>(null);
   const [request, setRequest] = useState(
     JSON.stringify(
@@ -93,6 +94,16 @@ function APIExplorerContent() {
     setConnectedWallet(null);
     setError("No wallet session detected. Connect a wallet first to continue to the transaction check.");
   }, [searchParams]);
+
+  const handleDisconnect = () => {
+    localStorage.removeItem("genesis_wallet_session");
+    setConnectedWallet(null);
+    setDecision(null);
+    setSignatureState("idle");
+    setResponse("");
+    // Route through the connect page so the live WalletConnect session is torn down too.
+    window.location.href = "/wallet-connect?change=1&disconnect=1";
+  };
 
   const applyConnectedWalletToRequest = () => {
     if (!connectedWallet) {
@@ -195,22 +206,6 @@ function APIExplorerContent() {
         </div>
       </div>
 
-      {/* Gate URL Config */}
-      <div className="bg-slate-900 rounded-lg border-2 border-teal-500/50 p-6 space-y-3">
-        <label className="block text-sm font-bold text-white">Gate Server URL</label>
-        <input
-          type="text"
-          value={gateUrl}
-          onChange={(e) => setGateUrl(e.target.value)}
-          className="w-full px-4 py-3 border-2 border-teal-500/30 bg-slate-800 rounded-lg text-sm font-mono focus:border-teal-400 focus:ring-2 focus:ring-teal-500/30 text-white"
-        />
-        <p className="text-xs text-slate-400">
-          💡 Default: <code className="bg-slate-800 px-2 py-1 rounded text-teal-400">https://genesis-gate.onrender.com</code>
-          <br />
-          Override only for local development if needed.
-        </p>
-      </div>
-
       <div className="bg-gradient-to-r from-emerald-900/40 to-slate-900 border-2 border-emerald-500/50 rounded-xl p-5 space-y-3">
         <div className="flex items-center justify-between gap-4 flex-wrap">
           <div>
@@ -218,9 +213,18 @@ function APIExplorerContent() {
             <h2 className="text-2xl font-bold text-white">{connectedWallet ? connectedWallet.wallet : "No wallet connected"}</h2>
           </div>
           {connectedWallet ? (
-            <a href="/wallet-connect" className="px-4 py-2 rounded-lg border border-emerald-500/50 text-emerald-100 bg-emerald-500/10 hover:bg-emerald-500/20 transition text-sm font-semibold">
-              Change wallet
-            </a>
+            <div className="flex gap-2 flex-wrap">
+              <a href="/wallet-connect?change=1" className="px-4 py-2 rounded-lg border border-emerald-500/50 text-emerald-100 bg-emerald-500/10 hover:bg-emerald-500/20 transition text-sm font-semibold">
+                Change wallet
+              </a>
+              <button
+                type="button"
+                onClick={handleDisconnect}
+                className="px-4 py-2 rounded-lg border border-rose-500/50 text-rose-100 bg-rose-500/10 hover:bg-rose-500/20 transition text-sm font-semibold"
+              >
+                Disconnect
+              </button>
+            </div>
           ) : (
             <a href="/wallet-connect" className="px-4 py-2 rounded-lg border border-slate-500 text-slate-100 bg-slate-800 hover:bg-slate-700 transition text-sm font-semibold">
               Connect wallet
@@ -611,7 +615,7 @@ const verdict = await res.json();`}</pre>
 
 export default function APIExplorerPage() {
   return (
-    <Suspense fallback={<div className="p-8 text-slate-300">Loading API Explorer…</div>}>
+    <Suspense fallback={<div className="p-8 text-slate-300">Loading transaction check…</div>}>
       <APIExplorerContent />
     </Suspense>
   );

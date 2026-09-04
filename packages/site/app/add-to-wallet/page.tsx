@@ -32,7 +32,7 @@ export default function AddToWallet() {
       details: [
         "Primary production path for non-MetaMask users",
         "Works with supported mobile wallets",
-        "Use the API Explorer to test real requests",
+        "Use the transaction check to test real requests",
         "No MetaMask required",
       ],
     },
@@ -163,7 +163,7 @@ export default function AddToWallet() {
       <section className="bg-slate-900/60 border border-teal-500/30 rounded-2xl p-6 max-w-3xl mx-auto space-y-3">
         <h2 className="text-2xl font-bold text-white">Recommended production flow</h2>
         <p className="text-sm text-slate-200">
-          Use WalletConnect to connect your mobile wallet, then open the API Explorer to test transaction analysis and confirm the verdict before signing.
+          Use WalletConnect to connect your mobile wallet, then open the transaction check to test transaction analysis and confirm the verdict before signing.
         </p>
       </section>
     </div>

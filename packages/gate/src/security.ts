@@ -147,18 +147,19 @@ export function validateAnalyzeRequest(body: unknown): ValidationError[] {
     });
   }
 
-  // Validate value (should be string for BigInt safety)
-  if (typeof tx.value !== "string" && typeof tx.value !== "number") {
-    errors.push({
-      field: "tx.value",
-      error: `Invalid 'value': must be a string or number. Got: ${typeof tx.value}`,
-    });
-  }
-  if (typeof tx.value === "string" && !isValidHex(tx.value) && isNaN(Number(tx.value))) {
-    errors.push({
-      field: "tx.value",
-      error: `Invalid 'value': must be hex (0x...) or decimal number. Got: ${tx.value}`,
-    });
+  // Validate value (optional; defaults to 0 when omitted, but if present must be a string or number)
+  if (tx.value !== undefined && tx.value !== null) {
+    if (typeof tx.value !== "string" && typeof tx.value !== "number") {
+      errors.push({
+        field: "tx.value",
+        error: `Invalid 'value': must be a string or number. Got: ${typeof tx.value}`,
+      });
+    } else if (typeof tx.value === "string" && !isValidHex(tx.value) && isNaN(Number(tx.value))) {
+      errors.push({
+        field: "tx.value",
+        error: `Invalid 'value': must be hex (0x...) or decimal number. Got: ${tx.value}`,
+      });
+    }
   }
 
   // Validate data (optional, but if present must be hex)

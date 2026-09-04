@@ -11,11 +11,11 @@ export default function HelpPage() {
       questions: [
         {
           q: "Where do I install GENESIS Snap?",
-          a: "If you use MetaMask, go to /snap-install. If you use a supported mobile wallet, go to /wallet-connect. For a real transaction test, use /api-explorer.",
+          a: "If you use MetaMask, go to /snap-install. If you use a supported mobile wallet, go to /wallet-connect. For a real transaction test, use /transaction-check.",
         },
         {
           q: "Which onboarding path should I use?",
-          a: "MetaMask users should install the Snap. WalletConnect users should start with the wallet-connect flow. Developers can use the API Explorer to test real requests.",
+          a: "MetaMask users should install the Snap. WalletConnect users should start with the wallet-connect flow. Developers can use the transaction check to test real requests.",
         },
         {
           q: "What are the system requirements?",

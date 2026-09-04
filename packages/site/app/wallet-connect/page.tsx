@@ -2,8 +2,36 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { QRCodeCanvas } from "qrcode.react";
+
+// Only request what every EVM wallet can fulfil. Non-universal methods (eth_sign,
+// typed-data, chain switching) go in optionalMethods so wallets like Trust Wallet
+// don't reject the whole session proposal. wallet_requestSnaps is MetaMask-only and
+// must never be required here.
+const REQUIRED_METHODS = ["eth_sendTransaction", "personal_sign"];
+const OPTIONAL_METHODS = [
+  "eth_sign",
+  "eth_signTypedData",
+  "eth_signTypedData_v4",
+  "eth_accounts",
+  "eth_chainId",
+  "wallet_switchEthereumChain",
+  "wallet_addEthereumChain",
+];
+
+function getProviderAccount(provider: any): string | null {
+  const accounts = Array.isArray(provider?.accounts) ? provider.accounts : [];
+  if (accounts[0]) return accounts[0];
+  const nsAccount = provider?.session?.namespaces?.eip155?.accounts?.[0];
+  return nsAccount ? nsAccount.split(":").slice(-1)[0] : null;
+}
+
+function getProviderChainId(provider: any): number {
+  const raw = provider?.chainId;
+  const parsed = typeof raw === "string" ? parseInt(raw, 10) : raw;
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : 1;
+}
 
 interface WalletOption {
   id: string;
@@ -31,6 +59,12 @@ export default function WalletConnect() {
   });
   const [provider, setProvider] = useState<any>(null);
   const [isMobile, setIsMobile] = useState(false);
+  const selectedWalletRef = useRef<WalletOption | null>(null);
+  const hasFinalizedRef = useRef(false);
+
+  useEffect(() => {
+    selectedWalletRef.current = selectedWallet;
+  }, [selectedWallet]);
 
   const walletOptions: WalletOption[] = [
     { id: "trust", name: "Trust Wallet", icon: "🔵", chain: "EVM" },
@@ -72,11 +106,10 @@ export default function WalletConnect() {
     ["trust", "rainbow", "metamask", "coinbase"].includes(wallet.id);
 
   const getQrValue = (wallet: WalletOption | null, uri: string | null) => {
-    if (!wallet || !uri) {
-      return uri;
-    }
-
-    return getWalletLaunchUrl(wallet, uri);
+    // WalletConnect QR codes must contain the raw wc: URI so any wallet's built-in
+    // scanner can parse it. Wallet-specific universal links are only for tap-to-open
+    // deep linking on mobile, never for QR content.
+    return uri;
   };
 
   const persistWalletSession = (wallet: WalletOption, account: string | null, chainId: number = 1, status: "pending" | "connected" = "connected") => {
@@ -92,24 +125,38 @@ export default function WalletConnect() {
     );
   };
 
-  const continueToExplorer = (wallet: WalletOption, account: string | null) => {
+  const continueToExplorer = (wallet: WalletOption, account: string | null, chainId: number = 1) => {
     const connectedAccount = account ?? "";
-    const target = `/api-explorer?wallet=${encodeURIComponent(wallet.name)}&account=${encodeURIComponent(connectedAccount)}&chainId=1`;
+    const target = `/connected?wallet=${encodeURIComponent(wallet.name)}&account=${encodeURIComponent(connectedAccount)}&chainId=${encodeURIComponent(chainId)}`;
     router.push(target);
   };
 
   useEffect(() => {
-    const stored = typeof window !== "undefined" ? localStorage.getItem("genesis_wallet_session") : null;
+    if (typeof window === "undefined") {
+      return;
+    }
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("change") === "1") {
+      // User explicitly asked to switch/reconnect: clear any stale session so this
+      // page doesn't immediately bounce back to the explorer.
+      localStorage.removeItem("genesis_wallet_session");
+      return;
+    }
+    const stored = localStorage.getItem("genesis_wallet_session");
     const parsedStored = stored ? JSON.parse(stored) : null;
     if (parsedStored?.status === "connected" && parsedStored.account) {
       const walletName = parsedStored.wallet || "WalletConnect";
-      const target = `/api-explorer?wallet=${encodeURIComponent(walletName)}&account=${encodeURIComponent(parsedStored.account)}&chainId=${encodeURIComponent(parsedStored.chainId ?? 1)}`;
+      const target = `/connected?wallet=${encodeURIComponent(walletName)}&account=${encodeURIComponent(parsedStored.account)}&chainId=${encodeURIComponent(parsedStored.chainId ?? 1)}`;
       router.replace(target);
     }
   }, [router]);
 
-  const finalizeWalletConnection = (wallet: WalletOption, account: string | null) => {
-    persistWalletSession(wallet, account, 1, "connected");
+  const finalizeWalletConnection = (wallet: WalletOption, account: string | null, chainId: number = 1) => {
+    if (hasFinalizedRef.current) {
+      return;
+    }
+    hasFinalizedRef.current = true;
+    persistWalletSession(wallet, account, chainId, "connected");
     setIsConnecting(false);
     setConnectionState((prev) => ({
       ...prev,
@@ -118,8 +165,23 @@ export default function WalletConnect() {
     }));
 
     window.setTimeout(() => {
-      continueToExplorer(wallet, account);
+      continueToExplorer(wallet, account, chainId);
     }, 1000);
+  };
+
+  const handleDisconnect = async () => {
+    try {
+      if (provider?.session) {
+        await provider.disconnect();
+      }
+    } catch {
+      // Ignore disconnect errors; we still clear local state below.
+    }
+    hasFinalizedRef.current = false;
+    localStorage.removeItem("genesis_wallet_session");
+    setSelectedWallet(null);
+    setIsConnecting(false);
+    setConnectionState((prev) => ({ ...prev, uri: null, connectionApproved: false, error: null }));
   };
 
   // Detect mobile on mount
@@ -134,6 +196,8 @@ export default function WalletConnect() {
   }, []);
 
   useEffect(() => {
+    let cleanup = () => {};
+
     const initWalletConnect = async () => {
       try {
         const projectId = process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID;
@@ -141,20 +205,23 @@ export default function WalletConnect() {
           setConnectionState({
             uri: null,
             connectionApproved: false,
-            error: "WalletConnect Project ID not configured",
+            error: "WalletConnect is not configured. Set NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID.",
             isInitialized: false,
           });
           return;
         }
 
-        console.log("Initializing WalletConnect EthereumProvider...");
         const { EthereumProvider } = await import("@walletconnect/ethereum-provider");
 
         const ethereumProvider = await EthereumProvider.init({
           projectId,
-          chains: [1, 137, 42161, 10, 43114],
+          // Require only Ethereum; the rest are optional so wallets that don't
+          // support every chain still accept the session proposal.
+          chains: [1],
+          optionalChains: [137, 42161, 10, 43114],
           showQrModal: false,
-          methods: ["eth_sendTransaction", "eth_signMessage", "eth_sign", "wallet_requestSnaps"],
+          methods: REQUIRED_METHODS,
+          optionalMethods: OPTIONAL_METHODS,
           events: ["chainChanged", "accountsChanged"],
           metadata: {
             name: "GENESIS Firewall",
@@ -166,102 +233,113 @@ export default function WalletConnect() {
 
         setProvider(ethereumProvider);
 
-        const restoreIfConnected = () => {
-          const activeWallet = selectedWallet ?? { id: "walletconnect", name: "WalletConnect", icon: "🔗", chain: "EVM" };
-          const accounts = Array.isArray((ethereumProvider as any)?.accounts) ? (ethereumProvider as any).accounts : [];
-          const connectedAccount = accounts[0] ?? (ethereumProvider as any)?.session?.namespaces?.eip155?.accounts?.[0]?.split(":").slice(-1)?.[0] ?? null;
-
-          if (connectedAccount) {
-            finalizeWalletConnection(activeWallet, connectedAccount);
-            return true;
+        // Tear down any lingering relay session when the user explicitly disconnected.
+        if (typeof window !== "undefined") {
+          const params = new URLSearchParams(window.location.search);
+          if (params.get("disconnect") === "1" && ethereumProvider.session) {
+            try {
+              await ethereumProvider.disconnect();
+            } catch {
+              // ignore; local session is already cleared
+            }
           }
-
-          const stored = localStorage.getItem("genesis_wallet_session");
-          const parsedStored = stored ? JSON.parse(stored) : null;
-          if (parsedStored?.status === "connected" && parsedStored.account) {
-            const walletName = parsedStored.wallet || "WalletConnect";
-            const walletFromStorage = { id: "walletconnect", name: walletName, icon: "🔗", chain: "EVM" };
-            finalizeWalletConnection(walletFromStorage, parsedStored.account);
-            return true;
-          }
-
-          return false;
-        };
-
-        if (restoreIfConnected()) {
-          return;
         }
 
-        ethereumProvider.on("connect", () => {
-          console.log("✅ Provider connected");
-          const accounts = (ethereumProvider as any)?.accounts ?? (ethereumProvider as any)?.session?.accounts ?? [];
-          const connectedAccount = Array.isArray(accounts) ? accounts[0] : null;
-          if (selectedWallet) {
-            finalizeWalletConnection(selectedWallet, connectedAccount);
+        const handleConnect = () => {
+          const account = getProviderAccount(ethereumProvider);
+          const chainId = getProviderChainId(ethereumProvider);
+          const wallet = selectedWalletRef.current ?? { id: "walletconnect", name: "WalletConnect", icon: "🔗", chain: "EVM" };
+          if (account) {
+            finalizeWalletConnection(wallet, account, chainId);
           } else {
             setConnectionState((prev) => ({ ...prev, connectionApproved: true, error: null }));
           }
-        });
+        };
 
-        ethereumProvider.on("disconnect", () => {
-          console.log("❌ Provider disconnected");
+        const handleDisconnectEvent = () => {
+          hasFinalizedRef.current = false;
           setIsConnecting(false);
-        });
+          setConnectionState((prev) => ({ ...prev, uri: null, connectionApproved: false }));
+        };
 
-        ethereumProvider.on("display_uri", (uri: string) => {
-          console.log("📱 QR URI:", uri);
+        const handleUri = (uri: string) => {
           setConnectionState((prev) => ({ ...prev, uri }));
-        });
+        };
 
-        setConnectionState((prev) => ({ ...prev, isInitialized: true }));
-        console.log("✅ WalletConnect initialized");
+        const handleChainChanged = () => {
+          const stored = localStorage.getItem("genesis_wallet_session");
+          if (!stored) return;
+          try {
+            const parsed = JSON.parse(stored);
+            parsed.chainId = getProviderChainId(ethereumProvider);
+            localStorage.setItem("genesis_wallet_session", JSON.stringify(parsed));
+          } catch {
+            // ignore malformed session
+          }
+        };
+
+        ethereumProvider.on("connect", handleConnect);
+        ethereumProvider.on("disconnect", handleDisconnectEvent);
+        ethereumProvider.on("display_uri", handleUri);
+        ethereumProvider.on("chainChanged", handleChainChanged);
+
+        cleanup = () => {
+          ethereumProvider.removeListener("connect", handleConnect);
+          ethereumProvider.removeListener("disconnect", handleDisconnectEvent);
+          ethereumProvider.removeListener("display_uri", handleUri);
+          ethereumProvider.removeListener("chainChanged", handleChainChanged);
+        };
+
+        setConnectionState((prev) => ({ ...prev, isInitialized: true, error: null }));
       } catch (error) {
-        console.error("❌ Init failed:", error);
         setConnectionState({
           uri: null,
           connectionApproved: false,
-          error: error instanceof Error ? error.message : "Failed to initialize",
+          error: error instanceof Error ? error.message : "Failed to initialize WalletConnect",
           isInitialized: false,
         });
       }
     };
 
     initWalletConnect();
-  }, [isMobile]);
+
+    return () => cleanup();
+  }, []);
 
   const handleWalletSelect = async (wallet: WalletOption) => {
     if (!provider || !connectionState.isInitialized) {
-      setConnectionState((prev) => ({ ...prev, error: "Not initialized" }));
+      setConnectionState((prev) => ({ ...prev, error: "WalletConnect is still initializing. Try again in a moment." }));
       return;
     }
 
+    hasFinalizedRef.current = false;
     setSelectedWallet(wallet);
     setIsConnecting(true);
     setConnectionState((prev) => ({ ...prev, uri: null, connectionApproved: false, error: null }));
     persistWalletSession(wallet, null, 1, "pending");
 
     try {
-      console.log(`Connecting with ${wallet.name}...`);
-      const accounts = await provider.connect();
-      const connectedAccount = Array.isArray(accounts) ? accounts[0] : accounts?.[0] ?? null;
-      console.log("Connected:", accounts);
+      // Reuse an existing live session instead of proposing a new one.
+      if (provider.session && getProviderAccount(provider)) {
+        finalizeWalletConnection(wallet, getProviderAccount(provider), getProviderChainId(provider));
+        return;
+      }
+
+      const accounts = await provider.enable();
+      const connectedAccount = (Array.isArray(accounts) ? accounts[0] : null) ?? getProviderAccount(provider);
+      const chainId = getProviderChainId(provider);
 
       if (connectedAccount) {
-        finalizeWalletConnection(wallet, connectedAccount);
+        finalizeWalletConnection(wallet, connectedAccount, chainId);
         return;
       }
 
       setIsConnecting(false);
       setConnectionState((prev) => ({
         ...prev,
-        connectionApproved: true,
+        error: "Wallet connected but shared no account. Please reconnect and approve account access.",
       }));
-
-      window.setTimeout(() => {
-        continueToExplorer(wallet, connectedAccount);
-      }, 1100);
     } catch (error) {
-      console.error("Connect error:", error);
       const msg = error instanceof Error ? error.message : "Connection failed";
       setConnectionState((prev) => ({ ...prev, error: msg }));
       setIsConnecting(false);
@@ -311,8 +389,8 @@ export default function WalletConnect() {
           <a href="/snap-install" className="px-4 py-2 rounded-lg bg-slate-800 text-slate-100 border border-slate-600 hover:border-teal-400 transition text-sm font-semibold">
             MetaMask Snap →
           </a>
-          <a href="/api-explorer" className="px-4 py-2 rounded-lg bg-slate-800 text-slate-100 border border-slate-600 hover:border-teal-400 transition text-sm font-semibold">
-            API Explorer →
+          <a href="/transaction-check" className="px-4 py-2 rounded-lg bg-slate-800 text-slate-100 border border-slate-600 hover:border-teal-400 transition text-sm font-semibold">
+            Transaction Check →
           </a>
         </div>
       </section>
@@ -414,18 +492,25 @@ export default function WalletConnect() {
                 )}
                 {connectionState.connectionApproved && (
                     <div className="space-y-3">
-                      <p className="text-xs text-teal-200">✅ Wallet connected. Your next step is to test a real transaction in the API Explorer.</p>
+                      <p className="text-xs text-teal-200">✅ Wallet connected. Your next step is to check a real transaction before signing.</p>
                       <div className="flex flex-col sm:flex-row gap-3">
                         <button
                           type="button"
                           onClick={() => {
                             const saved = localStorage.getItem("genesis_wallet_session");
                             const parsed = saved ? JSON.parse(saved) : null;
-                            continueToExplorer(selectedWallet, parsed?.account ?? null);
+                            continueToExplorer(selectedWallet, parsed?.account ?? null, parsed?.chainId ?? 1);
                           }}
                           className="flex-1 text-center px-4 py-2 rounded-lg bg-teal-600 text-white font-semibold hover:bg-teal-500 transition"
                         >
-                          Continue to transaction check
+                          Continue →
+                        </button>
+                        <button
+                          type="button"
+                          onClick={handleDisconnect}
+                          className="px-4 py-2 rounded-lg border border-slate-500 bg-slate-800 text-slate-100 font-semibold hover:bg-slate-700 transition"
+                        >
+                          Disconnect
                         </button>
                       </div>
                     </div>
@@ -473,9 +558,29 @@ export default function WalletConnect() {
               </button>
             </div>
           ) : connectionState.connectionApproved ? (
-            <div className="bg-green-900/40 border border-green-500/50 rounded-lg p-4 text-center space-y-2">
+            <div className="bg-green-900/40 border border-green-500/50 rounded-lg p-4 text-center space-y-3">
               <p className="text-green-200 font-semibold">✅ Connection Approved!</p>
-              <p className="text-xs text-green-300">Wallet connected. Test a real transaction in the API Explorer next.</p>
+              <p className="text-xs text-green-300">Wallet connected. Check a real transaction before signing next.</p>
+              <div className="flex flex-col gap-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    const saved = localStorage.getItem("genesis_wallet_session");
+                    const parsed = saved ? JSON.parse(saved) : null;
+                    continueToExplorer(selectedWallet, parsed?.account ?? null, parsed?.chainId ?? 1);
+                  }}
+                  className="w-full py-2 bg-teal-600 hover:bg-teal-500 text-white rounded-lg text-sm font-semibold transition"
+                >
+                  Continue →
+                </button>
+                <button
+                  type="button"
+                  onClick={handleDisconnect}
+                  className="w-full py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg text-sm font-semibold transition"
+                >
+                  Disconnect
+                </button>
+              </div>
             </div>
           ) : (
             <div className="space-y-4">
