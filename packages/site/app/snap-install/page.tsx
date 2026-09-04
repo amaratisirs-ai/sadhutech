@@ -604,9 +604,23 @@ export default function SnapInstallPage() {
             <>
               <div className="text-center">
                 <p className="text-sm text-green-300 font-semibold mb-3">✓ MetaMask Browser Detected</p>
+                <label className="flex items-start gap-2 text-xs text-slate-400 cursor-pointer text-left mb-3">
+                  <input
+                    type="checkbox"
+                    checked={agreedToTerms}
+                    onChange={(e) => setAgreedToTerms(e.target.checked)}
+                    className="mt-0.5 accent-teal-400"
+                  />
+                  <span>
+                    I have read and agree to the{" "}
+                    <a href="/terms" target="_blank" className="text-teal-300 underline">Terms of Service</a> and{" "}
+                    <a href="/privacy" target="_blank" className="text-teal-300 underline">Privacy Policy</a>.
+                  </span>
+                </label>
                 <button
                   onClick={handleInstallClick}
-                  className="w-full px-4 py-3 bg-gradient-to-r from-teal-500 to-teal-400 text-slate-950 font-bold rounded-lg hover:shadow-lg transition-all text-base"
+                  disabled={!agreedToTerms}
+                  className="w-full px-4 py-3 bg-gradient-to-r from-teal-500 to-teal-400 text-slate-950 font-bold rounded-lg hover:shadow-lg transition-all text-base disabled:opacity-40 disabled:cursor-not-allowed"
                 >
                   + Install GENESIS Snap
                 </button>
