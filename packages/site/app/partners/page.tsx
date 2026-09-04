@@ -54,6 +54,26 @@ export default function PartnersPage() {
             href="https://blockaid.io"
             blurb="Real-time Web3 threat feed (drainers, scams, exploits) — a supported data source for our threat sync."
           />
+          <Partner
+            name="Scam Sniffer"
+            href="https://github.com/scamsniffer/scam-database"
+            blurb="Open phishing-address blacklist, synced into our community threat feed."
+          />
+          <Partner
+            name="CryptoScamDB"
+            href="https://github.com/CryptoScamDB/blacklist"
+            blurb="Open-source scam and phishing address database, synced into our community threat feed."
+          />
+          <Partner
+            name="Rugdoc"
+            href="https://rugdoc.io"
+            blurb="Community-confirmed rug-pull token database, synced into our community threat feed."
+          />
+          <Partner
+            name="SlowMist"
+            href="https://slowmist.com"
+            blurb="Public security alerts on flagged contracts, synced into our community threat feed."
+          />
         </div>
       </section>
 
@@ -79,6 +99,11 @@ export default function PartnersPage() {
           <Partner name="Neon" href="https://neon.tech" blurb="Serverless Postgres — hosts threat intel, credit balances, and audit logs." />
           <Partner name="Render" href="https://render.com" blurb="Hosts the GENESIS Gate API." />
           <Partner name="Vercel" href="https://vercel.com" blurb="Hosts the GENESIS website." />
+          <Partner
+            name="Tenderly"
+            href="https://tenderly.co"
+            blurb="Optional transaction fork simulation, used to improve decode accuracy when configured."
+          />
         </div>
       </section>
 
