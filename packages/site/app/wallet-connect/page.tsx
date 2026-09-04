@@ -166,6 +166,32 @@ export default function WalletConnect() {
 
         setProvider(ethereumProvider);
 
+        const restoreIfConnected = () => {
+          const activeWallet = selectedWallet ?? { id: "walletconnect", name: "WalletConnect", icon: "🔗", chain: "EVM" };
+          const accounts = Array.isArray((ethereumProvider as any)?.accounts) ? (ethereumProvider as any).accounts : [];
+          const connectedAccount = accounts[0] ?? (ethereumProvider as any)?.session?.namespaces?.eip155?.accounts?.[0]?.split(":").slice(-1)?.[0] ?? null;
+
+          if (connectedAccount) {
+            finalizeWalletConnection(activeWallet, connectedAccount);
+            return true;
+          }
+
+          const stored = localStorage.getItem("genesis_wallet_session");
+          const parsedStored = stored ? JSON.parse(stored) : null;
+          if (parsedStored?.status === "connected" && parsedStored.account) {
+            const walletName = parsedStored.wallet || "WalletConnect";
+            const walletFromStorage = { id: "walletconnect", name: walletName, icon: "🔗", chain: "EVM" };
+            finalizeWalletConnection(walletFromStorage, parsedStored.account);
+            return true;
+          }
+
+          return false;
+        };
+
+        if (restoreIfConnected()) {
+          return;
+        }
+
         ethereumProvider.on("connect", () => {
           console.log("✅ Provider connected");
           const accounts = (ethereumProvider as any)?.accounts ?? (ethereumProvider as any)?.session?.accounts ?? [];
