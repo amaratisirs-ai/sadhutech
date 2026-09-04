@@ -11,6 +11,10 @@ const USDC_BASE = "0x833589fcd6edb6e08f4c7c32d4f71b54bda02913";
 const BASE_CHAIN_HEX = "0x2105"; // 8453
 const CONFIGURED = PAYMENT_ADDRESS.length === 42;
 
+type WalletProvider = {
+  request: (args: { method: string; params?: unknown[] }) => Promise<unknown>;
+};
+
 function short(a: string) {
   return a ? `${a.slice(0, 6)}…${a.slice(-4)}` : "";
 }
@@ -23,7 +27,37 @@ export default function ProPage() {
   const [message, setMessage] = useState<string>("");
   const [error, setError] = useState<string>("");
 
-  const eth = () => (typeof window !== "undefined" ? (window as any).ethereum : undefined);
+  const eth = (): WalletProvider | null => (typeof window !== "undefined" ? (window as any).ethereum ?? null : null);
+
+  const getWalletProvider = async (): Promise<WalletProvider | null> => {
+    const injected = eth();
+    if (injected) return injected;
+
+    const projectId = process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID;
+    if (!projectId) return null;
+
+    try {
+      const { EthereumProvider } = await import("@walletconnect/ethereum-provider");
+      const provider = await EthereumProvider.init({
+        projectId,
+        chains: [1],
+        optionalChains: [137, 42161, 10, 43114],
+        showQrModal: false,
+        methods: ["eth_sendTransaction", "personal_sign", "eth_accounts"],
+        optionalMethods: ["eth_chainId", "wallet_switchEthereumChain", "wallet_addEthereumChain"],
+        events: ["chainChanged", "accountsChanged"],
+        metadata: {
+          name: "GENESIS Firewall",
+          description: "Community-powered transaction security firewall",
+          url: typeof window !== "undefined" ? window.location.origin : "https://sadhutech.com",
+          icons: ["https://sadhutech.com/images/genesis-icon.png"],
+        },
+      });
+      return provider.session ? (provider as unknown as WalletProvider) : null;
+    } catch {
+      return null;
+    }
+  };
 
   const loadCredits = async (addr: string) => {
     try {
@@ -35,29 +69,31 @@ export default function ProPage() {
   };
 
   useEffect(() => {
-    const e = eth();
-    if (!e) return;
-    e.request?.({ method: "eth_accounts" })
-      .then((accts: string[]) => {
-        if (accts?.[0]) {
-          setAccount(accts[0].toLowerCase());
-          loadCredits(accts[0].toLowerCase());
+    getWalletProvider()
+      .then((e) => e?.request({ method: "eth_accounts" }))
+      .then((accts) => {
+        const address = Array.isArray(accts) && typeof accts[0] === "string" ? accts[0].toLowerCase() : null;
+        if (address) {
+          setAccount(address);
+          loadCredits(address);
         }
       })
       .catch(() => {});
   }, []);
 
   const connect = async () => {
-    const e = eth();
+    const e = await getWalletProvider();
     if (!e) {
-      setError("No wallet found. Open this page in your wallet's browser, or install MetaMask / Coinbase Wallet.");
+      setError("No connected wallet found. Connect with WalletConnect first, or open this page in a browser wallet.");
       return;
     }
     setBusy("connecting");
     setError("");
     try {
-      const accts: string[] = await e.request({ method: "eth_requestAccounts" });
+      const accts = await e.request({ method: "eth_requestAccounts" });
+      if (!Array.isArray(accts)) throw new Error("Wallet did not return an account.");
       const addr = (accts?.[0] || "").toLowerCase();
+      if (!addr) throw new Error("Wallet did not return an account.");
       setAccount(addr);
       await loadCredits(addr);
     } catch (err: any) {
@@ -68,7 +104,8 @@ export default function ProPage() {
   };
 
   const ensureBase = async () => {
-    const e = eth();
+    const e = await getWalletProvider();
+    if (!e) throw new Error("Connect a wallet before paying.");
     try {
       await e.request({ method: "wallet_switchEthereumChain", params: [{ chainId: BASE_CHAIN_HEX }] });
     } catch (err: any) {
@@ -108,7 +145,7 @@ export default function ProPage() {
   };
 
   const pay = async () => {
-    const e = eth();
+    const e = await getWalletProvider();
     if (!e || !account) return;
     const amt = Math.max(MIN_USDC, Math.floor(amount || 0));
     setError("");
