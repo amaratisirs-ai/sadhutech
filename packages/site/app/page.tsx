@@ -122,7 +122,7 @@ export default function Home() {
               </div>
             </div>
             <div className="flex items-center justify-center">
-              <img src="/images/hero-shield.svg" alt="Protection shield" className="w-96 h-auto drop-shadow-2xl" />
+              <img src="/images/hero-shield.svg" alt="Protection shield" loading="lazy" decoding="async" className="w-96 h-auto drop-shadow-2xl" />
             </div>
           </div>
         </div>
@@ -319,7 +319,7 @@ export default function Home() {
 
       {/* ===== VISUAL: TRANSACTION FLOW ===== */}
       <section className="flex justify-center py-8">
-        <img src="/images/transaction-flow.svg" alt="Transaction flow diagram" className="w-full max-w-2xl drop-shadow-xl rounded-2xl" />
+        <img src="/images/transaction-flow.svg" alt="Transaction flow diagram" loading="lazy" decoding="async" className="w-full max-w-2xl drop-shadow-xl rounded-2xl" />
       </section>
 
       {/* ===== VERDICT EXAMPLES ===== */}
@@ -468,7 +468,7 @@ export default function Home() {
       {/* ===== WHO IS THIS FOR ===== */}
       <section className="space-y-8">
         <div className="flex justify-center mb-8">
-          <img src="/images/community-network.svg" alt="Community network" className="w-full max-w-2xl drop-shadow-xl rounded-2xl" />
+          <img src="/images/community-network.svg" alt="Community network" loading="lazy" decoding="async" className="w-full max-w-2xl drop-shadow-xl rounded-2xl" />
         </div>
         <div>
           <h2 className="text-3xl font-bold text-slate-900 dark:text-white mb-2">Who is GENESIS for?</h2>
@@ -534,7 +534,7 @@ export default function Home() {
         </div>
 
         <div className="flex justify-center mb-8">
-          <img src="/images/wallet-protection.svg" alt="Wallet protection" className="w-full max-w-2xl drop-shadow-xl rounded-2xl" />
+          <img src="/images/wallet-protection.svg" alt="Wallet protection" loading="lazy" decoding="async" className="w-full max-w-2xl drop-shadow-xl rounded-2xl" />
         </div>
 
         <div className="space-y-6">
@@ -625,7 +625,7 @@ export default function Home() {
 
         {/* Threat Detection Image */}
         <div className="flex justify-center my-8">
-          <img src="/images/threat-detection.svg" alt="Threat detection system" className="w-full max-w-2xl drop-shadow-xl rounded-2xl" />
+          <img src="/images/threat-detection.svg" alt="Threat detection system" loading="lazy" decoding="async" className="w-full max-w-2xl drop-shadow-xl rounded-2xl" />
         </div>
 
         {/* Not roadmap: What we won't do */}
