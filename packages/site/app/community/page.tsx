@@ -227,8 +227,8 @@ export default function CommunityPage() {
 
             {!loading && contributors.length === 0 && (
               <div className="p-10 text-center text-slate-500 dark:text-slate-400">
-                <p className="font-semibold text-slate-700 dark:text-slate-300">No contributors yet.</p>
-                <p className="text-sm mt-1">The leaderboard fills up as verified reports come in. <a href="/report" className="text-emerald-600 hover:underline">Be the first to report a threat.</a></p>
+                <p className="font-semibold text-slate-700 dark:text-slate-300">Contributor rankings will appear here.</p>
+                <p className="text-sm mt-1">Scores reflect the quality and impact of community threat reports.</p>
               </div>
             )}
 
