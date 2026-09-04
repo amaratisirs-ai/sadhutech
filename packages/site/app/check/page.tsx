@@ -44,6 +44,18 @@ function short(a: string) {
   return a ? `${a.slice(0, 6)}…${a.slice(-4)}` : "";
 }
 
+// Best-effort detection so non-EVM users get an honest "not covered yet" message.
+function detectNonEvmChain(addr: string): string | null {
+  if (/^(bc1|tb1)[a-z0-9]{20,}$/i.test(addr)) return "Bitcoin";
+  if (/^[13][a-km-zA-HJ-NP-Z1-9]{25,34}$/.test(addr)) return "Bitcoin";
+  if (/^D[5-9A-HJ-NP-U][1-9A-HJ-NP-Za-km-z]{32,34}$/.test(addr)) return "Dogecoin";
+  if (/^L[a-km-zA-HJ-NP-Z1-9]{26,33}$/.test(addr)) return "Litecoin";
+  if (/^T[1-9A-HJ-NP-Za-km-z]{33}$/.test(addr)) return "Tron";
+  if (/^(bnb1|cosmos1|osmo1)[a-z0-9]{20,}$/i.test(addr)) return "Cosmos";
+  if (/^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(addr)) return "Solana";
+  return null;
+}
+
 function VerdictCard({ result }: { result: Result }) {
   if (result.error) {
     return (
@@ -114,8 +126,13 @@ export default function CheckPage() {
       return;
     }
     if (!ADDRESS_RE.test(addr)) {
-      const msg = addr.startsWith("0x")
-        ? "That looks incomplete — an address is 0x followed by 40 characters."
+      if (addr.startsWith("0x")) {
+        setResult({ title: "Address check", error: "That looks incomplete — an address is 0x followed by 40 characters." });
+        return;
+      }
+      const chain = detectNonEvmChain(addr);
+      const msg = chain
+        ? `That looks like a ${chain} address. GENESIS currently covers EVM chains (Ethereum, Polygon, Arbitrum, Optimism, Avalanche) — ${chain} support is on the roadmap, so we can't verify it yet.`
         : "We currently check EVM addresses (Ethereum, Polygon, Arbitrum, Optimism, Avalanche). Paste a 0x… address.";
       setResult({ title: "Address check", error: msg });
       return;
@@ -195,13 +212,25 @@ export default function CheckPage() {
             </p>
           </div>
           <div className="flex flex-col sm:flex-row gap-3">
-            <input
-              value={addressInput}
-              onChange={(e) => setAddressInput(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && checkAddress()}
-              placeholder="0x… address"
-              className="flex-1 px-4 py-3 rounded-lg bg-slate-800 border-2 border-slate-600 focus:border-teal-400 text-white font-mono text-sm outline-none"
-            />
+            <div className="relative flex-1">
+              <input
+                value={addressInput}
+                onChange={(e) => setAddressInput(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && checkAddress()}
+                placeholder="0x… address"
+                className="w-full px-4 py-3 pr-10 rounded-lg bg-slate-800 border-2 border-slate-600 focus:border-teal-400 text-white font-mono text-sm outline-none"
+              />
+              {addressInput && (
+                <button
+                  type="button"
+                  onClick={() => { setAddressInput(""); setResult(null); }}
+                  aria-label="Clear address"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 w-6 h-6 flex items-center justify-center rounded-full text-slate-400 hover:text-white hover:bg-slate-700 transition"
+                >
+                  ✕
+                </button>
+              )}
+            </div>
             <button
               onClick={checkAddress}
               disabled={checking}
