@@ -176,7 +176,7 @@ export default function ThreatsPage() {
         <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-6">
           <h2 className="font-bold text-red-900 dark:text-red-200 mb-2">Error Loading Threats</h2>
           <p className="text-red-800 dark:text-red-300 mb-4">{error}</p>
-          <p className="text-sm text-red-700 dark:text-red-400 mb-4">The threat database is temporarily unavailable. Please try again in a few moments.</p>
+          <p className="text-sm text-red-700 dark:text-red-400 mb-4">Community threat intelligence is temporarily unavailable. Please try again in a few moments.</p>
           <button
             onClick={() => {
               setError(null);
@@ -198,10 +198,10 @@ export default function ThreatsPage() {
           <svg className="w-8 h-8 text-red-500" fill="currentColor" viewBox="0 0 24 24">
             <path d="M13 10V3L4 14h7v7l9-11h-7z" />
           </svg>
-          <h1 className="text-4xl font-bold text-slate-900 dark:text-white">Threat Database</h1>
+          <h1 className="text-4xl font-bold text-slate-900 dark:text-white">Community Threat Intelligence</h1>
         </div>
         <p className="text-slate-600 dark:text-slate-400 mt-2">
-          Browse all {stats?.total || 0} verified malicious addresses in the GENESIS database
+          Explore addresses reported by the community and reviewed for suspicious activity.
         </p>
       </div>
 
@@ -209,19 +209,19 @@ export default function ThreatsPage() {
       {stats && (
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <div className="bg-slate-50 dark:bg-slate-900/30 rounded-lg border border-slate-200 dark:border-slate-700 p-4">
-            <div className="text-sm text-slate-600 dark:text-slate-400 mb-1">Total in Database</div>
+            <div className="text-sm text-slate-600 dark:text-slate-400 mb-1">Threats Tracked</div>
             <div className="text-3xl font-bold text-slate-900 dark:text-white">{stats.total}</div>
           </div>
           <div className="bg-slate-50 dark:bg-slate-900/30 rounded-lg border border-slate-200 dark:border-slate-700 p-4">
-            <div className="text-sm text-slate-600 dark:text-slate-400 mb-1">Loaded So Far</div>
+            <div className="text-sm text-slate-600 dark:text-slate-400 mb-1">Showing Now</div>
             <div className="text-3xl font-bold text-slate-900 dark:text-white">{allThreats.length}</div>
           </div>
           <div className="bg-slate-50 dark:bg-slate-900/30 rounded-lg border border-slate-200 dark:border-slate-700 p-4">
-            <div className="text-sm text-slate-600 dark:text-slate-400 mb-1">High Severity</div>
+            <div className="text-sm text-slate-600 dark:text-slate-400 mb-1">High Risk Showing</div>
             <div className="text-3xl font-bold text-red-600">{allThreats.filter((t) => t.severity === "high").length}</div>
           </div>
           <div className="bg-slate-50 dark:bg-slate-900/30 rounded-lg border border-slate-200 dark:border-slate-700 p-4">
-            <div className="text-sm text-slate-600 dark:text-slate-400 mb-1">Verified</div>
+            <div className="text-sm text-slate-600 dark:text-slate-400 mb-1">Confirmed by Community</div>
             <div className="text-3xl font-bold text-green-600">{allThreats.filter((t) => t.trusted).length}</div>
           </div>
         </div>
@@ -236,7 +236,7 @@ export default function ThreatsPage() {
             {[
               { id: "latest" as SortBy, label: "Latest First" },
               { id: "reports" as SortBy, label: "Most Reports" },
-              { id: "verified" as SortBy, label: "Verified First" },
+              { id: "verified" as SortBy, label: "Community Confirmed" },
             ].map((sort) => (
               <button
                 key={sort.id}
@@ -295,7 +295,7 @@ export default function ThreatsPage() {
           <h3 className="font-semibold text-slate-900 dark:text-white">
             {filter
               ? `${categoryInfo[filter as keyof typeof categoryInfo]?.label} (${filteredThreats.length})`
-              : `All Threats (${filteredThreats.length})`}
+              : `All Reported Threats (${filteredThreats.length})`}
           </h3>
           {filter && (
             <button
@@ -344,11 +344,11 @@ export default function ThreatsPage() {
                       <span className="font-semibold text-slate-900 dark:text-white">{threat.reporters}</span>
                     </div>
                     <div>
-                      <span className="text-slate-500">First Seen</span>{" "}
+                      <span className="text-slate-500">First Reported</span>{" "}
                       <span className="text-slate-700 dark:text-slate-300">{formatTime(threat.firstSeen)}</span>
                     </div>
                     <div>
-                      <span className="text-slate-500">Last Seen</span>{" "}
+                      <span className="text-slate-500">Last Reported</span>{" "}
                       <span className="text-slate-700 dark:text-slate-300">{formatTime(threat.lastSeen)}</span>
                     </div>
                   </div>
@@ -386,7 +386,7 @@ export default function ThreatsPage() {
         )}
 
         {!hasMore && allThreats.length > 0 && (
-          <div className="text-center py-4 text-slate-600 dark:text-slate-400">✓ All {allThreats.length} threats loaded</div>
+          <div className="text-center py-4 text-slate-600 dark:text-slate-400">You&apos;re up to date with all {allThreats.length} reported threats.</div>
         )}
       </div>
     </div>
