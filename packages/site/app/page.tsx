@@ -533,84 +533,81 @@ export default function Home() {
 
         <div className="space-y-6">
           {/* Phase 1: MVP */}
-          <div className="relative overflow-hidden rounded-2xl backdrop-blur-xl bg-gradient-to-br from-emerald-500/10 via-green-500/5 to-teal-500/10 dark:from-emerald-500/5 dark:via-emerald-500/5 dark:to-teal-500/5 border border-emerald-400/30 dark:border-emerald-500/20 shadow-2xl hover:shadow-emerald-500/10 transition-all p-8 space-y-4">
-            <div className="absolute inset-0 bg-gradient-to-br from-emerald-400/5 to-transparent pointer-events-none"></div>
-            <div className="relative flex items-start justify-between">
+          <div className="bg-white dark:bg-slate-800 rounded-lg border-2 border-slate-200 dark:border-slate-700 p-8 space-y-4 hover:border-emerald-300 dark:hover:border-emerald-500 transition">
+            <div className="flex items-start justify-between">
               <div>
-                <div className="inline-flex items-center gap-2 px-3 py-1 backdrop-blur-md bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 rounded-full text-xs font-bold mb-3 border border-emerald-400/30">
+                <div className="inline-flex items-center gap-2 px-3 py-1 bg-emerald-100 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 rounded-full text-xs font-bold mb-3">
                   <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" /></svg>
                   LIVE NOW
                 </div>
-                <h3 className="text-2xl font-bold text-emerald-950 dark:text-white mb-2">Phase 1: Foundation (Sept 2026)</h3>
-                <p className="text-emerald-900 dark:text-slate-300 mb-4 font-medium">Wallet protection you can trust, starting today</p>
+                <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">Phase 1: Foundation (Sept 2026)</h3>
+                <p className="text-slate-700 dark:text-slate-300 mb-4 font-medium">Wallet protection you can trust, starting today</p>
               </div>
-              <div className="w-12 h-12 rounded-lg bg-emerald-500/20 flex items-center justify-center flex-shrink-0 backdrop-blur-md border border-emerald-400/30">
+              <div className="w-12 h-12 rounded-lg bg-emerald-100 dark:bg-emerald-500/20 flex items-center justify-center flex-shrink-0">
                 <svg className="w-6 h-6 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
               </div>
             </div>
 
             <div className="space-y-3">
-              <p className="text-emerald-950 dark:text-slate-300">
+              <p className="text-slate-700 dark:text-slate-300">
                 We've built a working gate that checks crypto transactions before you sign. It blocks known scams, warns you about risky moves, and explains everything in plain English - no crypto jargon.
               </p>
-              <p className="text-emerald-950 dark:text-slate-300">
+              <p className="text-slate-700 dark:text-slate-300">
                 Try it with real transactions on our demo. The system learns from community reports, so it gets smarter over time.
               </p>
-              <a href="/check" className="inline-flex items-center gap-2 text-green-600 dark:text-green-400 font-semibold hover:underline">
+              <a href="/check" className="inline-flex items-center gap-2 text-emerald-600 dark:text-emerald-400 font-semibold hover:underline">
                 → Try the free checker
               </a>
             </div>
           </div>
 
           {/* Phase 2: Adoption */}
-          <div className="relative overflow-hidden rounded-2xl backdrop-blur-xl bg-gradient-to-br from-indigo-500/10 via-indigo-500/5 to-indigo-500/10 dark:from-indigo-500/5 dark:via-indigo-500/5 dark:to-indigo-500/5 border border-indigo-400/30 dark:border-indigo-500/20 shadow-2xl hover:shadow-indigo-500/10 transition-all p-8 space-y-4">
-            <div className="absolute inset-0 bg-gradient-to-br from-indigo-400/5 to-transparent pointer-events-none"></div>
-            <div className="relative flex items-start justify-between">
+          <div className="bg-white dark:bg-slate-800 rounded-lg border-2 border-slate-200 dark:border-slate-700 p-8 space-y-4 hover:border-indigo-300 dark:hover:border-indigo-500 transition">
+            <div className="flex items-start justify-between">
               <div>
-                <div className="inline-flex items-center gap-2 px-3 py-1 backdrop-blur-md bg-indigo-500/20 text-indigo-700 dark:text-indigo-300 rounded-full text-xs font-bold mb-3 border border-indigo-400/30">
+                <div className="inline-flex items-center gap-2 px-3 py-1 bg-indigo-100 dark:bg-indigo-500/20 text-indigo-700 dark:text-indigo-300 rounded-full text-xs font-bold mb-3">
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
                   Q4 2026
                 </div>
-                <h3 className="text-2xl font-bold text-indigo-950 dark:text-white mb-2">Phase 2: In Your Wallet (Q4 2026)</h3>
-                <p className="text-indigo-900 dark:text-slate-300 mb-4 font-medium">Protection built directly into MetaMask</p>
+                <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">Phase 2: In Your Wallet (Q4 2026)</h3>
+                <p className="text-slate-700 dark:text-slate-300 mb-4 font-medium">Protection built directly into MetaMask</p>
               </div>
-              <div className="w-12 h-12 rounded-lg bg-indigo-500/20 flex items-center justify-center flex-shrink-0 backdrop-blur-md border border-indigo-400/30">
+              <div className="w-12 h-12 rounded-lg bg-indigo-100 dark:bg-indigo-500/20 flex items-center justify-center flex-shrink-0">
                 <svg className="w-6 h-6 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3v-6" /></svg>
               </div>
             </div>
 
             <div className="space-y-3">
-              <p className="text-indigo-950 dark:text-slate-300">
+              <p className="text-slate-700 dark:text-slate-300">
                 Install GENESIS as a MetaMask Snap and get real-time protection every time you sign. No copy-pasting addresses or leaving your wallet - just one-click safety.
               </p>
-              <p className="text-indigo-950 dark:text-slate-300">
+              <p className="text-slate-700 dark:text-slate-300">
                 Works across Ethereum, Polygon, Base, and more. Whether you're trading, collecting NFTs, or doing DeFi, GENESIS watches your back.
               </p>
             </div>
           </div>
 
           {/* Phase 3: Scale */}
-          <div className="relative overflow-hidden rounded-2xl backdrop-blur-xl bg-gradient-to-br from-orange-500/10 via-red-500/5 to-orange-500/10 dark:from-orange-500/5 dark:via-red-500/5 dark:to-orange-500/5 border border-orange-400/30 dark:border-orange-500/20 shadow-2xl hover:shadow-orange-500/10 transition-all p-8 space-y-4">
-            <div className="absolute inset-0 bg-gradient-to-br from-orange-400/5 to-transparent pointer-events-none"></div>
-            <div className="relative flex items-start justify-between">
+          <div className="bg-white dark:bg-slate-800 rounded-lg border-2 border-slate-200 dark:border-slate-700 p-8 space-y-4 hover:border-orange-300 dark:hover:border-orange-500 transition">
+            <div className="flex items-start justify-between">
               <div>
-                <div className="inline-flex items-center gap-2 px-3 py-1 backdrop-blur-md bg-orange-500/20 text-orange-700 dark:text-orange-300 rounded-full text-xs font-bold mb-3 border border-orange-400/30">
+                <div className="inline-flex items-center gap-2 px-3 py-1 bg-orange-100 dark:bg-orange-500/20 text-orange-700 dark:text-orange-300 rounded-full text-xs font-bold mb-3">
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                   2027
                 </div>
-                <h3 className="text-2xl font-bold text-orange-950 dark:text-white mb-2">Phase 3: Community-Powered (2027)</h3>
-                <p className="text-orange-900 dark:text-slate-300 mb-4 font-medium">Your network, your rules</p>
+                <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">Phase 3: Community-Powered (2027)</h3>
+                <p className="text-slate-700 dark:text-slate-300 mb-4 font-medium">Your network, your rules</p>
               </div>
-              <div className="w-12 h-12 rounded-lg bg-orange-500/20 flex items-center justify-center flex-shrink-0 backdrop-blur-md border border-orange-400/30">
+              <div className="w-12 h-12 rounded-lg bg-orange-100 dark:bg-orange-500/20 flex items-center justify-center flex-shrink-0">
                 <svg className="w-6 h-6 text-orange-600 dark:text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 0H3m9 9c-1.657 0-3-4.03-3-9s1.343-9 3-9m0 0h6" /></svg>
               </div>
             </div>
 
             <div className="space-y-3">
-              <p className="text-orange-950 dark:text-slate-300">
+              <p className="text-slate-700 dark:text-slate-300">
                 Threat intel is stronger when the community contributes. We're building tools for security researchers, white-hats, and everyday users to report scams and vote on what's dangerous.
               </p>
-              <p className="text-orange-950 dark:text-slate-300">
+              <p className="text-slate-700 dark:text-slate-300">
                 You'll earn rewards for helping protect others. Together, we grow the world's most trusted threat intelligence network - owned by the community, not by any corporation.
               </p>
             </div>
