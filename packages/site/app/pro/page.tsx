@@ -167,7 +167,7 @@ export default function ProPage() {
 
   const disconnect = () => {
     localStorage.removeItem("genesis_wallet_session");
-    window.location.href = "/wallet-connect?change=1&disconnect=1&returnTo=%2Fpro";
+    window.location.href = "/pro";
   };
 
   const pay = async () => {
