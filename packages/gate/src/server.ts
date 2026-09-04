@@ -128,9 +128,8 @@ app.post<{ Body: ReportRequest }>("/v1/report",
       // Record the threat
       const result = await intel.report(body);
       
-      // Track contributor stats (if service initialized)
-      if (contributorsService && intel instanceof (await import("./intel-postgres.js")).ThreatIntelPostgres) {
-        const postgresIntel = intel as ThreatIntelPostgres;
+      // Track contributor stats (contributorsService is only set when using Postgres).
+      if (contributorsService) {
         try {
           await contributorsService.recordReport(
             body.reporterId,

@@ -98,7 +98,7 @@ export class ContributorsService {
         )
         VALUES ($1, $2, '🛡️', 1, NOW(), 'active')
         ON CONFLICT (reporter_id) DO UPDATE SET
-          total_reports = total_reports + 1,
+          total_reports = contributors.total_reports + 1,
           last_report_at = NOW(),
           display_name = COALESCE($2, contributors.display_name)
         RETURNING *;
@@ -136,7 +136,7 @@ export class ContributorsService {
       if (newBadges.length > 0) {
         const badgeQuery = `
           UPDATE contributors
-          SET badges = array_distinct(array_cat(badges, $2))
+          SET badges = ARRAY(SELECT DISTINCT unnest(array_cat(badges, $2::text[])))
           WHERE reporter_id = $1;
         `;
 
