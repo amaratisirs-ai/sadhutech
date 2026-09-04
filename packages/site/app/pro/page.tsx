@@ -28,6 +28,7 @@ export default function ProPage() {
   const [message, setMessage] = useState<string>("");
   const [error, setError] = useState<string>("");
   const [walletConnectUri, setWalletConnectUri] = useState<string | null>(null);
+  const [verifyAttempt, setVerifyAttempt] = useState(0);
 
   const eth = (): WalletProvider | null => (typeof window !== "undefined" ? (window as any).ethereum ?? null : null);
 
@@ -144,7 +145,8 @@ export default function ProPage() {
   };
 
   const pollVerify = async (addr: string) => {
-    for (let i = 0; i < 6; i++) {
+    for (let i = 0; i < 4; i++) {
+      setVerifyAttempt(i + 1);
       const r = await fetch(`${GATE_URL}/v1/pro/verify`, {
         method: "POST",
         headers: { "content-type": "application/json" },
@@ -152,13 +154,20 @@ export default function ProPage() {
       });
       const d = await r.json().catch(() => ({}));
       if (r.ok && d.ok) {
+        setVerifyAttempt(0);
         setCredits(d.balance ?? credits);
         setMessage(`Added ${d.credited} check${d.credited === 1 ? "" : "s"}  -  you now have ${d.balance}.`);
         return true;
       }
-      await new Promise((res) => setTimeout(res, 8000));
+      if (i < 3) await new Promise((res) => setTimeout(res, 6000));
     }
+    setVerifyAttempt(0);
     return false;
+  };
+
+  const disconnect = () => {
+    localStorage.removeItem("genesis_wallet_session");
+    window.location.href = "/wallet-connect?change=1&disconnect=1";
   };
 
   const pay = async () => {
@@ -256,7 +265,11 @@ export default function ProPage() {
         <div className="bg-slate-900/60 border-2 border-teal-500/40 rounded-2xl p-6 space-y-4">
           <div className="flex items-center justify-between text-sm">
             <span className="text-slate-400">Wallet</span>
-            <span className="font-mono text-white">{short(account)}</span>
+            <div className="flex items-center gap-3">
+              <span className="font-mono text-white">{short(account)}</span>
+              <a href="/wallet-connect?change=1" className="text-xs font-semibold text-teal-300 hover:text-white hover:underline">Change wallet</a>
+              <button type="button" onClick={disconnect} className="text-xs font-semibold text-rose-300 hover:text-white hover:underline">Disconnect</button>
+            </div>
           </div>
           <div className="rounded-xl border border-emerald-500/40 bg-emerald-900/15 p-4 text-center">
             <p className="text-3xl font-black text-white">{credits}</p>
@@ -303,7 +316,7 @@ export default function ProPage() {
             disabled={busy !== "idle"}
             className="w-full text-xs text-slate-400 hover:text-teal-300 underline disabled:opacity-50 transition"
           >
-            Already paid? Add checks
+            {busy === "verifying" && verifyAttempt > 0 ? `Checking payment (attempt ${verifyAttempt}/4)…` : "Already paid? Add checks"}
           </button>
 
           {message && <p className="text-sm text-teal-200">{message}</p>}
