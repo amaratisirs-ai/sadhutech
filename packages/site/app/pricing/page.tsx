@@ -22,7 +22,7 @@ const TIERS = [
     cadence: "/month",
     tagline: "Deeper, cross-chain protection.",
     highlight: true,
-    cta: { label: "Coming soon", href: "#", disabled: true },
+    cta: { label: "Go Pro", href: "/pro", disabled: false },
     features: [
       "Everything in Free",
       "ChainAbuse-enriched threat feed",
