@@ -2,7 +2,6 @@
 
 import { useEffect, useRef, useState } from "react";
 import { Icon } from "@/components/Icon";
-import { QRCodeCanvas } from "qrcode.react";
 
 const GATE_URL = process.env.NEXT_PUBLIC_GATE_URL || "https://genesis-gate.onrender.com";
 const PAYMENT_ADDRESS = (process.env.NEXT_PUBLIC_PAYMENT_ADDRESS || "").toLowerCase();
@@ -31,12 +30,13 @@ export default function ProPage() {
   const [busy, setBusy] = useState<"idle" | "connecting" | "paying" | "verifying">("idle");
   const [message, setMessage] = useState<string>("");
   const [error, setError] = useState<string>("");
-  const [walletConnectUri, setWalletConnectUri] = useState<string | null>(null);
   const [verifyAttempt, setVerifyAttempt] = useState(0);
   const wcProviderRef = useRef<WalletProvider | null>(null);
 
   const eth = (): WalletProvider | null => (typeof window !== "undefined" ? (window as any).ethereum ?? null : null);
 
+  // Restores the shared WalletConnect session (established via /wallet-connect) for signing;
+  // it never drives its own pairing UI — that flow already exists and is reused as-is.
   const getWalletProvider = async (): Promise<WalletProvider | null> => {
     const injected = eth();
     if (injected) return injected;
@@ -63,8 +63,6 @@ export default function ProPage() {
           icons: ["https://sadhutech.com/images/genesis-icon.png"],
         },
       });
-      provider.on("display_uri", (uri: string) => setWalletConnectUri(uri));
-      provider.on("connect", () => setWalletConnectUri(null));
       wcProviderRef.current = provider as unknown as WalletProvider;
       return wcProviderRef.current;
     } catch {
@@ -82,36 +80,46 @@ export default function ProPage() {
   };
 
   useEffect(() => {
-    if (typeof window !== "undefined" && localStorage.getItem(MANUAL_DISCONNECT_KEY) === "1") return;
-    getWalletProvider()
-      .then((e) => e?.request({ method: "eth_accounts" }))
-      .then((accts) => {
-        const address = Array.isArray(accts) && typeof accts[0] === "string" ? accts[0].toLowerCase() : null;
-        if (address) {
-          setAccount(address);
-          loadCredits(address);
-        }
-      })
-      .catch(() => {});
+    if (typeof window === "undefined" || localStorage.getItem(MANUAL_DISCONNECT_KEY) === "1") return;
+    const injected = eth();
+    if (injected) {
+      injected
+        .request({ method: "eth_accounts" })
+        .then((accts) => {
+          const address = Array.isArray(accts) && typeof accts[0] === "string" ? accts[0].toLowerCase() : null;
+          if (address) {
+            setAccount(address);
+            loadCredits(address);
+          }
+        })
+        .catch(() => {});
+      return;
+    }
+    // No injected wallet: fall back to the shared session set by /wallet-connect.
+    const stored = localStorage.getItem("genesis_wallet_session");
+    const parsed = stored ? JSON.parse(stored) : null;
+    if (parsed?.status === "connected" && parsed.account) {
+      const addr = String(parsed.account).toLowerCase();
+      setAccount(addr);
+      loadCredits(addr);
+    }
   }, []);
 
   const connect = async () => {
-    const e = await getWalletProvider();
-    if (!e) {
-      window.location.href = "/wallet-connect?change=1&disconnect=1&returnTo=%2Fpro";
+    const injected = eth();
+    if (!injected) {
+      window.location.href = "/wallet-connect?returnTo=%2Fpro";
       return;
     }
     setBusy("connecting");
     setError("");
-    setWalletConnectUri(null);
     try {
-      const accts = await e.request({ method: "eth_requestAccounts" });
+      const accts = await injected.request({ method: "eth_requestAccounts" });
       if (!Array.isArray(accts)) throw new Error("Wallet did not return an account.");
       const addr = (accts?.[0] || "").toLowerCase();
       if (!addr) throw new Error("Wallet did not return an account.");
       localStorage.removeItem(MANUAL_DISCONNECT_KEY);
       setAccount(addr);
-      setWalletConnectUri(null);
       await loadCredits(addr);
     } catch (err: any) {
       setError(err?.message || "Couldn't connect wallet.");
@@ -175,23 +183,10 @@ export default function ProPage() {
     return false;
   };
 
-  const disconnect = async () => {
+  const disconnect = () => {
     localStorage.setItem(MANUAL_DISCONNECT_KEY, "1");
     localStorage.removeItem("genesis_wallet_session");
-    const wc = wcProviderRef.current;
-    if (wc?.session && wc.disconnect) {
-      try {
-        await wc.disconnect();
-      } catch {
-        // Best-effort; local state is cleared regardless.
-      }
-    }
-    wcProviderRef.current = null;
-    setAccount(null);
-    setCredits(0);
-    setMessage("");
-    setError("");
-    setWalletConnectUri(null);
+    window.location.href = "/wallet-connect?change=1&disconnect=1";
   };
 
   const pay = async () => {
@@ -276,14 +271,7 @@ export default function ProPage() {
           >
             {busy === "connecting" ? "Connecting…" : "Connect wallet"}
           </button>
-          {walletConnectUri && (
-            <div className="mx-auto max-w-xs space-y-3 rounded-xl border border-teal-500/30 bg-white p-4 text-slate-900">
-              <p className="text-sm font-bold">Scan with your mobile wallet</p>
-              <QRCodeCanvas value={walletConnectUri} size={190} level="H" includeMargin />
-              <p className="text-xs text-slate-600">Approve the connection, then return here to continue.</p>
-            </div>
-          )}
-          <p className="text-xs text-slate-500">Already connected through WalletConnect? This page will restore that session automatically.</p>
+          <p className="text-xs text-slate-500">No MetaMask? You'll be sent to WalletConnect to pair your wallet.</p>
         </div>
       ) : (
         <div className="bg-slate-900/60 border-2 border-teal-500/40 rounded-2xl p-6 space-y-4">
