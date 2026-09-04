@@ -1,74 +1,34 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
+import { encodeFunctionData, erc20Abi } from "viem";
+import { base } from "@reown/appkit/networks";
+import { useSendTransaction, useSwitchChain } from "wagmi";
 import { Icon } from "@/components/Icon";
+import { useWallet } from "@/src/wallet/useWallet";
+import { DEEP_CHECK_ENABLED } from "@/src/pro-status";
 
 const GATE_URL = process.env.NEXT_PUBLIC_GATE_URL || "https://genesis-gate.onrender.com";
-const PAYMENT_ADDRESS = (process.env.NEXT_PUBLIC_PAYMENT_ADDRESS || "").toLowerCase();
+const PAYMENT_ADDRESS = (process.env.NEXT_PUBLIC_PAYMENT_ADDRESS || "").toLowerCase() as `0x${string}`;
 const MIN_USDC = Math.max(1, Number(process.env.NEXT_PUBLIC_PRO_MIN_USDC || "1"));
 const CREDITS_PER_USDC = Math.max(1, Number(process.env.NEXT_PUBLIC_PRO_CREDITS_PER_USDC || "1"));
-const USDC_BASE = "0x833589fcd6edb6e08f4c7c32d4f71b54bda02913";
-const BASE_CHAIN_HEX = "0x2105"; // 8453
-const CONFIGURED = PAYMENT_ADDRESS.length === 42;
-
-type WalletProvider = {
-  request: (args: { method: string; params?: unknown[] }) => Promise<unknown>;
-  disconnect?: () => Promise<void>;
-  session?: unknown;
-};
-
-const MANUAL_DISCONNECT_KEY = "genesis_pro_disconnected";
+const USDC_BASE = "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913" as const;
 
 function short(a: string) {
   return a ? `${a.slice(0, 6)}…${a.slice(-4)}` : "";
 }
 
 export default function ProPage() {
-  const [account, setAccount] = useState<string | null>(null);
+  const { address, isConnected, chainId, connect, disconnect } = useWallet();
+  const { switchChainAsync } = useSwitchChain();
+  const { sendTransactionAsync } = useSendTransaction();
+
   const [credits, setCredits] = useState<number>(0);
   const [amount, setAmount] = useState<number>(MIN_USDC);
-  const [busy, setBusy] = useState<"idle" | "connecting" | "paying" | "verifying">("idle");
+  const [busy, setBusy] = useState<"idle" | "paying" | "verifying">("idle");
   const [message, setMessage] = useState<string>("");
   const [error, setError] = useState<string>("");
   const [verifyAttempt, setVerifyAttempt] = useState(0);
-  const wcProviderRef = useRef<WalletProvider | null>(null);
-
-  const eth = (): WalletProvider | null => (typeof window !== "undefined" ? (window as any).ethereum ?? null : null);
-
-  // Restores the shared WalletConnect session (established via /wallet-connect) for signing;
-  // it never drives its own pairing UI — that flow already exists and is reused as-is.
-  const getWalletProvider = async (): Promise<WalletProvider | null> => {
-    const injected = eth();
-    if (injected) return injected;
-
-    if (wcProviderRef.current) return wcProviderRef.current;
-
-    const projectId = process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID;
-    if (!projectId) return null;
-
-    try {
-      const { EthereumProvider } = await import("@walletconnect/ethereum-provider");
-      const provider = await EthereumProvider.init({
-        projectId,
-        chains: [1],
-        optionalChains: [137, 42161, 10, 43114],
-        showQrModal: false,
-        methods: ["eth_sendTransaction", "personal_sign", "eth_accounts"],
-        optionalMethods: ["eth_chainId", "wallet_switchEthereumChain", "wallet_addEthereumChain"],
-        events: ["chainChanged", "accountsChanged"],
-        metadata: {
-          name: "GENESIS Firewall",
-          description: "Community-powered transaction security firewall",
-          url: typeof window !== "undefined" ? window.location.origin : "https://sadhutech.com",
-          icons: ["https://sadhutech.com/images/genesis-icon.png"],
-        },
-      });
-      wcProviderRef.current = provider as unknown as WalletProvider;
-      return wcProviderRef.current;
-    } catch {
-      return null;
-    }
-  };
 
   const loadCredits = async (addr: string) => {
     try {
@@ -80,87 +40,9 @@ export default function ProPage() {
   };
 
   useEffect(() => {
-    if (typeof window === "undefined" || localStorage.getItem(MANUAL_DISCONNECT_KEY) === "1") return;
-    const injected = eth();
-    if (injected) {
-      injected
-        .request({ method: "eth_accounts" })
-        .then((accts) => {
-          const address = Array.isArray(accts) && typeof accts[0] === "string" ? accts[0].toLowerCase() : null;
-          if (address) {
-            setAccount(address);
-            loadCredits(address);
-          }
-        })
-        .catch(() => {});
-      return;
-    }
-    // No injected wallet: fall back to the shared session set by /wallet-connect.
-    const stored = localStorage.getItem("genesis_wallet_session");
-    const parsed = stored ? JSON.parse(stored) : null;
-    if (parsed?.status === "connected" && parsed.account) {
-      const addr = String(parsed.account).toLowerCase();
-      setAccount(addr);
-      loadCredits(addr);
-    }
-  }, []);
-
-  const connect = async () => {
-    const injected = eth();
-    if (!injected) {
-      window.location.href = "/wallet-connect?returnTo=%2Fpro";
-      return;
-    }
-    setBusy("connecting");
-    setError("");
-    try {
-      const accts = await injected.request({ method: "eth_requestAccounts" });
-      if (!Array.isArray(accts)) throw new Error("Wallet did not return an account.");
-      const addr = (accts?.[0] || "").toLowerCase();
-      if (!addr) throw new Error("Wallet did not return an account.");
-      localStorage.removeItem(MANUAL_DISCONNECT_KEY);
-      setAccount(addr);
-      await loadCredits(addr);
-    } catch (err: any) {
-      setError(err?.message || "Couldn't connect wallet.");
-    } finally {
-      setBusy("idle");
-    }
-  };
-
-  const ensureBase = async () => {
-    const e = await getWalletProvider();
-    if (!e) throw new Error("Connect a wallet before paying.");
-    const currentChain = await e.request({ method: "eth_chainId" });
-    if (String(currentChain).toLowerCase() === BASE_CHAIN_HEX) return;
-    try {
-      await e.request({ method: "wallet_switchEthereumChain", params: [{ chainId: BASE_CHAIN_HEX }] });
-    } catch (err: any) {
-      if (err?.code === 4902) {
-        try {
-          await e.request({
-            method: "wallet_addEthereumChain",
-            params: [{
-              chainId: BASE_CHAIN_HEX,
-              chainName: "Base",
-              nativeCurrency: { name: "Ether", symbol: "ETH", decimals: 18 },
-              rpcUrls: ["https://mainnet.base.org"],
-              blockExplorerUrls: ["https://basescan.org"],
-            }],
-          });
-        } catch (addError: any) {
-          if (addError?.code === 4200 || addError?.code === -32601) {
-            throw new Error("Switch your wallet to Base network, then tap Pay again.");
-          }
-          throw addError;
-        }
-      } else if (err?.code === 4200 || err?.code === -32601) {
-        throw new Error("Switch your wallet to Base network, then tap Pay again.");
-      } else {
-        throw err;
-      }
-    }
-  };
+    if (address) loadCredits(address);
+    else setCredits(0);
+  }, [address]);
 
   const pollVerify = async (addr: string) => {
     for (let i = 0; i < 4; i++) {
@@ -174,7 +56,7 @@ export default function ProPage() {
       if (r.ok && d.ok) {
         setVerifyAttempt(0);
         setCredits(d.balance ?? credits);
-        setMessage(`Added ${d.credited} check${d.credited === 1 ? "" : "s"}  -  you now have ${d.balance}.`);
+        setMessage(`Added ${d.credited} check${d.credited === 1 ? "" : "s"} — you now have ${d.balance}.`);
         return true;
       }
       if (i < 3) await new Promise((res) => setTimeout(res, 6000));
@@ -183,66 +65,56 @@ export default function ProPage() {
     return false;
   };
 
-  const disconnect = () => {
-    localStorage.setItem(MANUAL_DISCONNECT_KEY, "1");
-    localStorage.removeItem("genesis_wallet_session");
-    window.location.href = "/wallet-connect?change=1&disconnect=1";
-  };
-
   const pay = async () => {
-    const e = await getWalletProvider();
-    if (!e || !account) return;
+    if (!address) return;
     const amt = Math.max(MIN_USDC, Math.floor(amount || 0));
     setError("");
     setMessage("");
     setBusy("paying");
     try {
-      await ensureBase();
-      const units = amt * 1_000_000; // USDC 6 decimals; small whole amounts safe as Number
-      const data =
-        "0xa9059cbb" +
-        PAYMENT_ADDRESS.replace("0x", "").padStart(64, "0") +
-        units.toString(16).padStart(64, "0");
-      await e.request({
-        method: "eth_sendTransaction",
-        params: [{ from: account, to: USDC_BASE, data, value: "0x0" }],
+      if (chainId !== base.id) {
+        await switchChainAsync({ chainId: base.id });
+      }
+      const units = BigInt(Math.round(amt * 1_000_000)); // USDC has 6 decimals
+      const data = encodeFunctionData({
+        abi: erc20Abi,
+        functionName: "transfer",
+        args: [PAYMENT_ADDRESS, units],
       });
+      await sendTransactionAsync({ to: USDC_BASE, data, value: BigInt(0), chainId: base.id });
       setBusy("verifying");
-      setMessage("Payment sent  -  adding your checks (this can take ~30s)…");
-      const ok = await pollVerify(account);
+      setMessage("Payment sent — adding your checks (this can take ~30s)…");
+      const ok = await pollVerify(address);
       if (!ok) setMessage("Payment sent. If your checks haven't appeared, tap “Already paid? Add checks” shortly.");
     } catch (err: any) {
-      setError(err?.code === 4001 ? "Payment cancelled." : err?.message || "Payment failed.");
+      setError(err?.shortMessage || err?.message || "Payment failed.");
     } finally {
       setBusy("idle");
     }
   };
 
   const verifyNow = async () => {
-    if (!account) return;
+    if (!address) return;
     setBusy("verifying");
     setError("");
     setMessage("Checking for your payment…");
-    const ok = await pollVerify(account);
+    const ok = await pollVerify(address);
     if (!ok) setMessage("No new payment found yet. If you just paid, wait a moment and try again.");
     setBusy("idle");
   };
 
-  if (!CONFIGURED) {
+  if (!DEEP_CHECK_ENABLED) {
     return (
       <div className="max-w-xl mx-auto text-center space-y-6 py-16">
         <div className="flex justify-center text-teal-400"><Icon name="bolt" className="w-16 h-16" /></div>
         <h1 className="text-4xl font-black text-white">Pro is coming soon</h1>
         <p className="text-slate-300">
-          Pay-as-you-go deep checks  -  pay only for what you use, straight from your wallet, powered by ChainAbuse for
-          cross-chain coverage. We'll flip it on shortly.
+          Pay-as-you-go deep checks — pay only for what you use, straight from your wallet, powered by ChainAbuse for
+          cross-chain coverage. We&apos;ll flip it on shortly.
         </p>
         <div className="flex flex-wrap justify-center gap-3">
           <a href="/check" className="inline-block px-6 py-3 rounded-lg bg-teal-500 text-slate-950 font-bold hover:bg-teal-400 transition">
             Try a free check
-          </a>
-          <a href="/check" className="inline-block px-6 py-3 rounded-lg border border-amber-400/50 bg-amber-400/10 text-amber-200 font-bold hover:bg-amber-400/20 transition">
-            Test deep check flow
           </a>
         </div>
       </div>
@@ -256,31 +128,29 @@ export default function ProPage() {
       <header className="text-center space-y-3">
         <h1 className="text-4xl font-black text-white">Deep checks, pay-as-you-go</h1>
         <p className="text-slate-300">
-          Pay what you like (min {MIN_USDC} USDC) in USDC on Base  -  {CREDITS_PER_USDC} check{CREDITS_PER_USDC === 1 ? "" : "s"} per
+          Pay what you like (min {MIN_USDC} USDC) in USDC on Base — {CREDITS_PER_USDC} check{CREDITS_PER_USDC === 1 ? "" : "s"} per
           USDC. No subscription, no account, just your wallet.
         </p>
       </header>
 
-      {!account ? (
+      {!isConnected || !address ? (
         <div className="bg-slate-900/60 border-2 border-teal-500/40 rounded-2xl p-6 text-center space-y-4">
           <p className="text-slate-300 text-sm">Connect your wallet to buy checks.</p>
           <button
             onClick={connect}
-            disabled={busy === "connecting"}
-            className="px-6 py-3 rounded-lg bg-teal-500 text-slate-950 font-bold hover:bg-teal-400 disabled:opacity-50 transition"
+            className="px-6 py-3 rounded-lg bg-teal-500 text-slate-950 font-bold hover:bg-teal-400 transition"
           >
-            {busy === "connecting" ? "Connecting…" : "Connect wallet"}
+            Connect wallet
           </button>
-          <p className="text-xs text-slate-500">No MetaMask? You'll be sent to WalletConnect to pair your wallet.</p>
         </div>
       ) : (
         <div className="bg-slate-900/60 border-2 border-teal-500/40 rounded-2xl p-6 space-y-4">
           <div className="flex items-center justify-between text-sm">
             <span className="text-slate-400">Wallet</span>
             <div className="flex items-center gap-3">
-              <span className="font-mono text-white">{short(account)}</span>
-              <a href="/wallet-connect?change=1&disconnect=1&returnTo=%2Fpro" className="text-xs font-semibold text-teal-300 hover:text-white hover:underline">Change wallet</a>
-              <button type="button" onClick={disconnect} className="text-xs font-semibold text-rose-300 hover:text-white hover:underline">Disconnect</button>
+              <span className="font-mono text-white">{short(address)}</span>
+              <button type="button" onClick={connect} className="text-xs font-semibold text-teal-300 hover:text-white hover:underline">Change wallet</button>
+              <button type="button" onClick={() => disconnect()} className="text-xs font-semibold text-rose-300 hover:text-white hover:underline">Disconnect</button>
             </div>
           </div>
           <div className="rounded-xl border border-emerald-500/40 bg-emerald-900/15 p-4 text-center">
@@ -289,7 +159,7 @@ export default function ProPage() {
           </div>
 
           <div className="space-y-2">
-            <p className="text-sm text-slate-300">Add checks  -  pay what you like:</p>
+            <p className="text-sm text-slate-300">Add checks — pay what you like:</p>
             <div className="flex gap-2">
               {[1, 5, 10].map((v) => (
                 <button
@@ -312,7 +182,7 @@ export default function ProPage() {
               />
             </div>
             <p className="text-xs text-slate-400">
-              = {buyChecks} check{buyChecks === 1 ? "" : "s"}. Paid on Base  -  make sure your wallet holds USDC on Base.
+              = {buyChecks} check{buyChecks === 1 ? "" : "s"}. Paid on Base — make sure your wallet holds USDC on Base.
             </p>
           </div>
 

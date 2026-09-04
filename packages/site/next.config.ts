@@ -13,6 +13,16 @@ const nextConfig: NextConfig = {
       { source: "/response", destination: "/check", permanent: false },
     ];
   },
+  turbopack: {
+    // Coinbase's "Base Account" smart-wallet connector (with its optional Solana/x402
+    // payment code) is pulled in transitively by @wagmi/connectors but is never used
+    // here (EVM injected + WalletConnect only), and several of its dynamic imports
+    // aren't installed. Stub the whole chain at its root instead of chasing each one.
+    resolveAlias: {
+      "@base-org/account": "./src/wallet/empty-module.ts",
+      "@coinbase/cdp-sdk": "./src/wallet/empty-module.ts",
+    },
+  },
 };
 
 export default nextConfig;

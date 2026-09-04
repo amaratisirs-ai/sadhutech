@@ -1,8 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useSignMessage } from "wagmi";
 import { resolveDecisionOutcome, type DecisionOutcome } from "../../src/decision";
 import { Icon } from "@/components/Icon";
+import { useWallet } from "@/src/wallet/useWallet";
 
 const GATE_URL = process.env.NEXT_PUBLIC_GATE_URL || "https://genesis-gate.onrender.com";
 const ADDRESS_RE = /^0x[0-9a-fA-F]{40}$/;
@@ -57,42 +59,6 @@ function detectNonEvmChain(addr: string): string | null {
   return null;
 }
 
-type Eth = { request: (a: { method: string; params?: unknown[] }) => Promise<unknown> };
-function getEth(): Eth | null {
-  if (typeof window === "undefined") return null;
-  return (window as unknown as { ethereum?: Eth }).ethereum ?? null;
-}
-
-async function getWalletProvider(): Promise<Eth | null> {
-  const injected = getEth();
-  if (injected) return injected;
-
-  const projectId = process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID;
-  if (!projectId) return null;
-
-  try {
-    const { EthereumProvider } = await import("@walletconnect/ethereum-provider");
-    const provider = await EthereumProvider.init({
-      projectId,
-      chains: [1],
-      optionalChains: [137, 42161, 10, 43114],
-      showQrModal: false,
-      methods: ["eth_accounts", "personal_sign"],
-      optionalMethods: ["eth_chainId", "eth_sign", "eth_signTypedData", "eth_signTypedData_v4"],
-      events: ["chainChanged", "accountsChanged"],
-      metadata: {
-        name: "GENESIS Firewall",
-        description: "Community-powered transaction security firewall",
-        url: typeof window !== "undefined" ? window.location.origin : "https://sadhutech.com",
-        icons: ["https://sadhutech.com/images/genesis-icon.png"],
-      },
-    });
-    return provider.session ? (provider as unknown as Eth) : null;
-  } catch {
-    return null;
-  }
-}
-
 function VerdictCard({ result }: { result: Result }) {
   if (result.error) {
     return (
@@ -144,17 +110,18 @@ function VerdictCard({ result }: { result: Result }) {
 }
 
 export default function CheckPage() {
+  const { address, isConnected, connect } = useWallet();
+  const { signMessageAsync } = useSignMessage();
   const [mode, setMode] = useState<Mode>("address");
   const [addressInput, setAddressInput] = useState("");
   const [dataInput, setDataInput] = useState("");
   const [checking, setChecking] = useState(false);
   const [result, setResult] = useState<Result | null>(null);
-  const [wallet, setWallet] = useState<string | null>(null);
   const [credits, setCredits] = useState<number | null>(null);
   const [lastTx, setLastTx] = useState<Record<string, unknown> | null>(null);
   const [deepBusy, setDeepBusy] = useState(false);
   const [deepMsg, setDeepMsg] = useState<string | null>(null);
-  const [resumeDeepCheck, setResumeDeepCheck] = useState(false);
+  const [pendingDeepCheck, setPendingDeepCheck] = useState(false);
 
   useEffect(() => {
     const raw = sessionStorage.getItem("genesis_check_pending");
@@ -162,9 +129,11 @@ export default function CheckPage() {
     sessionStorage.removeItem("genesis_check_pending");
     try {
       const saved = JSON.parse(raw);
+      if (saved.mode) setMode(saved.mode);
+      if (saved.addressInput) setAddressInput(saved.addressInput);
+      if (saved.dataInput) setDataInput(saved.dataInput);
       if (saved.lastTx) setLastTx(saved.lastTx);
       if (saved.result) setResult(saved.result);
-      if (saved.lastTx) setResumeDeepCheck(true);
     } catch {
       // ignore malformed restore payload
     }
@@ -262,35 +231,20 @@ export default function CheckPage() {
 
   const runDeepCheck = async () => {
     setDeepMsg(null);
-    if (!lastTx) return;
-    const eth = await getWalletProvider();
-    if (!eth) {
-      setDeepMsg("connect-wallet");
-      return;
-    }
+    if (!lastTx || !address) return;
     setDeepBusy(true);
     try {
-      let w = wallet;
-      if (!w) {
-        let accounts = (await eth.request({ method: "eth_accounts" })) as string[];
-        if (!accounts?.[0]) {
-          accounts = (await eth.request({ method: "eth_requestAccounts" })) as string[];
-        }
-        w = accounts?.[0]?.toLowerCase() ?? null;
-        if (!w) { setDeepMsg("Wallet connection was rejected."); return; }
-        setWallet(w);
-      }
-      const s = await refreshStatus(w);
+      const s = await refreshStatus(address);
       if (!s?.premium) { setDeepMsg("Deep checks (global ChainAbuse intel) are launching soon."); return; }
       if (!s.credits || s.credits < 1) { setDeepMsg("no-credits"); return; }
-      const message = `SadhuTech deep check\nwallet: ${w}\nts: ${new Date().toISOString()}`;
-      const signature = (await eth.request({ method: "personal_sign", params: [message, w] })) as string;
+      const message = `SadhuTech deep check\nwallet: ${address}\nts: ${new Date().toISOString()}`;
+      const signature = await signMessageAsync({ message });
       const res = await fetch(`${GATE_URL}/v1/analyze`, {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ tx: lastTx, pro: { wallet: w, message, signature } }),
+        body: JSON.stringify({ tx: lastTx, pro: { wallet: address, message, signature } }),
       });
-      if (res.status === 402) { await refreshStatus(w); setDeepMsg("no-credits"); return; }
+      if (res.status === 402) { await refreshStatus(address); setDeepMsg("no-credits"); return; }
       if (!res.ok) { setDeepMsg(`Deep check failed (HTTP ${res.status}). Please try again.`); return; }
       const data = await res.json();
       const outcome = resolveDecisionOutcome(data);
@@ -301,28 +255,37 @@ export default function CheckPage() {
         findings: data.findings ?? [],
       }));
       if (typeof data.creditsLeft === "number") setCredits(data.creditsLeft);
-    } catch (e) {
-      setDeepMsg(e instanceof Error ? e.message : "Deep check failed.");
+    } catch (e: any) {
+      setDeepMsg(e?.shortMessage || (e instanceof Error ? e.message : "Deep check failed."));
     } finally {
       setDeepBusy(false);
     }
   };
 
-  const connectForDeepCheck = () => {
+  const startDeepCheck = () => {
+    if (!isConnected || !address) {
+      setPendingDeepCheck(true);
+      connect();
+      return;
+    }
+    runDeepCheck();
+  };
+
+  const goBuyChecks = () => {
     try {
-      sessionStorage.setItem("genesis_check_pending", JSON.stringify({ lastTx, result }));
+      sessionStorage.setItem("genesis_check_pending", JSON.stringify({ mode, addressInput, dataInput, lastTx, result }));
     } catch {
       // ignore storage failures; worst case the user re-runs the check
     }
-    window.location.href = "/wallet-connect?returnTo=%2Fcheck";
+    window.location.href = "/pro";
   };
 
   useEffect(() => {
-    if (!resumeDeepCheck || !lastTx) return;
-    setResumeDeepCheck(false);
+    if (!pendingDeepCheck || !isConnected || !address) return;
+    setPendingDeepCheck(false);
     runDeepCheck();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [resumeDeepCheck, lastTx]);
+  }, [pendingDeepCheck, isConnected, address]);
 
   return (
     <div className="space-y-10 max-w-3xl mx-auto">
@@ -425,20 +388,20 @@ export default function CheckPage() {
           <div className="flex items-center gap-3 shrink-0">
             {credits !== null && <span className="text-xs text-slate-400">{credits} left</span>}
             <button
-              onClick={wallet ? runDeepCheck : connectForDeepCheck}
+              onClick={startDeepCheck}
               disabled={deepBusy}
               className="px-4 py-2 rounded-lg bg-amber-400 text-slate-950 text-sm font-bold hover:bg-amber-300 disabled:opacity-50 transition whitespace-nowrap"
             >
-              {deepBusy ? "Working…" : wallet ? "Deep check (1 credit)" : "Connect & deep check"}
+              {deepBusy ? "Working…" : isConnected ? "Deep check (1 credit)" : "Connect & deep check"}
             </button>
           </div>
         </div>
       )}
-      {deepMsg && deepMsg !== "no-credits" && deepMsg !== "connect-wallet" && (
+      {deepMsg && deepMsg !== "no-credits" && (
         <p className="text-xs text-amber-300 text-center">{deepMsg}</p>
       )}
       {deepMsg === "no-credits" && (
-        <p className="text-xs text-amber-300 text-center">You&apos;re out of checks. <a href="/pro" className="underline font-semibold">Buy more →</a></p>
+        <p className="text-xs text-amber-300 text-center">You&apos;re out of checks. <button type="button" onClick={goBuyChecks} className="underline font-semibold">Buy more →</button></p>
       )}
 
       {/* Examples */}

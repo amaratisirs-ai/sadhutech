@@ -2,6 +2,7 @@
 
 import { useEffect, useState, type ReactNode } from "react";
 import { ThemeProvider } from "./theme-provider";
+import { Web3Provider } from "./web3-provider";
 import { Icon } from "@/components/Icon";
 
 export function LayoutClient({ children }: { children: ReactNode }) {
@@ -18,6 +19,7 @@ export function LayoutClient({ children }: { children: ReactNode }) {
   const scrollToTop = () => window.scrollTo({ top: 0, behavior: "smooth" });
 
   return (
+    <Web3Provider>
     <ThemeProvider>
       {/* Modern Sticky Nav  -  Dark with Teal Border */}
       <nav className="bg-slate-950 backdrop-blur-xl border-b-2 border-teal-500 sticky top-0 z-50 shadow-lg">
@@ -189,6 +191,7 @@ export function LayoutClient({ children }: { children: ReactNode }) {
         </div>
       </footer>
     </ThemeProvider>
+    </Web3Provider>
   );
 }
 

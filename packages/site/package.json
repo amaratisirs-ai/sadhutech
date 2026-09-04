@@ -10,6 +10,9 @@
   },
   "dependencies": {
     "@genesis/shared": "workspace:*",
+    "@reown/appkit": "^1.8.23",
+    "@reown/appkit-adapter-wagmi": "^1.8.23",
+    "@tanstack/react-query": "^5.102.8",
     "@walletconnect/core": "^2.24.0",
     "@walletconnect/ethereum-provider": "^2.24.0",
     "@walletconnect/modal": "^2.7.0",
@@ -18,7 +21,9 @@
     "next": "16.3.4",
     "qrcode.react": "^4.2.0",
     "react": "19.2.8",
-    "react-dom": "19.2.8"
+    "react-dom": "19.2.8",
+    "viem": "^2.56.3",
+    "wagmi": "^3.7.7"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",

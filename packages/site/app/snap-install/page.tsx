@@ -7,11 +7,17 @@ import { Icon } from "@/components/Icon";
 
 declare global {
   interface Window {
-    ethereum?: {
-      request: (args: { method: string; params?: any }) => Promise<any>;
-      isMetaMask?: boolean;
-    };
+    ethereum?: Record<string, unknown>;
   }
+}
+
+type MetaMaskEthereum = {
+  request: (args: { method: string; params?: any }) => Promise<any>;
+  isMetaMask?: boolean;
+};
+
+function getMetaMask(): MetaMaskEthereum | undefined {
+  return typeof window !== "undefined" ? (window.ethereum as MetaMaskEthereum | undefined) : undefined;
 }
 
 type Platform = "desktop" | "mobile";
@@ -32,7 +38,7 @@ export default function SnapInstallPage() {
 
     // Detect MetaMask availability
     const checkMetaMask = () => {
-      if (typeof window !== "undefined" && window.ethereum?.isMetaMask) {
+      if (typeof window !== "undefined" && getMetaMask()?.isMetaMask) {
         setHasMetaMask(true);
         setState("ready");
       } else {
@@ -48,7 +54,7 @@ export default function SnapInstallPage() {
   }, []);
 
   const handleInstallClick = async () => {
-    if (!window.ethereum?.isMetaMask) {
+    if (!getMetaMask()?.isMetaMask) {
       setState("error");
       setErrorMsg("MetaMask not detected. Please install MetaMask extension first.");
       return;
@@ -63,7 +69,7 @@ export default function SnapInstallPage() {
         ? SNAP_CONFIG.getSnapId(window.location.origin)
         : SNAP_CONFIG.bundleUrl();
       
-      await window.ethereum.request({
+      await getMetaMask()!.request({
         method: "wallet_requestSnaps",
         params: {
           [snapId]: {},
