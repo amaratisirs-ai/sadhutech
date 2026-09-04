@@ -262,7 +262,7 @@ export default function ThreatsPage() {
               className={`p-3 rounded-lg border transition-all text-left ${
                 filter === null
                   ? "bg-indigo-600 text-white border-indigo-600"
-                  : "bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600"
+                  : "bg-white dark:bg-slate-800 text-slate-900 dark:text-white border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600"
               }`}
             >
               <div className="font-medium text-sm">All Categories</div>
@@ -276,7 +276,7 @@ export default function ThreatsPage() {
                   className={`p-3 rounded-lg border transition-all text-left ${
                     filter === category
                       ? (categoryInfo[category as keyof typeof categoryInfo]?.color || "bg-slate-100 dark:bg-slate-700")
-                      : "bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600"
+                      : "bg-white dark:bg-slate-800 text-slate-900 dark:text-white border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600"
                   }`}
                 >
                   <div className="font-medium text-sm">
