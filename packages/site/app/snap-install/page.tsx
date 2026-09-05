@@ -39,6 +39,7 @@ export default function SnapInstallPage() {
   const [awaitingWalletConnect, setAwaitingWalletConnect] = useState(false);
   const [permissionsDetailsOpen, setPermissionsDetailsOpen] = useState(false);
   const [mobileDetailsOpen, setMobileDetailsOpen] = useState(false);
+  const [metaMaskDetailsOpen, setMetaMaskDetailsOpen] = useState(false);
   const [linkCopied, setLinkCopied] = useState(false);
 
   const copyInstallLink = async () => {
@@ -340,20 +341,14 @@ export default function SnapInstallPage() {
 
             {/* State: MetaMask Not Installed */}
             {state === "ready" && !hasMetaMask && (
-              <div className="bg-gradient-to-br from-orange-500/10 to-red-500/10 border-2 border-orange-500/30 rounded-2xl p-8 space-y-6">
-                <div className="text-center space-y-2">
-                  <div className="flex justify-center text-orange-400"><Icon name="warning" className="w-14 h-14" /></div>
-                  <h3 className="text-xl font-bold text-white">MetaMask Extension Not Found</h3>
-                  <p className="text-sm text-orange-300">Snaps only run inside the actual MetaMask browser extension - install it, or use GENESIS Check with any other wallet instead</p>
-                  {isConnected && (
-                    <p className="text-xs text-slate-400 pt-1">
-                      Note: you have a wallet connected in the header, but that's a separate connection (e.g. WalletConnect) - it doesn't mean the MetaMask extension is installed in this browser.
-                    </p>
-                  )}
+              <div className="bg-gradient-to-br from-orange-500/10 to-red-500/10 border-2 border-orange-500/30 rounded-2xl p-5 space-y-4">
+                <div className="flex items-center gap-3">
+                  <Icon name="warning" className="w-8 h-8 text-orange-400 shrink-0" />
+                  <h3 className="text-base font-bold text-white">MetaMask Extension Not Found</h3>
                 </div>
 
                 <div className="bg-slate-900/50 rounded-lg p-4 space-y-3">
-                  <p className="text-white font-semibold">3 Easy Steps:</p>
+                  <p className="text-white font-semibold text-sm">3 Easy Steps:</p>
                   <ol className="space-y-2 text-sm text-slate-300">
                     <li className="flex gap-2">
                       <span className="font-bold text-orange-400 flex-shrink-0">1.</span>
@@ -380,6 +375,22 @@ export default function SnapInstallPage() {
                   </ol>
                 </div>
 
+                <button
+                  type="button"
+                  onClick={() => setMetaMaskDetailsOpen((v) => !v)}
+                  className="text-xs font-semibold text-teal-300 hover:text-teal-200 underline"
+                >
+                  {metaMaskDetailsOpen ? "Hide details" : "Why do I see this?"}
+                </button>
+                {metaMaskDetailsOpen && (
+                  <div className="text-xs text-slate-400 space-y-2 border-t border-slate-700 pt-3">
+                    <p>Snaps only run inside the actual MetaMask browser extension - install it, or use GENESIS Check with any other wallet instead.</p>
+                    {isConnected && (
+                      <p>Note: you have a wallet connected in the header, but that's a separate connection (e.g. WalletConnect) - it doesn't mean the MetaMask extension is installed in this browser.</p>
+                    )}
+                  </div>
+                )}
+
                 <a
                   href="https://metamask.io"
                   target="_blank"
@@ -395,14 +406,9 @@ export default function SnapInstallPage() {
                     onClick={handleUseWalletConnect}
                     className="flex-1 px-6 py-3 bg-teal-500 text-slate-950 font-bold rounded-xl hover:bg-teal-400 transition-all text-center"
                   >
-                    {isConnected ? "Reconnect a different wallet →" : "Use WalletConnect Instead"}
+                    Connect a different wallet →
                   </button>
                 </div>
-                {platform === "desktop" && (
-                  <p className="text-xs text-slate-500 text-center -mt-3">
-                    Opens a QR code you can scan with any mobile wallet, then takes you to GENESIS Check.
-                  </p>
-                )}
 
                 <button
                   onClick={() => window.location.reload()}
