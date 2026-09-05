@@ -173,6 +173,8 @@ export default function CheckPage() {
   const [bulkBusy, setBulkBusy] = useState(false);
   const [bulkMsg, setBulkMsg] = useState<string | null>(null);
   const [pendingBulkCheck, setPendingBulkCheck] = useState(false);
+  // Cached wallet signature proving ownership - reused across checks instead of re-prompting every click.
+  const [proAuth, setProAuth] = useState<{ address: string; message: string; signature: string; ts: number } | null>(null);
 
   useEffect(() => {
     const raw = sessionStorage.getItem("genesis_check_pending");
@@ -281,6 +283,25 @@ export default function CheckPage() {
     }
   };
 
+  // Stays under the gate's 10-minute signature-freshness window (server.ts) so a cached
+  // signature is never rejected as stale, while avoiding a fresh wallet prompt on every click.
+  const PRO_AUTH_TTL_MS = 8 * 60 * 1000;
+
+  const getProAuth = async (addr: string): Promise<{ message: string; signature: string }> => {
+    if (proAuth && proAuth.address === addr && Date.now() - proAuth.ts < PRO_AUTH_TTL_MS) {
+      return proAuth;
+    }
+    const message = `SadhuTech pro check\nwallet: ${addr}\nts: ${new Date().toISOString()}`;
+    const signature = await withTimeout(
+      signMessageAsync({ message }),
+      WALLET_SIGN_TIMEOUT_MS,
+      "No response from your wallet. Check for a pending signature request, or try again."
+    );
+    const auth = { address: addr, message, signature, ts: Date.now() };
+    setProAuth(auth);
+    return auth;
+  };
+
   const runDeepCheck = async () => {
     setDeepMsg(null);
     if (!lastTx || !address) return;
@@ -293,17 +314,13 @@ export default function CheckPage() {
       const s = await refreshStatus(address);
       if (!s?.premium) { setDeepMsg("Deep checks (global scam-address intel) are launching soon."); return; }
       if (!s.credits || s.credits < 1) { setDeepMsg("no-credits"); return; }
-      const message = `SadhuTech deep check\nwallet: ${address}\nts: ${new Date().toISOString()}`;
-      const signature = await withTimeout(
-        signMessageAsync({ message }),
-        WALLET_SIGN_TIMEOUT_MS,
-        "No response from your wallet. Check for a pending signature request, or try again."
-      );
+      const { message, signature } = await getProAuth(address);
       const res = await fetch(`${GATE_URL}/v1/analyze`, {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({ tx: lastTx, pro: { wallet: address, message, signature } }),
       });
+      if (res.status === 401) { setProAuth(null); setDeepMsg("Your session expired - please try again."); return; }
       if (res.status === 402) { await refreshStatus(address); setDeepMsg("no-credits"); return; }
       if (!res.ok) { setDeepMsg(`Deep check failed (HTTP ${res.status}). Please try again.`); return; }
       const data = await res.json();
@@ -354,17 +371,13 @@ export default function CheckPage() {
       const s = await refreshStatus(address);
       if (!s?.premium) { setBulkMsg("Bulk check (like deep checks) is launching soon."); return; }
       if (!s.credits || s.credits < addresses.length) { setBulkMsg("no-credits"); return; }
-      const message = `SadhuTech bulk check\nwallet: ${address}\nts: ${new Date().toISOString()}`;
-      const signature = await withTimeout(
-        signMessageAsync({ message }),
-        WALLET_SIGN_TIMEOUT_MS,
-        "No response from your wallet. Check for a pending signature request, or try again."
-      );
+      const { message, signature } = await getProAuth(address);
       const res = await fetch(`${GATE_URL}/v1/analyze/bulk`, {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({ addresses, pro: { wallet: address, message, signature } }),
       });
+      if (res.status === 401) { setProAuth(null); setBulkMsg("Your session expired - please try again."); return; }
       if (res.status === 402) { await refreshStatus(address); setBulkMsg("no-credits"); return; }
       if (!res.ok) { setBulkMsg(`Bulk check failed (HTTP ${res.status}). Please try again.`); return; }
       const data = await res.json();
