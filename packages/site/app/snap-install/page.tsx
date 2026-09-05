@@ -328,7 +328,7 @@ export default function SnapInstallPage() {
                 </p>
 
                 <a
-                  href="https://metamask.io"
+                  href="https://metamask.io/download"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="block w-full px-6 py-3 bg-orange-600 hover:bg-orange-700 text-white font-bold rounded-xl transition-all text-center"
