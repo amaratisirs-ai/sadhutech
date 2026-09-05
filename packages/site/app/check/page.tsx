@@ -517,9 +517,22 @@ export default function CheckPage() {
             <h2 className="text-xl font-bold text-white flex items-center gap-2"><Icon name="shieldAlert" className="w-5 h-5 text-teal-400" /> Bulk check (up to {MAX_BULK_ADDRESSES})</h2>
             <p className="text-sm text-slate-300 mt-1">
               Paste up to {MAX_BULK_ADDRESSES} addresses, one per line. Costs 1 Pro credit per address  -  requires a
-              connected wallet.
+              connected wallet.{" "}
+              <button
+                type="button"
+                onClick={() => setDeepDetailsOpen((v) => !v)}
+                className="underline font-semibold text-teal-300 hover:text-teal-200"
+              >
+                {deepDetailsOpen ? "Hide details" : "Details"}
+              </button>
             </p>
           </div>
+          {deepDetailsOpen && (
+            <div className="rounded-xl border border-slate-700 bg-slate-900/60 p-4 text-xs text-slate-300 space-y-2">
+              <p>Each address is cross-checked against an independent, continuously-updated database of over a million confirmed scam addresses, drainer contracts, and sanctioned wallets - built from security researchers and community reports.</p>
+              <p>It's a second, deeper layer on top of GENESIS's own community threat feed, useful for addresses that are new or not yet reported anywhere else. Costs 1 credit per address checked.</p>
+            </div>
+          )}
           <textarea
             value={bulkInput}
             onChange={(e) => { setBulkInput(e.target.value); setBulkMsg(null); }}
