@@ -176,6 +176,28 @@ export default function CheckPage() {
   // Cached wallet signature proving ownership - reused across checks instead of re-prompting every click.
   const [proAuth, setProAuth] = useState<{ address: string; message: string; signature: string; ts: number } | null>(null);
 
+  const PRO_AUTH_STORAGE_KEY = "genesis_pro_auth";
+
+  // Persists alongside state so the cached signature survives a page reload within its freshness window.
+  const persistProAuth = (auth: { address: string; message: string; signature: string; ts: number } | null) => {
+    setProAuth(auth);
+    try {
+      if (auth) localStorage.setItem(PRO_AUTH_STORAGE_KEY, JSON.stringify(auth));
+      else localStorage.removeItem(PRO_AUTH_STORAGE_KEY);
+    } catch {
+      // ignore storage failures (private browsing, quota, etc.) - falls back to in-memory only
+    }
+  };
+
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem(PRO_AUTH_STORAGE_KEY);
+      if (raw) setProAuth(JSON.parse(raw));
+    } catch {
+      // ignore malformed/missing cached auth
+    }
+  }, []);
+
   useEffect(() => {
     const raw = sessionStorage.getItem("genesis_check_pending");
     if (!raw) return;
@@ -283,9 +305,9 @@ export default function CheckPage() {
     }
   };
 
-  // Stays under the gate's 10-minute signature-freshness window (server.ts) so a cached
+  // Stays under the gate's 24-hour signature-freshness window (server.ts) so a cached
   // signature is never rejected as stale, while avoiding a fresh wallet prompt on every click.
-  const PRO_AUTH_TTL_MS = 8 * 60 * 1000;
+  const PRO_AUTH_TTL_MS = 23 * 60 * 60 * 1000;
 
   const getProAuth = async (addr: string): Promise<{ message: string; signature: string }> => {
     if (proAuth && proAuth.address === addr && Date.now() - proAuth.ts < PRO_AUTH_TTL_MS) {
@@ -298,7 +320,7 @@ export default function CheckPage() {
       "No response from your wallet. Check for a pending signature request, or try again."
     );
     const auth = { address: addr, message, signature, ts: Date.now() };
-    setProAuth(auth);
+    persistProAuth(auth);
     return auth;
   };
 
@@ -320,7 +342,7 @@ export default function CheckPage() {
         headers: { "content-type": "application/json" },
         body: JSON.stringify({ tx: lastTx, pro: { wallet: address, message, signature } }),
       });
-      if (res.status === 401) { setProAuth(null); setDeepMsg("Your session expired - please try again."); return; }
+      if (res.status === 401) { persistProAuth(null); setDeepMsg("Your session expired - please try again."); return; }
       if (res.status === 402) { await refreshStatus(address); setDeepMsg("no-credits"); return; }
       if (!res.ok) { setDeepMsg(`Deep check failed (HTTP ${res.status}). Please try again.`); return; }
       const data = await res.json();
@@ -377,7 +399,7 @@ export default function CheckPage() {
         headers: { "content-type": "application/json" },
         body: JSON.stringify({ addresses, pro: { wallet: address, message, signature } }),
       });
-      if (res.status === 401) { setProAuth(null); setBulkMsg("Your session expired - please try again."); return; }
+      if (res.status === 401) { persistProAuth(null); setBulkMsg("Your session expired - please try again."); return; }
       if (res.status === 402) { await refreshStatus(address); setBulkMsg("no-credits"); return; }
       if (!res.ok) { setBulkMsg(`Bulk check failed (HTTP ${res.status}). Please try again.`); return; }
       const data = await res.json();

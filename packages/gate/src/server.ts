@@ -125,9 +125,10 @@ app.post<{ Body: AnalyzeRequest }>("/v1/analyze",
       }
       const tsMatch = /ts:\s*(\S+)/.exec(message);
       const timestamp = tsMatch?.[1];
-      // Snap-originated requests reuse a one-time-signed credential (see onHomePage),
-      // so they get a much longer freshness window than the web's per-request signature.
-      const freshnessWindowMs = source === "snap" ? 24 * 60 * 60 * 1000 : 10 * 60 * 1000;
+      // Both the Snap (one-time onHomePage auth) and the web (cached signature, see
+      // check/page.tsx's getProAuth) reuse a signed credential across requests rather
+      // than re-signing every call, so both get the same 24h freshness window.
+      const freshnessWindowMs = 24 * 60 * 60 * 1000;
       const fresh = timestamp ? Math.abs(Date.now() - Date.parse(timestamp)) < freshnessWindowMs : false;
       if (signer.toLowerCase() !== wallet.toLowerCase() || !fresh || !message.toLowerCase().includes(wallet.toLowerCase())) {
         return reply.status(401).send({ error: "Invalid or expired signature." });
@@ -216,7 +217,8 @@ app.post<{ Body: { addresses?: string[]; pro?: { wallet?: string; message?: stri
     }
     const tsMatch = /ts:\s*(\S+)/.exec(message);
     const timestamp = tsMatch?.[1];
-    const freshnessWindowMs = source === "snap" ? 24 * 60 * 60 * 1000 : 10 * 60 * 1000;
+    // Same 24h window as /v1/analyze - the web now caches a signed credential too (see getProAuth).
+    const freshnessWindowMs = 24 * 60 * 60 * 1000;
     const fresh = timestamp ? Math.abs(Date.now() - Date.parse(timestamp)) < freshnessWindowMs : false;
     if (signer.toLowerCase() !== wallet.toLowerCase() || !fresh || !message.toLowerCase().includes(wallet.toLowerCase())) {
       return reply.status(401).send({ error: "Invalid or expired signature." });
