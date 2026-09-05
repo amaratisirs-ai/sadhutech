@@ -220,7 +220,8 @@ export default function CheckPage() {
   };
 
   const checkTransaction = async (rawData: string, title: string) => {
-    const data = rawData.trim();
+    // Strip all whitespace, not just leading/trailing - pasted calldata often wraps with spaces/newlines.
+    const data = rawData.replace(/\s+/g, "");
     if (!/^0x[0-9a-fA-F]*$/.test(data) || data.length < 10) {
       setResult({ title, error: "Paste valid transaction data  -  0x followed by the encoded call (at least a 4-byte method)." });
       return;
