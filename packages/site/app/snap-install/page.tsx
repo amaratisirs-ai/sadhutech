@@ -149,6 +149,7 @@ export default function SnapInstallPage() {
               {[
                 { icon: <Icon name="bolt" className="w-6 h-6" />, title: "Instant Analysis", desc: "<200ms transaction analysis" },
                 { icon: <Icon name="shield" className="w-6 h-6" />, title: "Community Powered", desc: "4k+ verified threats and growing" },
+                { icon: <Icon name="shieldAlert" className="w-6 h-6" />, title: "Deep Check", desc: "Optional Pro layer - cross-checks against 1M+ reported scam addresses" },
                 { icon: <Icon name="chart" className="w-6 h-6" />, title: "Clear Verdicts", desc: "ALLOW, WARN, or BLOCK" },
                 { icon: <Icon name="refresh" className="w-6 h-6" />, title: "Always Updated", desc: "New threats added hourly" },
                 { icon: <Icon name="lock" className="w-6 h-6" />, title: "100% Private", desc: "Runs locally, zero data tracking" },
