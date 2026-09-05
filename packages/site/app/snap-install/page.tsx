@@ -138,18 +138,6 @@ export default function SnapInstallPage() {
         {/* Header */}
         <div className="text-center space-y-4">
           <h1 className="text-5xl font-black text-white flex items-center justify-center gap-3"><Icon name="lock" className="w-12 h-12 text-teal-400" /> Get <Genesis /> Protection in MetaMask</h1>
-          <p className="text-lg text-teal-200 max-w-2xl mx-auto">
-            This path installs the MetaMask Snap. If you use Trust Wallet, Rainbow, Argent, or another WalletConnect wallet, use the WalletConnect path instead.
-          </p>
-          <div className="mt-4 p-3 bg-blue-900/40 border border-blue-500/40 rounded-lg max-w-2xl mx-auto">
-            <p className="text-xs text-blue-200">
-              {SNAP_CONFIG.getSnapMode() === "testing" ? (
-                <>🧪 <strong>Testing Mode:</strong> Direct bundle testing. Switch to <code>NEXT_PUBLIC_USE_REGISTRY_SNAP=true</code> when registry approved.</>
-              ) : (
-                <><strong>Production Mode:</strong> Using official MetaMask registry snap.</>
-              )}
-            </p>
-          </div>
         </div>
 
         {/* Main Two-Column Layout */}
@@ -160,8 +148,8 @@ export default function SnapInstallPage() {
             <div className="space-y-4">
               {[
                 { icon: <Icon name="bolt" className="w-6 h-6" />, title: "Instant Analysis", desc: "<200ms transaction analysis" },
-                { icon: <Icon name="shield" className="w-6 h-6" />, title: "Community Powered", desc: "4,122+ verified threats in database" },
-                { icon: <Icon name="chart" className="w-6 h-6" />, title: "Clear Verdicts", desc: "ALLOW, WARN, or BLOCK in plain English" },
+                { icon: <Icon name="shield" className="w-6 h-6" />, title: "Community Powered", desc: "4k+ verified threats and growing" },
+                { icon: <Icon name="chart" className="w-6 h-6" />, title: "Clear Verdicts", desc: "ALLOW, WARN, or BLOCK" },
                 { icon: <Icon name="refresh" className="w-6 h-6" />, title: "Always Updated", desc: "New threats added hourly" },
                 { icon: <Icon name="lock" className="w-6 h-6" />, title: "100% Private", desc: "Runs locally, zero data tracking" },
                 { icon: <Icon name="checkCircle" className="w-6 h-6" />, title: "Non-Custodial", desc: "Your keys, your control, always" },
@@ -203,11 +191,6 @@ export default function SnapInstallPage() {
                   <div className="flex justify-center text-teal-400"><Icon name="shield" className="w-16 h-16" /></div>
                   <h3 className="text-xl font-bold text-white">Ready to Install</h3>
                   <p className="text-sm text-teal-300">MetaMask detected ✓</p>
-                </div>
-
-                <div className="bg-slate-900/50 rounded-lg p-4 text-sm text-slate-200 border border-slate-700">
-                  <p className="font-semibold text-white mb-1">This is the MetaMask path.</p>
-                  <p>Use this if you want <Genesis /> inside MetaMask. WalletConnect wallets should use the connect flow instead.</p>
                 </div>
 
                 <div className="bg-slate-900/50 rounded-lg p-4 space-y-2 text-sm">

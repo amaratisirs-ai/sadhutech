@@ -81,6 +81,7 @@ export function LayoutClient({ children }: { children: ReactNode }) {
                 <NavDropdown
                   label="Resources"
                   items={[
+                    { href: "/demo", label: "Demo" },
                     { href: "/developers", label: "Developers" },
                     { href: "/partners", label: "Integrations & Partners" },
                     { href: "/whitepaper", label: "Vision & Roadmap" },
@@ -130,6 +131,7 @@ export function LayoutClient({ children }: { children: ReactNode }) {
                 <MobileNavLink href="https://github.com/amaratisirs-ai/sadhutech" onClick={() => setMobileMenuOpen(false)}>GitHub</MobileNavLink>
 
                 <MobileSectionLabel>Resources</MobileSectionLabel>
+                <MobileNavLink href="/demo" onClick={() => setMobileMenuOpen(false)}>Demo</MobileNavLink>
                 <MobileNavLink href="/developers" onClick={() => setMobileMenuOpen(false)}>Developers</MobileNavLink>
                 <MobileNavLink href="/partners" onClick={() => setMobileMenuOpen(false)}>Integrations & Partners</MobileNavLink>
                 <MobileNavLink href="/whitepaper" onClick={() => setMobileMenuOpen(false)}>Vision & Roadmap</MobileNavLink>

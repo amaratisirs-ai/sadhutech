@@ -30,27 +30,6 @@ type Result = {
   error?: string;
 };
 
-const EXAMPLES = [
-  {
-    key: "safe",
-    label: "A normal token transfer",
-    hint: "What a routine, safe action looks like",
-    data: "0xa9059cbb000000000000000000000000444444444444444444444444444444444444444400000000000000000000000000000000000000000000000000000000000003e8",
-  },
-  {
-    key: "approval",
-    label: "An unlimited spending approval",
-    hint: "Grants access to ALL your tokens  -  a common scam",
-    data: "0x095ea7b30000000000000000000000003333333333333333333333333333333333333333ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
-  },
-  {
-    key: "drainer",
-    label: "Approval to a known drainer",
-    hint: "An address the community has confirmed as malicious",
-    data: "0x095ea7b3000000000000000000000000000000000000000000000000000000000000deadffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
-  },
-];
-
 function short(a: string) {
   return a ? `${a.slice(0, 6)}…${a.slice(-4)}` : "";
 }
@@ -652,25 +631,6 @@ export default function CheckPage() {
       {deepMsg === "no-credits" && (
         <p className="text-xs text-amber-300 text-center">You&apos;re out of credits. <button type="button" onClick={goBuyChecks} className="underline font-semibold">Buy credits →</button></p>
       )}
-
-      {/* Examples */}
-      <section className="space-y-3">
-        <h3 className="text-lg font-bold text-white">See it in action</h3>
-        <p className="text-sm text-slate-400">Run a sample check to see how GENESIS explains a verdict.</p>
-        <div className="grid sm:grid-cols-3 gap-3">
-          {EXAMPLES.map((ex) => (
-            <button
-              key={ex.key}
-              onClick={() => checkTransaction(ex.data, `Example · ${ex.label}`)}
-              disabled={checking}
-              className="text-left rounded-xl border-2 border-slate-700 bg-slate-800/50 hover:border-teal-500 p-4 transition disabled:opacity-50"
-            >
-              <p className="font-semibold text-white text-sm">{ex.label}</p>
-              <p className="text-xs text-slate-400 mt-1">{ex.hint}</p>
-            </button>
-          ))}
-        </div>
-      </section>
 
       {/* Trust + report */}
       <section className="grid sm:grid-cols-2 gap-4">
