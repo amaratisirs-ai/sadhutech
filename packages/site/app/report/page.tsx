@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { Icon } from '@/components/Icon';
+import { Genesis } from '@/components/Genesis';
 
 const THREAT_CATEGORIES = [
   { value: 'phishing', label: 'Phishing' },
@@ -259,7 +260,7 @@ export default function ReportPage() {
           <ul className="space-y-2 text-slate-300 text-sm">
             <li className="flex gap-2"><Icon name="check" className="w-4 h-4 mt-0.5 text-green-400 flex-shrink-0" /><span><strong>Submit:</strong> Report a malicious address (Ethereum, Polygon, Arbitrum, Optimism, etc.)</span></li>
             <li className="flex gap-2"><Icon name="check" className="w-4 h-4 mt-0.5 text-green-400 flex-shrink-0" /><span><strong>Confirm:</strong> Click the link we email you  -  this proves the report is genuine</span></li>
-            <li className="flex gap-2"><Icon name="check" className="w-4 h-4 mt-0.5 text-green-400 flex-shrink-0" /><span><strong>Protect:</strong> Once confirmed by the community, GENESIS blocks the address for everyone</span></li>
+            <li className="flex gap-2"><Icon name="check" className="w-4 h-4 mt-0.5 text-green-400 flex-shrink-0" /><span><strong>Protect:</strong> Once confirmed by the community, <Genesis /> blocks the address for everyone</span></li>
             <li className="flex gap-2"><Icon name="check" className="w-4 h-4 mt-0.5 text-green-400 flex-shrink-0" /><span><strong>Track:</strong> Build your reporter reputation on the community leaderboard</span></li>
           </ul>
         </div>

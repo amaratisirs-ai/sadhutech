@@ -1,6 +1,7 @@
 "use client";
 
 import { Icon } from "@/components/Icon";
+import { Genesis, withGenesisStyle } from "@/components/Genesis";
 
 export default function AfterInstallPage() {
   return (
@@ -10,7 +11,7 @@ export default function AfterInstallPage() {
         <div className="flex justify-center text-emerald-400"><Icon name="checkCircle" className="w-16 h-16" /></div>
         <h1 className="text-5xl font-black text-white">You're Protected!</h1>
         <p className="text-lg text-teal-200 max-w-2xl mx-auto">
-          GENESIS Snap is now active. Here's what happens next.
+          <Genesis /> Snap is now active. Here's what happens next.
         </p>
       </div>
 
@@ -22,7 +23,7 @@ export default function AfterInstallPage() {
           <div className="space-y-4">
             <h3 className="text-xl font-bold text-white">Your First Transaction</h3>
             <p className="text-slate-300">
-              Open any crypto app (Uniswap, OpenSea, etc.) and try a transaction. <strong>Before you sign</strong>, GENESIS will analyze it and show you a verdict.
+              Open any crypto app (Uniswap, OpenSea, etc.) and try a transaction. <strong>Before you sign</strong>, <Genesis /> will analyze it and show you a verdict.
             </p>
             <div className="bg-teal-500/10 border border-teal-500/30 rounded-lg p-4">
               <p className="text-sm text-teal-200 font-mono">
@@ -34,7 +35,7 @@ export default function AfterInstallPage() {
           <div className="space-y-4">
             <h3 className="text-xl font-bold text-white">Where to See It</h3>
             <p className="text-slate-300">
-              When you're about to sign a transaction in MetaMask, look for the <strong>"Insights"</strong> section. That's where GENESIS shows its analysis.
+              When you're about to sign a transaction in MetaMask, look for the <strong>"Insights"</strong> section. That's where <Genesis /> shows its analysis.
             </p>
             <div className="bg-indigo-500/10 border border-indigo-500/30 rounded-lg p-4">
               <p className="text-sm text-indigo-200">
@@ -113,7 +114,7 @@ export default function AfterInstallPage() {
 
       {/* Real-World Signals */}
       <section className="bg-slate-900/50 rounded-2xl border border-teal-500/20 p-12">
-        <h2 className="text-3xl font-bold text-white mb-8 flex items-center gap-3"><Icon name="search" className="w-7 h-7 text-teal-400" /> What GENESIS looks for</h2>
+        <h2 className="text-3xl font-bold text-white mb-8 flex items-center gap-3"><Icon name="search" className="w-7 h-7 text-teal-400" /> What <Genesis /> looks for</h2>
 
         <div className="space-y-4">
           {[
@@ -138,7 +139,7 @@ export default function AfterInstallPage() {
                 <Icon name={scenario.icon as any} className="w-5 h-5 text-teal-400" />
                 <span>{scenario.title}</span>
               </h3>
-              <p className="text-slate-300">{scenario.desc}</p>
+              <p className="text-slate-300">{withGenesisStyle(scenario.desc)}</p>
             </div>
           ))}
         </div>
@@ -149,7 +150,7 @@ export default function AfterInstallPage() {
         <h2 className="text-3xl font-bold text-white mb-8 flex items-center gap-3"><Icon name="search" className="w-7 h-7 text-teal-400" /> What Findings Mean</h2>
         
         <p className="text-slate-300 mb-6">
-          When GENESIS detects something, it shows a finding with details. Here are common ones:
+          When <Genesis /> detects something, it shows a finding with details. Here are common ones:
         </p>
 
         <div className="space-y-4">
@@ -221,7 +222,7 @@ export default function AfterInstallPage() {
           ].map((item, i) => (
             <div key={i} className="bg-slate-800/50 border border-slate-700 rounded-lg p-6 space-y-2">
               <h3 className="font-bold text-white text-lg">{item.q}</h3>
-              <p className="text-slate-300">{item.a}</p>
+              <p className="text-slate-300">{withGenesisStyle(item.a)}</p>
             </div>
           ))}
         </div>
@@ -258,10 +259,10 @@ export default function AfterInstallPage() {
       {/* Final Note */}
       <section className="bg-teal-500/10 border-2 border-teal-500/30 rounded-2xl p-8 text-center space-y-3">
         <p className="text-teal-200">
-          <strong>Pro Tip:</strong> GENESIS learns from your feedback. If you find a false positive or false negative, please report it!
+          <strong>Pro Tip:</strong> <Genesis /> learns from your feedback. If you find a false positive or false negative, please report it!
         </p>
         <p className="text-sm text-slate-400">
-          Privacy: GENESIS never sees your addresses or personal data. All analysis is done on your device.
+          Privacy: <Genesis /> never sees your addresses or personal data. All analysis is done on your device.
         </p>
       </section>
     </div>

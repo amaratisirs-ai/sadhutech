@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Icon } from "@/components/Icon";
+import { Genesis, withGenesisStyle } from "@/components/Genesis";
 
 const slides = [
   {
@@ -133,7 +134,7 @@ export default function LaymansPPTPage() {
       <div className="bg-gradient-to-r from-indigo-950 to-slate-950 py-8 px-6 border-b-2 border-teal-500/30">
         <div className="max-w-6xl mx-auto">
           <h1 className="text-4xl font-black text-teal-400">
-            GENESIS Layman's PPT
+            <Genesis /> Layman's PPT
           </h1>
           <p className="text-slate-400 text-sm mt-2">
             Slide {currentSlide + 1} of {slides.length}
@@ -156,17 +157,17 @@ export default function LaymansPPTPage() {
 
             {/* Title */}
             <h2 className="text-4xl md:text-5xl font-black text-teal-400 mb-4 leading-tight">
-              {slide.title}
+              {withGenesisStyle(slide.title)}
             </h2>
 
             {/* Subtitle */}
             <p className="text-xl text-teal-300/80 font-semibold mb-8">
-              {slide.subtitle}
+              {withGenesisStyle(slide.subtitle)}
             </p>
 
             {/* Content */}
             <p className="text-lg text-slate-300 leading-relaxed mb-8">
-              {slide.content}
+              {withGenesisStyle(slide.content)}
             </p>
           </div>
 
@@ -256,7 +257,7 @@ export default function LaymansPPTPage() {
 
       {/* Footer */}
       <div className="border-t border-teal-500/20 mt-12 py-8 px-6 text-center text-slate-500 text-sm">
-        <p>GENESIS Layman's Presentation | 15 Slides</p>
+        <p><Genesis /> Layman's Presentation | 15 Slides</p>
         <p className="text-xs mt-2">Nature-Inspired Crypto Security</p>
       </div>
     </div>

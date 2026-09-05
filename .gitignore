@@ -18,3 +18,7 @@ packages/site/public/*.apikey
 packages/site/public/*.secret
 .vercel
 .env*
+
+# Raw source assets (compressed copies live under packages/site/public/)
+/logo/
+/images/

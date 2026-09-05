@@ -3,6 +3,7 @@
 import { useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
 import { resolveDecisionOutcome, type DecisionOutcome } from "../../src/decision";
+import { Genesis } from "@/components/Genesis";
 
 const GATE_URL = process.env.NEXT_PUBLIC_GATE_URL || "https://genesis-gate.onrender.com";
 const ADDRESS_RE = /^0x[0-9a-fA-F]{40}$/;
@@ -221,7 +222,7 @@ function ConnectedContent() {
           <div className="text-emerald-400"><svg className="w-12 h-12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75"><path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" /></svg></div>
           <div>
             <h1 className="text-3xl md:text-4xl font-black text-white">You're connected</h1>
-            <p className="text-emerald-200 text-sm">GENESIS is ready to check transactions before you sign them.</p>
+            <p className="text-emerald-200 text-sm"><Genesis /> is ready to check transactions before you sign them.</p>
           </div>
         </div>
         <div className="grid sm:grid-cols-3 gap-3 text-sm">
@@ -253,7 +254,7 @@ function ConnectedContent() {
         <div>
           <h3 className="text-xl font-bold text-white">Check any address before you approve it</h3>
           <p className="text-sm text-slate-300 mt-1">
-            About to approve a contract, connect to a dApp, or send funds? Paste that address here first and GENESIS screens
+            About to approve a contract, connect to a dApp, or send funds? Paste that address here first and <Genesis /> screens
             it against community threat intel  -  before you sign anything in your wallet.
           </p>
           <p className="text-xs text-slate-400 mt-2">
@@ -283,7 +284,7 @@ function ConnectedContent() {
       {/* Examples */}
       <section className="space-y-3">
         <h3 className="text-lg font-bold text-white">See it in action</h3>
-        <p className="text-sm text-slate-400">Run a sample check to see how GENESIS explains a verdict.</p>
+        <p className="text-sm text-slate-400">Run a sample check to see how <Genesis /> explains a verdict.</p>
         <div className="grid sm:grid-cols-3 gap-3">
           {EXAMPLES.map((ex) => (
             <button

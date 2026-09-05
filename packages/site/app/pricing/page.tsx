@@ -25,7 +25,7 @@ const TIERS = [
     cta: { label: "Buy credits", href: "/pro", disabled: false },
     features: [
       "Everything in Free",
-      "Deep checks powered by ChainAbuse",
+      "Deep checks powered by enterprise threat intel",
       "Cross-chain coverage (BTC, Solana & more)",
       "Pay-as-you-go  -  no subscription, no account",
       "Pay what you like, min 1 USDC",
@@ -38,10 +38,10 @@ const TIERS = [
     cadence: "/month",
     tagline: "For wallets, dapps, and security teams.",
     highlight: false,
-    cta: { label: "Contact us", href: "mailto:contact@bhusoft.com", disabled: false },
+    cta: { label: "Contact us", href: "mailto:security@sadhutech.com", disabled: false },
     features: [
       "REST API with quota + SLA",
-      "Full ChainAbuse-powered intel",
+      "Full enterprise threat intel",
       "Webhooks & custom allow/deny lists",
       "Team dashboard",
       "Volume pricing",
@@ -119,7 +119,8 @@ export default function PricingPage() {
         <p className="text-sm text-slate-300">
           <strong className="text-white">Free</strong> checks against our community threat feed  -  thousands of
           scam addresses reported and confirmed by the community. <strong className="text-white">Pro</strong> is
-          pay-as-you-go: buy credits with USDC from your wallet and get ChainAbuse's premium, cross-chain intel per check.
+          pay-as-you-go: buy credits with USDC from your wallet and get enterprise-grade threat intel, aggregated from
+          millions of addresses and scam reports worldwide, per check.
         </p>
         <p className="text-xs text-slate-400">
           We will never paywall basic safety or charge you to report a scam  -  that's what keeps everyone protected.

@@ -3,6 +3,7 @@
 import { useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
 import { resolveDecisionOutcome } from "../../src/decision";
+import { Genesis } from "@/components/Genesis";
 
 function APIExplorerContent() {
   const searchParams = useSearchParams();
@@ -187,7 +188,7 @@ function APIExplorerContent() {
       <div className="space-y-4">
         <h1 className="text-5xl font-black text-white mb-4">Transaction Review</h1>
         <p className="text-slate-300 text-lg">
-          Connect your wallet, review the transaction, and let GENESIS check it before signing.
+          Connect your wallet, review the transaction, and let <Genesis /> check it before signing.
         </p>
       </div>
 
@@ -198,7 +199,7 @@ function APIExplorerContent() {
             <span className="font-bold text-white">1. Connect wallet</span>
           </div>
           <div className="rounded-lg border border-slate-700 bg-slate-950/40 p-3">
-            <span className="font-bold text-white">2. Send tx to GENESIS</span>
+            <span className="font-bold text-white">2. Send tx to <Genesis /></span>
           </div>
           <div className="rounded-lg border border-slate-700 bg-slate-950/40 p-3">
             <span className="font-bold text-white">3. Sign only after the verdict</span>
@@ -248,7 +249,7 @@ function APIExplorerContent() {
             </div>
           </div>
         ) : (
-          <p className="text-sm text-slate-300">Connect a wallet to prefill the request and test a real transaction against GENESIS.</p>
+          <p className="text-sm text-slate-300">Connect a wallet to prefill the request and test a real transaction against <Genesis />.</p>
         )}
       </div>
 
@@ -306,7 +307,7 @@ function APIExplorerContent() {
 
           {signatureState === "signed" && (
             <div className="mt-4 rounded-lg border border-emerald-500/40 bg-emerald-500/10 p-3 text-sm text-emerald-100">
-              GENESIS verdict approved the transaction. The wallet can proceed to the final sign step when the user confirms in the wallet.
+              <Genesis /> verdict approved the transaction. The wallet can proceed to the final sign step when the user confirms in the wallet.
             </div>
           )}
         </div>

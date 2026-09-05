@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { QRCodeCanvas } from "qrcode.react";
 import { SNAP_CONFIG } from "@/config/snap-config";
 import { Icon } from "@/components/Icon";
+import { Genesis } from "@/components/Genesis";
 
 declare global {
   interface Window {
@@ -123,7 +124,7 @@ export default function SnapInstallPage() {
       <div className="space-y-12">
         {/* Header */}
         <div className="text-center space-y-4">
-          <h1 className="text-5xl font-black text-white flex items-center justify-center gap-3"><Icon name="lock" className="w-12 h-12 text-teal-400" /> Get GENESIS Protection in MetaMask</h1>
+          <h1 className="text-5xl font-black text-white flex items-center justify-center gap-3"><Icon name="lock" className="w-12 h-12 text-teal-400" /> Get <Genesis /> Protection in MetaMask</h1>
           <p className="text-lg text-teal-200 max-w-2xl mx-auto">
             This path installs the MetaMask Snap. If you use Trust Wallet, Rainbow, Argent, or another WalletConnect wallet, use the WalletConnect path instead.
           </p>
@@ -142,7 +143,7 @@ export default function SnapInstallPage() {
         <div className="grid md:grid-cols-2 gap-12 items-start">
           {/* Left: Benefits */}
           <div className="space-y-6">
-            <h2 className="text-2xl font-bold text-white mb-6">Why GENESIS?</h2>
+            <h2 className="text-2xl font-bold text-white mb-6">Why <Genesis />?</h2>
             <div className="space-y-4">
               {[
                 { icon: <Icon name="bolt" className="w-6 h-6" />, title: "Instant Analysis", desc: "<200ms transaction analysis" },
@@ -193,7 +194,7 @@ export default function SnapInstallPage() {
 
                 <div className="bg-slate-900/50 rounded-lg p-4 text-sm text-slate-200 border border-slate-700">
                   <p className="font-semibold text-white mb-1">This is the MetaMask path.</p>
-                  <p>Use this if you want GENESIS inside MetaMask. WalletConnect wallets should use the connect flow instead.</p>
+                  <p>Use this if you want <Genesis /> inside MetaMask. WalletConnect wallets should use the connect flow instead.</p>
                 </div>
 
                 <div className="bg-slate-900/50 rounded-lg p-4 space-y-2 text-sm">
@@ -239,7 +240,7 @@ export default function SnapInstallPage() {
                   disabled={!agreedToTerms}
                   className="w-full px-6 py-4 bg-gradient-to-r from-teal-500 to-teal-400 text-slate-950 font-bold rounded-xl hover:shadow-xl hover:shadow-teal-500/50 transition-all text-lg disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:shadow-none"
                 >
-                  + Install GENESIS Snap
+                  + Install <Genesis /> Snap
                 </button>
 
                 <p className="text-xs text-slate-500 text-center">
@@ -259,7 +260,7 @@ export default function SnapInstallPage() {
                   </div>
                 </div>
                 <div>
-                  <h3 className="text-xl font-bold text-white">Installing GENESIS...</h3>
+                  <h3 className="text-xl font-bold text-white">Installing <Genesis />...</h3>
                   <p className="text-slate-400">Look at your MetaMask popup to approve</p>
                 </div>
               </div>
@@ -271,14 +272,14 @@ export default function SnapInstallPage() {
                 <div className="text-center space-y-3">
                   <div className="flex justify-center text-green-400"><Icon name="checkCircle" className="w-16 h-16" /></div>
                   <h3 className="text-2xl font-bold text-white">All Set!</h3>
-                  <p className="text-slate-400">GENESIS is now protecting your transactions</p>
+                  <p className="text-slate-400"><Genesis /> is now protecting your transactions</p>
                 </div>
 
                 <div className="bg-slate-900/50 rounded-lg p-4 space-y-2 text-sm">
                   <p className="text-white font-semibold">What's next:</p>
                   <ol className="space-y-2 text-slate-300">
                     <li>1. Try any transaction in any app (Uniswap, OpenSea, etc.)</li>
-                    <li>2. MetaMask will show GENESIS's analysis before you sign</li>
+                    <li>2. MetaMask will show <Genesis />'s analysis before you sign</li>
                     <li>3. Get a clear verdict: ALLOW, WARN, or BLOCK</li>
                   </ol>
                 </div>
@@ -440,7 +441,7 @@ export default function SnapInstallPage() {
         <div className="bg-indigo-500/10 border-2 border-indigo-500/30 rounded-2xl p-12">
           <h2 className="text-2xl font-bold text-white mb-6">About Snap Permissions</h2>
           <p className="text-slate-300 mb-8">
-            When you install GENESIS, MetaMask asks for a few permissions. Here's why we need them and how they keep you safe:
+            When you install <Genesis />, MetaMask asks for a few permissions. Here's why we need them and how they keep you safe:
           </p>
 
           <div className="grid md:grid-cols-2 gap-8">
@@ -448,11 +449,11 @@ export default function SnapInstallPage() {
               <div className="bg-slate-900/50 rounded-lg p-6 border border-indigo-500/20">
                 <h3 className="text-lg font-bold text-white mb-3 flex items-center gap-2"><Icon name="search" className="w-5 h-5 text-teal-400" /> Transaction Insight</h3>
                 <p className="text-slate-300 mb-4">
-                  This lets GENESIS <strong>see transactions before you sign</strong> so it can analyze them for risks.
+                  This lets <Genesis /> <strong>see transactions before you sign</strong> so it can analyze them for risks.
                 </p>
                 <div className="bg-slate-800/50 rounded p-3 text-sm text-slate-400 space-y-2">
                   <p>
-                    <strong>GENESIS sees:</strong>
+                    <strong><Genesis /> sees:</strong>
                   </p>
                   <ul className="list-disc list-inside space-y-1">
                     <li>Which address you're sending to</li>
@@ -460,7 +461,7 @@ export default function SnapInstallPage() {
                     <li>Transaction amount</li>
                   </ul>
                   <p className="mt-3 pt-3 border-t border-slate-700">
-                    <strong>GENESIS does NOT see:</strong>
+                    <strong><Genesis /> does NOT see:</strong>
                   </p>
                   <ul className="list-disc list-inside space-y-1">
                     <li>Your private key (impossible)</li>
@@ -475,13 +476,13 @@ export default function SnapInstallPage() {
               <div className="bg-slate-900/50 rounded-lg p-6 border border-indigo-500/20">
                 <h3 className="text-lg font-bold text-white mb-3 flex items-center gap-2"><Icon name="shield" className="w-5 h-5 text-teal-400" /> Signature Insight</h3>
                 <p className="text-slate-300 mb-4">
-                  This lets GENESIS <strong>screen signature requests</strong> too — not just transactions. Most modern
+                  This lets <Genesis /> <strong>screen signature requests</strong> too — not just transactions. Most modern
                   drainers steal funds through a blind signature (a "permit" or marketplace order) rather than an
                   on-chain transaction, so this closes that gap.
                 </p>
                 <div className="bg-slate-800/50 rounded p-3 text-sm text-slate-400 space-y-2">
                   <p>
-                    <strong>GENESIS checks:</strong>
+                    <strong><Genesis /> checks:</strong>
                   </p>
                   <ul className="list-disc list-inside space-y-1">
                     <li>Gasless "permit" approvals (EIP-2612, Permit2)</li>
@@ -499,7 +500,7 @@ export default function SnapInstallPage() {
               <div className="bg-slate-900/50 rounded-lg p-6 border border-indigo-500/20">
                 <h3 className="text-lg font-bold text-white mb-3 flex items-center gap-2"><Icon name="globe" className="w-5 h-5 text-teal-400" /> Network Access</h3>
                 <p className="text-slate-300 mb-4">
-                  This lets GENESIS <strong>fetch the latest threat database</strong> from our servers so it has current threat intel.
+                  This lets <Genesis /> <strong>fetch the latest threat database</strong> from our servers so it has current threat intel.
                 </p>
                 <div className="bg-slate-800/50 rounded p-3 text-sm text-slate-400 space-y-2">
                   <p>
@@ -525,7 +526,7 @@ export default function SnapInstallPage() {
 
           <div className="mt-8 p-6 bg-teal-500/10 border border-teal-500/30 rounded-lg">
             <p className="text-teal-200">
-              <strong>Your security:</strong> GENESIS runs in MetaMask's sandbox. It can't access your keys, funds, or personal info. Risk analysis is performed by the GENESIS gate service over the network (that's what Network Access is for) — nothing is analyzed by a third party beyond that.
+              <strong>Your security:</strong> <Genesis /> runs in MetaMask's sandbox. It can't access your keys, funds, or personal info. Risk analysis is performed by the <Genesis /> gate service over the network (that's what Network Access is for) — nothing is analyzed by a third party beyond that.
             </p>
           </div>
 
@@ -549,7 +550,7 @@ export default function SnapInstallPage() {
     <div className="space-y-8">
       {/* Header */}
       <div className="text-center space-y-3">
-        <h1 className="text-3xl font-black text-white">GENESIS Protection</h1>
+        <h1 className="text-3xl font-black text-white"><Genesis /> Protection</h1>
         <p className="text-sm text-teal-200">MetaMask Snap for MetaMask users. WalletConnect users should use the connect flow instead.</p>
       </div>
 
@@ -567,7 +568,7 @@ export default function SnapInstallPage() {
                 <ul className="list-disc list-inside space-y-1">
                   <li>Desktop browsers: Chrome, Firefox, Safari, Brave</li>
                   <li>MetaMask browser extension installed</li>
-                  <li>Visit this site and click "Install GENESIS Snap"</li>
+                  <li>Visit this site and click "Install <Genesis /> Snap"</li>
                 </ul>
               </div>
 
@@ -622,7 +623,7 @@ export default function SnapInstallPage() {
                   disabled={!agreedToTerms}
                   className="w-full px-4 py-3 bg-gradient-to-r from-teal-500 to-teal-400 text-slate-950 font-bold rounded-lg hover:shadow-lg transition-all text-base disabled:opacity-40 disabled:cursor-not-allowed"
                 >
-                  + Install GENESIS Snap
+                  + Install <Genesis /> Snap
                 </button>
               </div>
             </>
@@ -646,7 +647,7 @@ export default function SnapInstallPage() {
             <div className="text-center space-y-3">
               <div className="flex justify-center text-green-400"><Icon name="checkCircle" className="w-12 h-12" /></div>
               <h3 className="font-bold text-white">Installation Complete!</h3>
-              <p className="text-xs text-slate-400">GENESIS is now protecting your transactions</p>
+              <p className="text-xs text-slate-400"><Genesis /> is now protecting your transactions</p>
               <a href="/after-install" className="block mt-3 px-4 py-2 bg-teal-500 text-slate-950 font-bold rounded-lg text-center text-sm">
                 What's Next?
               </a>
@@ -694,7 +695,7 @@ export default function SnapInstallPage() {
 
       {/* Why GENESIS - Quick Card */}
       <div className="bg-slate-900/50 rounded-lg p-4 space-y-3">
-        <h3 className="font-bold text-white text-sm">Why GENESIS?</h3>
+        <h3 className="font-bold text-white text-sm">Why <Genesis />?</h3>
         <div className="space-y-2 text-xs text-slate-300">
           <div className="flex gap-2 items-center"><Icon name="bolt" className="w-4 h-4 text-teal-400" /><span>Instant analysis in milliseconds</span></div>
           <div className="flex gap-2 items-center"><Icon name="shield" className="w-4 h-4 text-teal-400" /><span>Community-powered threat detection</span></div>

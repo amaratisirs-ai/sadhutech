@@ -1,3 +1,5 @@
+import { Genesis } from "@/components/Genesis";
+
 export const metadata = {
   title: "Terms of Service — GENESIS",
 };
@@ -6,9 +8,9 @@ export default function TermsPage() {
   return (
     <div className="max-w-3xl mx-auto space-y-8 py-8 text-slate-200">
       <div className="rounded-xl border-2 border-amber-500/40 bg-amber-500/10 p-4 text-sm text-amber-200">
-        <strong>Draft — pending attorney review.</strong> This page describes how GENESIS actually works today, in
+        <strong>Draft — pending attorney review.</strong> This page describes how <Genesis /> actually works today, in
         plain language, but it has not yet been reviewed by a lawyer and is not a final, binding legal document.
-        Do not rely on it as legal advice; contact <a href="mailto:contact@bhusoft.com" className="underline">contact@bhusoft.com</a> with questions.
+        Do not rely on it as legal advice; contact <a href="mailto:security@sadhutech.com" className="underline">security@sadhutech.com</a> with questions.
       </div>
 
       <header className="space-y-2">
@@ -17,9 +19,9 @@ export default function TermsPage() {
       </header>
 
       <section className="space-y-3">
-        <h2 className="text-xl font-bold text-white">1. What GENESIS is</h2>
+        <h2 className="text-xl font-bold text-white">1. What <Genesis /> is</h2>
         <p>
-          GENESIS ("we", "us", operated by Bhusoft LLC) is a pre-sign transaction and signature analysis tool (the
+          <Genesis /> ("we", "us", operated by Bhusoft LLC) is a pre-sign transaction and signature analysis tool (the
           "Service"), offered as a website (sadhutech.com), a MetaMask Snap, and an HTTP API. The Service decodes a
           transaction or signature request, checks it against community-reported and third-party threat
           intelligence, and returns a verdict (allow / warn / block) with a plain-English explanation. By visiting
@@ -30,11 +32,11 @@ export default function TermsPage() {
       <section className="space-y-3">
         <h2 className="text-xl font-bold text-white">2. No custody, no financial advice</h2>
         <p>
-          GENESIS never holds, controls, or has access to your private keys, seed phrase, or funds, and we will
-          never ask you for them. Nothing GENESIS shows you is financial, investment, tax, or legal advice, and no
+          <Genesis /> never holds, controls, or has access to your private keys, seed phrase, or funds, and we will
+          never ask you for them. Nothing <Genesis /> shows you is financial, investment, tax, or legal advice, and no
           verdict is a recommendation to buy, sell, or hold any asset. A verdict of "allow" is not a guarantee that
           a transaction is safe, and a verdict of "warn" or "block" is not a guarantee that it is unsafe — every
-          verdict reflects the information available to GENESIS at the time of the check, which is necessarily
+          verdict reflects the information available to <Genesis /> at the time of the check, which is necessarily
           incomplete, and heuristic/third-party detections can produce both false positives and false negatives.
           You alone are responsible for reviewing and deciding whether to sign any transaction or message, and for
           the security of your own wallet, device, and recovery phrase — including securing them against
@@ -74,7 +76,7 @@ export default function TermsPage() {
         <h2 className="text-xl font-bold text-white">5. Community threat reports</h2>
         <p>
           Some threat data comes from community-submitted reports (see <a href="/report" className="underline text-teal-300">/report</a>).
-          Reports are user submissions, not independently verified facts. GENESIS uses a quorum system (multiple
+          Reports are user submissions, not independently verified facts. <Genesis /> uses a quorum system (multiple
           independent reporters) before treating a report as confirmed, but disclaims responsibility for the accuracy
           of any individual report, confirmed or not. If you believe a report about an address you control is
           inaccurate, contact us to dispute it.
@@ -84,7 +86,7 @@ export default function TermsPage() {
       <section className="space-y-3">
         <h2 className="text-xl font-bold text-white">6. Paid deep checks ("Pro")</h2>
         <p>
-          GENESIS offers optional, pay-as-you-go "deep checks" paid in USDC on Base, credited to the paying wallet
+          <Genesis /> offers optional, pay-as-you-go "deep checks" paid in USDC on Base, credited to the paying wallet
           address.
         </p>
         <ul className="list-disc list-inside space-y-1">
@@ -123,9 +125,9 @@ export default function TermsPage() {
         <h2 className="text-xl font-bold text-white">9. No guarantee, limitation of liability</h2>
         <p>
           The Service is provided "as is" and "as available," without warranties of any kind, express or implied. To
-          the maximum extent permitted by law, GENESIS and Bhusoft LLC are not liable for any indirect, incidental,
+          the maximum extent permitted by law, <Genesis /> and Bhusoft LLC are not liable for any indirect, incidental,
           or consequential damages, or any loss of funds, data, or profits, arising from your use of, or inability
-          to use, the Service — including losses that occur despite (or because of) a verdict GENESIS produced. To
+          to use, the Service — including losses that occur despite (or because of) a verdict <Genesis /> produced. To
           the extent any liability cannot be excluded, our aggregate liability for any claim will not exceed the
           total amount you paid us for the Service in the three months preceding the claim, or $100 if you have not
           paid us anything, whichever is greater. (This cap, and the governing law/dispute-resolution process for
@@ -154,7 +156,7 @@ export default function TermsPage() {
       <section className="space-y-3">
         <h2 className="text-xl font-bold text-white">12. Contact</h2>
         <p>
-          Questions about these Terms: <a href="mailto:contact@bhusoft.com" className="underline text-teal-300">contact@bhusoft.com</a>.
+          Questions about these Terms: <a href="mailto:security@sadhutech.com" className="underline text-teal-300">security@sadhutech.com</a>.
           See also our <a href="/privacy" className="underline text-teal-300">Privacy Policy</a>.
         </p>
       </section>

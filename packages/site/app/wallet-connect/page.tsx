@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { QRCodeCanvas } from "qrcode.react";
 import { Icon, type IconName } from "@/components/Icon";
+import { Genesis } from "@/components/Genesis";
 
 // Only request what every EVM wallet can fulfil. Non-universal methods (eth_sign,
 // typed-data, chain switching) go in optionalMethods so wallets like Trust Wallet
@@ -396,7 +397,7 @@ export default function WalletConnect() {
           </div>
           <div className="rounded-xl border border-slate-700 bg-slate-950/40 p-4">
             <div className="text-xs uppercase tracking-wide text-teal-300 font-semibold mb-2">Step 3</div>
-            <p className="font-bold text-white">GENESIS checks it</p>
+            <p className="font-bold text-white"><Genesis /> checks it</p>
             <p className="mt-1 text-slate-300">Allow, warn, or block before signing.</p>
           </div>
         </div>
@@ -650,7 +651,7 @@ export default function WalletConnect() {
         <ul className="space-y-2 text-sm text-slate-200">
           <li className="flex gap-2"><span className="text-green-400">✓</span><span>WalletConnect uses industry-standard encryption</span></li>
           <li className="flex gap-2"><span className="text-green-400">✓</span><span>Your private keys never leave your wallet</span></li>
-          <li className="flex gap-2"><span className="text-green-400">✓</span><span>GENESIS only receives transaction data</span></li>
+          <li className="flex gap-2"><span className="text-green-400">✓</span><span><Genesis /> only receives transaction data</span></li>
           <li className="flex gap-2"><span className="text-green-400">✓</span><span>You approve each transaction before signing</span></li>
         </ul>
       </section>

@@ -1,9 +1,20 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { withGenesisStyle } from "@/components/Genesis";
 import { Icon } from "@/components/Icon";
 
 type Tab = "threats" | "articles" | "tips" | "stats";
+
+interface BlogPostMeta {
+  slug: string;
+  title: string;
+  description: string;
+  pubDate: string;
+  author: string;
+  tags: string[];
+  featured: boolean;
+}
 
 interface Threat {
   address: string;
@@ -68,6 +79,16 @@ function truncateAddress(addr: string): string {
   return `${addr.slice(0, 6)}...${addr.slice(-4)}`;
 }
 
+function formatPostDate(iso: string): string {
+  if (!iso) return "";
+  const diff = Date.now() - new Date(iso).getTime();
+  const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+  if (days <= 0) return "Today";
+  if (days === 1) return "1 day ago";
+  if (days < 14) return `${days} days ago`;
+  return new Date(iso).toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" });
+}
+
 const PAGE_SIZE = 25; // Load 25 threats per page
 
 export default function NewsPage() {
@@ -81,6 +102,8 @@ export default function NewsPage() {
   const [activeTab, setActiveTab] = useState<Tab>("threats");
   const [offset, setOffset] = useState(0);
   const [hasMore, setHasMore] = useState(true);
+  const [posts, setPosts] = useState<BlogPostMeta[]>([]);
+  const [postsLoading, setPostsLoading] = useState(true);
 
   // Fetch threats with pagination
   const fetchThreats = async (fetchOffset: number = 0) => {
@@ -129,12 +152,21 @@ export default function NewsPage() {
     fetchThreats(0);
   }, [timeWindow]);
 
+  // Articles come from our own content/blog markdown files, not the gate API.
+  useEffect(() => {
+    fetch("/api/blog")
+      .then((r) => (r.ok ? r.json() : { posts: [] }))
+      .then((j) => setPosts(j.posts ?? []))
+      .catch(() => setPosts([]))
+      .finally(() => setPostsLoading(false));
+  }, []);
+
   // Load more handler
   const handleLoadMore = () => {
     fetchThreats(offset);
   };
 
-  if (loading)
+  if (loading && activeTab === "threats")
     return (
       <div className="flex items-center justify-center min-h-96">
         <div className="text-center space-y-4">
@@ -148,7 +180,7 @@ export default function NewsPage() {
       </div>
     );
 
-  if (error)
+  if (error && activeTab === "threats")
     return (
       <div className="relative overflow-hidden rounded-xl backdrop-blur-xl bg-gradient-to-br from-red-500/10 via-rose-500/5 to-red-500/10 dark:from-red-500/5 dark:via-rose-500/5 dark:to-red-500/5 border border-red-400/30 dark:border-red-500/20 p-6">
         <div className="flex items-start gap-4">
@@ -163,7 +195,7 @@ export default function NewsPage() {
       </div>
     );
 
-  if (!allThreats.length && !loading)
+  if (!allThreats.length && !loading && activeTab === "threats")
     return (
       <div className="relative overflow-hidden rounded-xl backdrop-blur-xl bg-gradient-to-br from-slate-500/10 via-slate-500/5 to-slate-500/10 dark:from-slate-500/5 dark:via-slate-500/5 dark:to-slate-500/5 border border-slate-400/30 dark:border-slate-500/20 p-6">
         <p className="text-slate-700 dark:text-slate-300">No threats detected in the past {timeWindow / 24} days.</p>
@@ -372,24 +404,29 @@ export default function NewsPage() {
       {/* Tab: Articles */}
       {activeTab === "articles" && (
         <div className="space-y-4">
-          {[
-            { title: "How Wallet Drainers Work", desc: "Technical breakdown of token approval exploits", date: "2 days ago", source: "GENESIS" },
-            { title: "Phishing Tactics 2024", desc: "Evolving attack vectors and defense strategies", date: "1 week ago", source: "Security" },
-            { title: "Token Approvals Explained", desc: "ERC-2612 permits and why they matter", date: "2 weeks ago", source: "Blog" },
-          ].map((article, i) => (
-            <div key={i} className="bg-slate-50 dark:bg-slate-900/30 border border-slate-200 dark:border-slate-700 rounded-lg p-4 hover:shadow-md transition-all">
+          {postsLoading && <p className="text-slate-600 dark:text-slate-400">Loading articles…</p>}
+          {!postsLoading && posts.length === 0 && (
+            <p className="text-slate-600 dark:text-slate-400">No articles published yet.</p>
+          )}
+          {posts.map((post) => (
+            <a
+              key={post.slug}
+              href={`/news/${post.slug}`}
+              className="block bg-slate-50 dark:bg-slate-900/30 border border-slate-200 dark:border-slate-700 rounded-lg p-4 hover:shadow-md hover:border-indigo-400 dark:hover:border-indigo-500 transition-all"
+            >
               <div className="flex justify-between items-start gap-4 mb-2">
-                <h3 className="font-semibold text-slate-900 dark:text-white">{article.title}</h3>
-                <span className="text-xs text-slate-500 flex-shrink-0">{article.date}</span>
+                <h3 className="font-semibold text-slate-900 dark:text-white">
+                  {post.featured && <span className="mr-2 text-xs font-bold uppercase tracking-wide text-indigo-500">Featured</span>}
+                  {post.title}
+                </h3>
+                <span className="text-xs text-slate-500 flex-shrink-0">{formatPostDate(post.pubDate)}</span>
               </div>
-              <p className="text-sm text-slate-600 dark:text-slate-400 mb-3">{article.desc}</p>
+              <p className="text-sm text-slate-600 dark:text-slate-400 mb-3">{post.description}</p>
               <div className="flex justify-between items-center">
-                <span className="text-xs font-medium text-slate-500">{article.source}</span>
-                <a href="#" className="text-indigo-600 dark:text-indigo-400 text-sm font-semibold hover:underline">
-                  Read →
-                </a>
+                <span className="text-xs font-medium text-slate-500">{post.author}</span>
+                <span className="text-indigo-600 dark:text-indigo-400 text-sm font-semibold">Read →</span>
               </div>
-            </div>
+            </a>
           ))}
         </div>
       )}
@@ -409,7 +446,7 @@ export default function NewsPage() {
               <div className="flex gap-3">
                 <div className="text-teal-500 dark:text-teal-400 flex-shrink-0">{tip.icon}</div>
                 <div>
-                  <h3 className="font-semibold text-slate-900 dark:text-white mb-1">{tip.title}</h3>
+                  <h3 className="font-semibold text-slate-900 dark:text-white mb-1">{withGenesisStyle(tip.title)}</h3>
                   <p className="text-sm text-slate-600 dark:text-slate-400">{tip.desc}</p>
                 </div>
               </div>

@@ -1,3 +1,5 @@
+import { Genesis } from "@/components/Genesis";
+
 export const metadata = {
   title: "Integrations & Partners — GENESIS",
 };
@@ -25,14 +27,14 @@ export default function PartnersPage() {
       <header className="space-y-2">
         <h1 className="text-3xl font-black text-white">Integrations &amp; Partners</h1>
         <p className="text-sm text-slate-400">
-          GENESIS is built on top of a small set of trusted data and infrastructure providers. Here's who they are
+          <Genesis /> is built on top of a small set of trusted data and infrastructure providers. Here's who they are
           and what each one does for you.
         </p>
       </header>
 
       <div className="rounded-xl border-2 border-slate-700 bg-slate-900/50 p-4 text-sm text-slate-400">
         Company names and marks below belong to their respective owners. Listing a provider here describes a
-        technical integration used to run GENESIS &mdash; it is not a paid endorsement, sponsorship, or formal
+        technical integration used to run <Genesis /> &mdash; it is not a paid endorsement, sponsorship, or formal
         business partnership unless stated otherwise.
       </div>
 
@@ -124,7 +126,7 @@ export default function PartnersPage() {
         <p className="text-sm text-slate-400">
           For more detail on what data each provider sees, read our{" "}
           <a href="/privacy" className="underline text-teal-300">Privacy Policy</a>. Want to integrate with GENESIS or
-          suggest a threat feed? <a href="mailto:contact@bhusoft.com" className="underline text-teal-300">contact@bhusoft.com</a>.
+          suggest a threat feed? <a href="mailto:security@sadhutech.com" className="underline text-teal-300">security@sadhutech.com</a>.
         </p>
       </section>
     </div>

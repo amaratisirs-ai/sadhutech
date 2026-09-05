@@ -8,6 +8,7 @@ import { useWallet } from "@/src/wallet/useWallet";
 import { friendlyWalletError } from "@/src/wallet/errors";
 import { DEEP_CHECK_ENABLED } from "@/src/pro-status";
 import { useGateStatus } from "@/src/gate-status";
+import { Genesis } from "@/components/Genesis";
 
 const GATE_URL = process.env.NEXT_PUBLIC_GATE_URL || "https://genesis-gate.onrender.com";
 const PAYMENT_ADDRESS = (process.env.NEXT_PUBLIC_PAYMENT_ADDRESS || "").toLowerCase() as `0x${string}`;
@@ -214,7 +215,7 @@ export default function ProPage() {
       )}
 
       <p className="text-xs text-slate-500 text-center">
-        Payment goes directly to GENESIS on Base. Checks are tied to your wallet. No custody, no card, no recurring charge.
+        Payment goes directly to <Genesis /> on Base. Checks are tied to your wallet. No custody, no card, no recurring charge.
       </p>
     </div>
   );

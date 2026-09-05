@@ -1,4 +1,6 @@
 import { Icon } from "@/components/Icon";
+import { DeveloperTryIt } from "@/components/DeveloperTryIt";
+import { Genesis } from "@/components/Genesis";
 
 const requestExample = `{
   "tx": {
@@ -34,11 +36,11 @@ export default function DevelopersPage() {
         </div>
         <h1 className="text-4xl md:text-6xl font-black text-white">Build transaction safety into your product.</h1>
         <p className="text-lg text-slate-300 leading-relaxed">
-          Send a transaction to the GENESIS Gate API and receive a clear risk verdict before a wallet or application asks a user to sign.
+          Send a transaction to the <Genesis /> Gate API and receive a clear risk verdict before a wallet or application asks a user to sign.
           Use it in wallets, dapps, dashboards, and internal review tools.
         </p>
         <div className="flex flex-wrap gap-3 pt-2">
-          <a href="/transaction-check" className="inline-flex items-center gap-2 rounded-lg bg-teal-400 px-5 py-3 font-bold text-slate-950 hover:bg-teal-300 transition">
+          <a href="#try-it" className="inline-flex items-center gap-2 rounded-lg bg-teal-400 px-5 py-3 font-bold text-slate-950 hover:bg-teal-300 transition">
             <Icon name="code" className="w-5 h-5" /> Try a request
           </a>
           <a href="/check" className="inline-flex items-center gap-2 rounded-lg border border-slate-600 bg-slate-800 px-5 py-3 font-bold text-white hover:border-teal-400 transition">
@@ -51,7 +53,7 @@ export default function DevelopersPage() {
         <div className="rounded-xl border border-slate-700 bg-slate-900 p-5 space-y-2">
           <Icon name="bolt" className="w-7 h-7 text-teal-400" />
           <h2 className="font-bold text-white">One endpoint</h2>
-          <p className="text-sm text-slate-400">POST a transaction to receive the same verdict used by the GENESIS interface.</p>
+          <p className="text-sm text-slate-400">POST a transaction to receive the same verdict used by the <Genesis /> interface.</p>
         </div>
         <div className="rounded-xl border border-slate-700 bg-slate-900 p-5 space-y-2">
           <Icon name="shield" className="w-7 h-7 text-teal-400" />
@@ -78,6 +80,15 @@ export default function DevelopersPage() {
           <div className="border-b border-slate-700 px-5 py-3 text-sm font-bold text-white">Response</div>
           <pre className="overflow-x-auto p-5 text-sm leading-relaxed text-emerald-200"><code>{responseExample}</code></pre>
         </div>
+      </section>
+
+      <section className="space-y-5">
+        <div>
+          <p className="text-xs font-bold uppercase tracking-[0.2em] text-teal-300">Playground</p>
+          <h2 className="text-3xl font-black text-white mt-2">Send a real request, right here</h2>
+          <p className="text-slate-400 mt-2">Pick a scenario or edit the JSON, then hit send. This calls the live <Genesis /> Gate API  -  no signup, no API key needed for the free tier.</p>
+        </div>
+        <DeveloperTryIt />
       </section>
 
       <section className="grid lg:grid-cols-2 gap-6">
@@ -110,10 +121,10 @@ export default function DevelopersPage() {
       <section className="rounded-xl border border-slate-700 bg-slate-900 p-6 space-y-4">
         <h2 className="text-xl font-bold text-white">Useful links</h2>
         <div className="flex flex-wrap gap-x-6 gap-y-3 text-sm">
-          <a href="/transaction-check" className="text-teal-300 hover:text-white hover:underline">Interactive API request builder</a>
+          <a href="#try-it" className="text-teal-300 hover:text-white hover:underline">Jump to the live API tester</a>
           <a href="/check" className="text-teal-300 hover:text-white hover:underline">User-facing checker</a>
           <a href="https://github.com/amaratisirs-ai/sadhutech" className="text-teal-300 hover:text-white hover:underline">Source on GitHub</a>
-          <a href="mailto:contact@bhusoft.com" className="text-teal-300 hover:text-white hover:underline">Contact support</a>
+          <a href="mailto:security@sadhutech.com" className="text-teal-300 hover:text-white hover:underline">Contact support</a>
         </div>
       </section>
     </div>

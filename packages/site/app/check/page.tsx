@@ -8,6 +8,7 @@ import { useWallet } from "@/src/wallet/useWallet";
 import { friendlyWalletError } from "@/src/wallet/errors";
 import { DEEP_CHECK_ENABLED } from "@/src/pro-status";
 import { useGateStatus } from "@/src/gate-status";
+import { Genesis, withGenesisStyle } from "@/components/Genesis";
 
 const GATE_URL = process.env.NEXT_PUBLIC_GATE_URL || "https://genesis-gate.onrender.com";
 const ADDRESS_RE = /^0x[0-9a-fA-F]{40}$/;
@@ -15,7 +16,11 @@ const ADDRESS_RE = /^0x[0-9a-fA-F]{40}$/;
 const PROBE_FROM = "0x1111111111111111111111111111111111111111";
 const PROBE_TO = "0x2222222222222222222222222222222222222222";
 
-type Mode = "address" | "advanced";
+type Mode = "address" | "advanced" | "bulk";
+
+const MAX_BULK_ADDRESSES = 5;
+
+type BulkResult = { address: string; outcome: DecisionOutcome; message: string };
 
 type Result = {
   title: string;
@@ -50,6 +55,16 @@ function short(a: string) {
   return a ? `${a.slice(0, 6)}…${a.slice(-4)}` : "";
 }
 
+// Splits on newlines/commas/whitespace, trims, drops empties, de-dupes, caps at the max.
+function parseBulkAddresses(raw: string): string[] {
+  const seen = new Set<string>();
+  for (const part of raw.split(/[\s,]+/)) {
+    const addr = part.trim();
+    if (addr) seen.add(addr);
+  }
+  return Array.from(seen).slice(0, MAX_BULK_ADDRESSES);
+}
+
 // Best-effort detection so non-EVM users get an honest "not covered yet" message.
 function detectNonEvmChain(addr: string): string | null {
   if (/^(bc1|tb1)[a-z0-9]{20,}$/i.test(addr)) return "Bitcoin";
@@ -69,7 +84,7 @@ function VerdictCard({ result }: { result: Result }) {
         <p className="text-sm font-semibold text-white">{result.title}</p>
         <div className="mt-2 flex items-center gap-2 text-sm text-rose-200">
           <Icon name="block" className="w-4 h-4" />
-          <span>{result.error}</span>
+          <span>{withGenesisStyle(result.error)}</span>
         </div>
       </div>
     );
@@ -126,6 +141,11 @@ export default function CheckPage() {
   const [deepBusy, setDeepBusy] = useState(false);
   const [deepMsg, setDeepMsg] = useState<string | null>(null);
   const [pendingDeepCheck, setPendingDeepCheck] = useState(false);
+  const [bulkInput, setBulkInput] = useState("");
+  const [bulkResults, setBulkResults] = useState<BulkResult[] | null>(null);
+  const [bulkBusy, setBulkBusy] = useState(false);
+  const [bulkMsg, setBulkMsg] = useState<string | null>(null);
+  const [pendingBulkCheck, setPendingBulkCheck] = useState(false);
 
   useEffect(() => {
     const raw = sessionStorage.getItem("genesis_check_pending");
@@ -279,6 +299,62 @@ export default function CheckPage() {
     runDeepCheck();
   };
 
+  const runBulkCheck = async () => {
+    setBulkMsg(null);
+    if (!address) return;
+    const addresses = parseBulkAddresses(bulkInput);
+    if (addresses.length === 0) {
+      setBulkMsg("Paste at least one EVM address (one per line).");
+      return;
+    }
+    const invalid = addresses.filter((a) => !ADDRESS_RE.test(a));
+    if (invalid.length > 0) {
+      setBulkMsg(`Not a valid EVM address: ${invalid[0]}`);
+      return;
+    }
+    if (!DEEP_CHECK_ENABLED) {
+      setBulkMsg("Bulk check is launching soon — check back shortly.");
+      return;
+    }
+    setBulkBusy(true);
+    setBulkResults(null);
+    try {
+      const s = await refreshStatus(address);
+      if (!s?.premium) { setBulkMsg("Bulk check (like deep checks) is launching soon."); return; }
+      if (!s.credits || s.credits < addresses.length) { setBulkMsg("no-credits"); return; }
+      const message = `SadhuTech bulk check\nwallet: ${address}\nts: ${new Date().toISOString()}`;
+      const signature = await signMessageAsync({ message });
+      const res = await fetch(`${GATE_URL}/v1/analyze/bulk`, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ addresses, pro: { wallet: address, message, signature } }),
+      });
+      if (res.status === 402) { await refreshStatus(address); setBulkMsg("no-credits"); return; }
+      if (!res.ok) { setBulkMsg(`Bulk check failed (HTTP ${res.status}). Please try again.`); return; }
+      const data = await res.json();
+      const results: BulkResult[] = (data.results ?? []).map((r: any) => {
+        const outcome = resolveDecisionOutcome(r);
+        const intel = (r.findings ?? []).find((f: { id?: string }) => String(f?.id).startsWith("intel."));
+        return { address: r.address, outcome, message: intel ? intel.description : r.plainEnglish || outcome.reason };
+      });
+      setBulkResults(results);
+      if (typeof data.creditsLeft === "number") setCredits(data.creditsLeft);
+    } catch (e: any) {
+      setBulkMsg(friendlyWalletError(e));
+    } finally {
+      setBulkBusy(false);
+    }
+  };
+
+  const startBulkCheck = () => {
+    if (!isConnected || !address) {
+      setPendingBulkCheck(true);
+      connect();
+      return;
+    }
+    runBulkCheck();
+  };
+
   const goBuyChecks = () => {
     try {
       sessionStorage.setItem("genesis_check_pending", JSON.stringify({ mode, addressInput, dataInput, lastTx, result }));
@@ -295,12 +371,19 @@ export default function CheckPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pendingDeepCheck, isConnected, address]);
 
+  useEffect(() => {
+    if (!pendingBulkCheck || !isConnected || !address) return;
+    setPendingBulkCheck(false);
+    runBulkCheck();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pendingBulkCheck, isConnected, address]);
+
   return (
     <div className="space-y-10 max-w-3xl mx-auto">
       <header className="text-center space-y-3">
         <h1 className="text-4xl md:text-5xl font-black text-white">Check before you sign</h1>
         <p className="text-slate-300 max-w-xl mx-auto">
-          Paste a crypto address or a transaction and GENESIS screens it against community threat intel  -  a plain-English
+          Paste a crypto address or a transaction and <Genesis /> screens it against community threat intel  -  a plain-English
           verdict in seconds. No wallet connection, no signup.
         </p>
         {gateStatus === "waking" && (
@@ -322,6 +405,12 @@ export default function CheckPage() {
             className={`px-4 py-2 rounded-md text-sm font-semibold transition ${mode === "advanced" ? "bg-teal-500 text-slate-950" : "text-slate-300 hover:text-white"}`}
           >
             Check a transaction
+          </button>
+          <button
+            onClick={() => { setMode("bulk"); setResult(null); }}
+            className={`px-4 py-2 rounded-md text-sm font-semibold transition ${mode === "bulk" ? "bg-teal-500 text-slate-950" : "text-slate-300 hover:text-white"}`}
+          >
+            Bulk check
           </button>
         </div>
       </div>
@@ -364,7 +453,7 @@ export default function CheckPage() {
           </div>
           <p className="text-xs text-slate-400">Supports EVM chains: Ethereum, Polygon, Arbitrum, Optimism, Avalanche.</p>
         </section>
-      ) : (
+      ) : mode === "advanced" ? (
         <section className="bg-slate-900/60 border-2 border-teal-500/40 rounded-2xl p-6 space-y-4">
           <div>
             <h2 className="text-xl font-bold text-white flex items-center gap-2"><Icon name="document" className="w-5 h-5 text-teal-400" /> Check transaction data</h2>
@@ -385,6 +474,56 @@ export default function CheckPage() {
           >
             {checking ? "Checking…" : "Check transaction"}
           </button>
+        </section>
+      ) : (
+        <section className="bg-slate-900/60 border-2 border-teal-500/40 rounded-2xl p-6 space-y-4">
+          <div>
+            <h2 className="text-xl font-bold text-white flex items-center gap-2"><Icon name="shieldAlert" className="w-5 h-5 text-teal-400" /> Bulk check (up to {MAX_BULK_ADDRESSES})</h2>
+            <p className="text-sm text-slate-300 mt-1">
+              Paste up to {MAX_BULK_ADDRESSES} addresses, one per line. Costs 1 Pro credit per address  -  requires a
+              connected wallet.
+            </p>
+          </div>
+          <textarea
+            value={bulkInput}
+            onChange={(e) => { setBulkInput(e.target.value); setBulkMsg(null); }}
+            placeholder={"0x1111…\n0x2222…\n0x3333…"}
+            className="w-full h-32 px-4 py-3 rounded-lg bg-slate-800 border-2 border-slate-600 focus:border-teal-400 text-white font-mono text-xs outline-none resize-none"
+          />
+          <div className="flex items-center justify-between flex-wrap gap-3">
+            <p className="text-xs text-slate-400">
+              {parseBulkAddresses(bulkInput).length} of {MAX_BULK_ADDRESSES} addresses parsed
+              {credits !== null && <> · {credits} credit{credits === 1 ? "" : "s"} left</>}
+            </p>
+            <button
+              onClick={startBulkCheck}
+              disabled={bulkBusy}
+              className="px-6 py-3 rounded-lg bg-teal-500 text-slate-950 font-bold hover:bg-teal-400 disabled:opacity-50 transition"
+            >
+              {bulkBusy ? "Checking…" : isConnected ? `Bulk check (${parseBulkAddresses(bulkInput).length || 1} credit${parseBulkAddresses(bulkInput).length === 1 ? "" : "s"})` : "Connect & bulk check"}
+            </button>
+          </div>
+          {bulkMsg && bulkMsg !== "no-credits" && <p className="text-xs text-amber-300">{bulkMsg}</p>}
+          {bulkMsg === "no-credits" && (
+            <p className="text-xs text-amber-300">Not enough credits for {parseBulkAddresses(bulkInput).length} addresses. <a href="/pro" className="underline font-semibold">Buy credits →</a></p>
+          )}
+          {bulkResults && (
+            <ul className="space-y-2 pt-1">
+              {bulkResults.map((r) => {
+                const v = r.outcome.verdict;
+                const color = v === "allow" ? "border-emerald-500/50 bg-emerald-900/10 text-emerald-300" : v === "block" ? "border-rose-500/50 bg-rose-900/10 text-rose-300" : "border-amber-500/50 bg-amber-900/10 text-amber-300";
+                return (
+                  <li key={r.address} className={`rounded-lg border p-3 ${color}`}>
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="font-mono text-xs text-white">{short(r.address)}</span>
+                      <span className="text-xs font-bold uppercase tracking-wide">{v}</span>
+                    </div>
+                    <p className="text-xs text-slate-300 mt-1">{r.message}</p>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
         </section>
       )}
 

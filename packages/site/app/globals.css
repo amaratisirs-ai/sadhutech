@@ -18,6 +18,12 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
+/* GENESIS wordmark treatment - the same script font used for the nav logo, reused
+   anywhere the brand name appears in body copy. */
+.font-script {
+  font-family: var(--font-dancing-script), cursive;
+}
+
 /* Animations */
 @keyframes blob {
   0%, 100% {

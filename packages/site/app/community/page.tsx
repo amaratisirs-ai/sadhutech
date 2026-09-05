@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Icon } from "@/components/Icon";
+import { Genesis, withGenesisStyle } from "@/components/Genesis";
 
 interface Contributor {
   reporterId: string;
@@ -105,7 +106,7 @@ export default function CommunityPage() {
           <h1 className="text-4xl font-bold text-slate-900 dark:text-white">Security Community</h1>
         </div>
         <p className="text-slate-600 dark:text-slate-400 mt-2">
-          Report and verify scam addresses so GENESIS can protect everyone. The more reports, the stronger the shield.
+          Report and verify scam addresses so <Genesis /> can protect everyone. The more reports, the stronger the shield.
         </p>
       </div>
 
@@ -311,7 +312,7 @@ export default function CommunityPage() {
                       </span>
                       <h3 className="font-semibold text-slate-900 dark:text-white">{item.title}</h3>
                     </div>
-                    <p className="text-slate-600 dark:text-slate-400 ml-8">{item.desc}</p>
+                    <p className="text-slate-600 dark:text-slate-400 ml-8">{withGenesisStyle(item.desc)}</p>
                   </div>
                 </div>
               ))}
@@ -320,7 +321,7 @@ export default function CommunityPage() {
             <div className="mt-8 p-4 bg-white dark:bg-slate-800 border border-indigo-200 dark:border-indigo-800 rounded-lg">
               <h3 className="font-semibold text-slate-900 dark:text-white mb-2 flex items-center gap-2"><Icon name="document" className="w-5 h-5 text-indigo-500" /> API Documentation</h3>
               <p className="text-sm text-slate-600 dark:text-slate-400 mb-4">
-                Submit threat reports programmatically using the GENESIS API:
+                Submit threat reports programmatically using the <Genesis /> API:
               </p>
               <pre className="bg-slate-50 dark:bg-slate-900 p-3 rounded text-xs overflow-x-auto text-slate-900 dark:text-slate-100">
 {`POST /v1/report

@@ -5,7 +5,7 @@ try {
   // no root .env file (e.g. production, where Render sets env vars directly)
 }
 import { isAddress, recoverMessageAddress } from "viem";
-import type { AnalyzeRequest, AnalyzeSignatureRequest, ReportRequest } from "@genesis/shared";
+import type { Address, AnalyzeRequest, AnalyzeSignatureRequest, ReportRequest } from "@genesis/shared";
 import { analyze, analyzeSignature } from "./analyze.js";
 import { createIntelAsync } from "./index.js";
 import { TESTER_HTML } from "./ui.js";
@@ -15,6 +15,7 @@ import { ContributorsService } from "./contributors.js";
 import { ProAccessService } from "./pro-access.js";
 import { AuditLogService, getClientIp, lookupGeoIp } from "./audit-log.js";
 import { premiumAvailable, lookupChainAbuse } from "./chainabuse-lookup.js";
+import { NewsletterService, initNewsletterService } from "./newsletter.js";
 import {
   loadApiKeys,
   createApiKeyMiddleware,
@@ -22,8 +23,10 @@ import {
   createSecurityHeadersMiddleware,
   SimpleRateLimiter,
   validateAnalyzeRequest,
+  validateBulkAnalyzeRequest,
   validateSignatureRequest,
   validateReportRequest,
+  isValidEmail,
 } from "./security.js";
 
 const app = Fastify({ logger: true });
@@ -40,6 +43,8 @@ let contributorsService: ContributorsService | null = null;
 let proAccessService: ProAccessService | null = null;
 // Audit log service (credit consumption + security-event trail; initialized during startup)
 let auditLogService: AuditLogService | null = null;
+// Newsletter/journey service (email subscribers + templated sends; initialized during startup)
+let newsletterService: NewsletterService | null = null;
 
 // ============================================================================
 // SECURITY MIDDLEWARE
@@ -176,6 +181,98 @@ app.post<{ Body: AnalyzeRequest }>("/v1/analyze",
 );
 
 // ============================================================================
+// POST /v1/analyze/bulk - Pro: check up to 5 addresses at once (1 credit each)
+// ============================================================================
+const BULK_PROBE_FROM: Address = "0x1111111111111111111111111111111111111111";
+app.post<{ Body: { addresses?: string[]; pro?: { wallet?: string; message?: string; signature?: string; source?: string } } }>(
+  "/v1/analyze/bulk",
+  {
+    onRequest: createRateLimitMiddleware(rateLimiter),
+  },
+  async (request, reply) => {
+    const validationErrors = validateBulkAnalyzeRequest(request.body);
+    if (validationErrors.length > 0) {
+      return reply.status(400).send({
+        error: "Invalid request",
+        details: validationErrors,
+      });
+    }
+
+    if (!premiumAvailable() || !proAccessService) {
+      return reply.status(503).send({ error: "Bulk check requires Pro credits, which aren't configured yet." });
+    }
+
+    const addresses = (request.body.addresses ?? []).map((a) => a.toLowerCase());
+    const proReq = request.body.pro;
+    if (!proReq?.wallet || !isAddress(proReq.wallet) || !proReq.message || !proReq.signature) {
+      return reply.status(400).send({ error: "Bulk check requires a signed Pro request." });
+    }
+    const { wallet, message, signature, source } = proReq;
+    let signer: string;
+    try {
+      signer = await recoverMessageAddress({ message, signature: signature as `0x${string}` });
+    } catch {
+      return reply.status(401).send({ error: "Bad signature." });
+    }
+    const tsMatch = /ts:\s*(\S+)/.exec(message);
+    const timestamp = tsMatch?.[1];
+    const freshnessWindowMs = source === "snap" ? 24 * 60 * 60 * 1000 : 10 * 60 * 1000;
+    const fresh = timestamp ? Math.abs(Date.now() - Date.parse(timestamp)) < freshnessWindowMs : false;
+    if (signer.toLowerCase() !== wallet.toLowerCase() || !fresh || !message.toLowerCase().includes(wallet.toLowerCase())) {
+      return reply.status(401).send({ error: "Invalid or expired signature." });
+    }
+
+    const remaining = await proAccessService.consume(wallet.toLowerCase(), addresses.length);
+    if (remaining === null) {
+      return reply.status(402).send({
+        error: `Not enough credits. Checking ${addresses.length} address${addresses.length === 1 ? "" : "es"} needs ${addresses.length} credit${addresses.length === 1 ? "" : "s"}.`,
+      });
+    }
+
+    const intel = await createIntelAsync();
+    try {
+      const results = await Promise.all(
+        addresses.map(async (address) => {
+          const addr = address as Address;
+          const tx = { chainId: 1, from: BULK_PROBE_FROM, to: addr, value: "1", data: "0x" as const };
+          const result = await analyze({ tx }, intel, auditLogService ?? undefined);
+          const hit = await lookupChainAbuse(addr, (reason) => void auditLogService?.logIntegrationFailure("chainabuse", reason));
+          if (hit?.flagged) {
+            result.findings.push({
+              id: "intel.chainabuse",
+              severity: "critical",
+              title: `ChainAbuse: reported as ${hit.category || "scam"}`,
+              description: `This address has ${hit.reports || 1} report(s) on ChainAbuse.`,
+              subject: addr,
+            });
+            (result as any).verdict = "block";
+            void auditLogService?.logSecurityEvent("chainabuse.flagged", address, "critical", {
+              category: hit.category,
+              reports: hit.reports,
+            });
+          }
+          return { address, ...result };
+        })
+      );
+      void auditLogService?.logCreditConsumption(
+        wallet.toLowerCase(),
+        addresses.length,
+        results.some((r) => r.verdict === "block") ? "block" : results.some((r) => r.verdict === "warn") ? "warn" : "allow",
+        results.some((r) => (r as any).findings?.some((f: any) => f.id === "intel.chainabuse")),
+        source
+      );
+      return { creditsLeft: remaining, results };
+    } catch (err) {
+      request.log.error(err);
+      return reply.status(400).send({
+        error: "Could not complete the bulk check",
+        message: err instanceof Error ? err.message : "Unknown error",
+      });
+    }
+  }
+);
+
+// ============================================================================
 // POST /v1/analyze-signature - Analyze an off-chain signature request before signing
 // ============================================================================
 app.post<{ Body: AnalyzeSignatureRequest }>("/v1/analyze-signature",
@@ -305,16 +402,19 @@ app.get<{ Params: { address: string } }>("/v1/pro/status/:address", async (reque
 // (wallet connect, Snap install, Snap one-time authorization).
 // ============================================================================
 const CONSENT_TYPES = ["wallet-connect", "snap-install", "snap-onboarding"];
-app.post<{ Body: { address?: string; type?: string; version?: string; context?: string } }>(
+app.post<{ Body: { address?: string; type?: string; version?: string; context?: string; email?: string } }>(
   "/v1/consent",
   { onRequest: createRateLimitMiddleware(rateLimiter) },
   async (request, reply) => {
-    const { address, type, version, context } = request.body ?? {};
+    const { address, type, version, context, email } = request.body ?? {};
     if (!type || !CONSENT_TYPES.includes(type)) {
       return reply.status(400).send({ error: `type must be one of ${CONSENT_TYPES.join(", ")}` });
     }
     if (address !== undefined && !isAddress(address)) {
       return reply.status(400).send({ error: "Invalid wallet address." });
+    }
+    if (email !== undefined && email !== "" && !isValidEmail(email)) {
+      return reply.status(400).send({ error: "Invalid email address." });
     }
     if (!auditLogService) {
       return reply.status(503).send({ error: "Consent logging isn't available right now." });
@@ -329,7 +429,65 @@ app.post<{ Body: { address?: string; type?: string; version?: string; context?: 
       region: geo?.region,
       city: geo?.city,
     });
+    // Optional: subscribe to the email journey/newsletter framework at the same touchpoint.
+    if (email && newsletterService) {
+      void newsletterService.subscribe(email, { walletAddress: address, consentVersion: version || "2026-09", source: `consent:${type}` });
+    }
     return { ok: true };
+  }
+);
+
+// ============================================================================
+// Newsletter / email journeys — subscribe, unsubscribe, and (cron-triggered) send.
+// ============================================================================
+app.post<{ Body: { email?: string; walletAddress?: string; consentVersion?: string; source?: string } }>(
+  "/v1/newsletter/subscribe",
+  { onRequest: createRateLimitMiddleware(rateLimiter) },
+  async (request, reply) => {
+    const { email, walletAddress, consentVersion, source } = request.body ?? {};
+    if (!email || !isValidEmail(email)) {
+      return reply.status(400).send({ error: "A valid email is required." });
+    }
+    if (walletAddress !== undefined && !isAddress(walletAddress)) {
+      return reply.status(400).send({ error: "Invalid wallet address." });
+    }
+    if (!newsletterService) {
+      return reply.status(503).send({ error: "Newsletter signup isn't available right now." });
+    }
+    const result = await newsletterService.subscribe(email, { walletAddress, consentVersion, source: source || "footer" });
+    if (!result.ok) {
+      return reply.status(500).send({ error: "Could not subscribe right now. Please try again." });
+    }
+    return { ok: true };
+  }
+);
+
+app.get<{ Querystring: { token?: string } }>(
+  "/v1/newsletter/unsubscribe",
+  { onRequest: createRateLimitMiddleware(rateLimiter) },
+  async (request, reply) => {
+    const token = request.query?.token;
+    if (!token) {
+      return reply.status(400).send({ error: "Missing token." });
+    }
+    if (!newsletterService) {
+      return reply.status(503).send({ error: "Newsletter isn't available right now." });
+    }
+    const ok = await newsletterService.unsubscribe(token);
+    return { ok };
+  }
+);
+
+// Cron-triggerable (API-key protected) so delivery doesn't depend on the in-process
+// timer, which only runs while this instance happens to be awake.
+app.post(
+  "/v1/newsletter/run",
+  { onRequest: [createRateLimitMiddleware(rateLimiter), createApiKeyMiddleware(authorizedApiKeys)] },
+  async (_request, reply) => {
+    if (!newsletterService) {
+      return reply.status(503).send({ error: "Newsletter isn't available right now." });
+    }
+    return newsletterService.sendDueEmails();
   }
 );
 
@@ -662,6 +820,9 @@ async function start(): Promise<void> {
         await proAccessService.initialize();
         auditLogService = new AuditLogService(postgresIntel.pool);
         await auditLogService.initialize();
+        newsletterService = new NewsletterService(postgresIntel.pool);
+        await newsletterService.initialize();
+        initNewsletterService(newsletterService, { runOnStartup: true, intervalHours: 1 });
         console.log("[startup] Contributors service initialized");
       } catch (err) {
         console.warn("[startup] Contributors service failed to initialize:", err);

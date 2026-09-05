@@ -1,6 +1,7 @@
 "use client";
 
 import { Icon } from "@/components/Icon";
+import { Genesis } from "@/components/Genesis";
 
 export default function WhitepaperPage() {
   return (
@@ -9,57 +10,78 @@ export default function WhitepaperPage() {
       <div className="bg-gradient-to-r from-indigo-950 to-slate-950 py-16 px-6 border-b-2 border-teal-500/30">
         <div className="max-w-6xl mx-auto">
           <h1 className="text-5xl font-black text-teal-400 mb-4">
-            GENESIS: Nature-Inspired Security Architecture
+            <Genesis />: Nature-Inspired Security Architecture
           </h1>
           <p className="text-xl text-slate-300 font-semibold">
             A Whitepaper on Decentralized, Emergent, and Self-Healing Defense
           </p>
-          <p className="text-sm text-slate-500 mt-4">Version 1.0 | September 2026</p>
+          <div className="flex flex-wrap items-center gap-3 mt-4">
+            <p className="text-sm text-slate-500">Version 1.0 | September 2026</p>
+            <span className="text-xs font-bold uppercase tracking-wide text-teal-300 bg-teal-500/10 border border-teal-500/30 rounded-full px-3 py-1">
+              Vision &amp; roadmap  -  describes where we're headed, not everything below is live today
+            </span>
+          </div>
         </div>
       </div>
 
       {/* Main Content */}
       <div className="max-w-6xl mx-auto px-6 py-16 space-y-16">
-        
-        {/* Problem Statement */}
+
+        {/* Design Philosophy */}
         <section className="space-y-8">
-          <div className="border-l-4 border-red-500 pl-6 py-4">
-            <h2 className="text-3xl font-black text-red-400 mb-4">The Problem</h2>
-            <p className="text-slate-300 text-lg leading-relaxed mb-4">
-              Traditional security defends through <strong>centralization, predictability, and stasis</strong>. One gate, one detection model, fixed topology  -  breach one, lose all.
+          <div className="border-l-4 border-teal-500 pl-6 py-4">
+            <h2 className="text-3xl font-black text-teal-400 mb-4">Our Approach</h2>
+            <p className="text-slate-300 text-lg leading-relaxed">
+              Nature builds resilient systems through <strong>decentralization, emergence, and self-healing</strong>  -  a
+              hive survives losing individual bees, an immune system adapts to new threats, an ecosystem recovers after
+              damage. <Genesis /> is modeled on those same principles: instead of one gate and one detection model, we're
+              building toward a layered, adaptive architecture where no single point of failure can bring the whole
+              system down.
             </p>
           </div>
+        </section>
 
-          {/* Fortress Paradox Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="bg-red-950/40 border-2 border-red-500/30 rounded-lg p-6">
-              <div className="mb-2 text-red-400"><Icon name="building" className="w-8 h-8" /></div>
-              <h3 className="font-bold text-red-400 mb-2">Centralization</h3>
-              <p className="text-slate-400 text-sm">Single control plane = single point of failure</p>
+        {/* sadhutech product roadmap */}
+        <section className="space-y-6">
+          <div className="border-l-4 border-teal-500 pl-6 py-4">
+            <h2 className="text-3xl font-black text-teal-400 mb-2"><Genesis /> is sadhutech's first product</h2>
+            <p className="text-slate-300">
+              sadhutech is building a family of pre-action security products. <Genesis />  -  for crypto  -  is live today
+              across three surfaces; everything else is where the same philosophy goes next.
+            </p>
+          </div>
+          <div className="grid md:grid-cols-2 gap-4">
+            <div className="bg-slate-900/50 border border-teal-500/30 rounded-lg p-5 space-y-1">
+              <p className="text-xs font-bold uppercase tracking-wide text-emerald-300">Live</p>
+              <h3 className="font-bold text-white"><Genesis /> Check &amp; <Genesis /> Snap</h3>
+              <p className="text-slate-400 text-sm">Web checker (free + Pro) and a MetaMask Snap for real-time, in-wallet verdicts.</p>
             </div>
-            <div className="bg-red-950/40 border-2 border-red-500/30 rounded-lg p-6">
-              <div className="mb-2 text-red-400"><Icon name="chart" className="w-8 h-8" /></div>
-              <h3 className="font-bold text-red-400 mb-2">Predictability</h3>
-              <p className="text-slate-400 text-sm">Known detection models can be bypassed</p>
+            <div className="bg-slate-900/50 border border-slate-700 rounded-lg p-5 space-y-1">
+              <p className="text-xs font-bold uppercase tracking-wide text-amber-300">Next</p>
+              <h3 className="font-bold text-white"><Genesis /> Wallet Guard</h3>
+              <p className="text-slate-400 text-sm">Automatic protection built into any wallet or browser, not just MetaMask.</p>
             </div>
-            <div className="bg-red-950/40 border-2 border-red-500/30 rounded-lg p-6">
-              <div className="mb-2 text-red-400"><Icon name="map" className="w-8 h-8" /></div>
-              <h3 className="font-bold text-red-400 mb-2">Fixed Topology</h3>
-              <p className="text-slate-400 text-sm">Attackers can map the infrastructure</p>
+            <div className="bg-slate-900/50 border border-slate-700 rounded-lg p-5 space-y-1">
+              <p className="text-xs font-bold uppercase tracking-wide text-slate-400">Planned</p>
+              <h3 className="font-bold text-white">Mobile &amp; laptop protection</h3>
+              <p className="text-slate-400 text-sm">The same pre-action firewall model, applied to phones and computers.</p>
             </div>
-            <div className="bg-red-950/40 border-2 border-red-500/30 rounded-lg p-6">
-              <div className="mb-2 text-red-400"><Icon name="fire" className="w-8 h-8" /></div>
-              <h3 className="font-bold text-red-400 mb-2">Breach Cascade</h3>
-              <p className="text-slate-400 text-sm">One bypass compromises everything</p>
+            <div className="bg-slate-900/50 border border-slate-700 rounded-lg p-5 space-y-1">
+              <p className="text-xs font-bold uppercase tracking-wide text-slate-400">Planned</p>
+              <h3 className="font-bold text-white">SaaS protection</h3>
+              <p className="text-slate-400 text-sm">Catching risky OAuth grants and integrations across your team's apps.</p>
             </div>
           </div>
+          <a href="/products" className="inline-block text-teal-300 hover:text-white hover:underline text-sm font-semibold">
+            See the products page →
+          </a>
         </section>
 
         {/* 4 Pillars */}
         <section className="space-y-8">
           <div className="border-l-4 border-teal-500 pl-6 py-4">
             <h2 className="text-3xl font-black text-teal-400 mb-2">The Solution: 4 Natural Pillars</h2>
-            <p className="text-slate-300">GENESIS implements four mechanisms from nature, using cryptography and distributed systems.</p>
+            <p className="text-slate-300"><Genesis /> implements four mechanisms from nature, using cryptography and distributed systems.</p>
           </div>
 
           {/* Pillar 1: Hive */}
@@ -105,7 +127,7 @@ export default function WhitepaperPage() {
             </div>
             <div className="bg-slate-900/50 rounded p-4 text-slate-300 text-sm space-y-2">
               <p><strong>How it works:</strong> Trust relationships are established via PQC (post-quantum cryptography) and contextual binding. Credentials are tied to session state, not replayable.</p>
-              <p><strong>Why it's resilient:</strong> Steal a certificate, it's useless without the context. Replay a transaction, entropy has changed. Quantum computers can't break the bonds.</p>
+              <p><strong>Why it's resilient:</strong> Steal a certificate, it's useless without the context. Replay a transaction, entropy has changed. Post-quantum cryptography is designed to resist attacks from quantum computers, not just classical ones.</p>
               <p><strong>Engineering:</strong> CRYSTALS-Kyber/Dilithium, session-scoped contexts, entropy mixing</p>
             </div>
           </div>
@@ -142,7 +164,7 @@ export default function WhitepaperPage() {
               </div>
               <div className="bg-slate-900/50 border-l-4 border-teal-500 rounded p-6 flex-1">
                 <h3 className="font-bold text-teal-400 mb-2">User submits transaction</h3>
-                <p className="text-slate-400 text-sm">Wallet sends calldata to GENESIS. No private keys leave the device.</p>
+                <p className="text-slate-400 text-sm">Wallet sends calldata to <Genesis />. No private keys leave the device.</p>
               </div>
             </div>
 
@@ -223,7 +245,7 @@ export default function WhitepaperPage() {
             {/* Level 2: GENESIS Gate */}
             <div className="flex justify-center mb-4">
               <div className="bg-gradient-to-r from-teal-900/60 to-cyan-900/60 border-2 border-teal-500/70 rounded-lg px-6 py-2 w-full max-w-lg text-center">
-                <div className="text-base font-black text-teal-300 flex items-center justify-center gap-2"><Icon name="bolt" className="w-5 h-5" /> GENESIS Gate</div>
+                <div className="text-base font-black text-teal-300 flex items-center justify-center gap-2"><Icon name="bolt" className="w-5 h-5" /> <Genesis /> Gate</div>
                 <div className="text-xs text-teal-400">(Pre-sign Analysis)</div>
               </div>
             </div>
@@ -341,7 +363,7 @@ export default function WhitepaperPage() {
 
           <div className="bg-gradient-to-r from-teal-950/30 to-indigo-950/30 border-2 border-teal-500/30 rounded-lg p-8">
             <p className="text-slate-300 leading-relaxed mb-4">
-              GENESIS is a security platform that embraces nature's wisdom: <strong>decentralization, emergent consensus, unpredictability, and self-healing</strong>. By modeling our architecture on biological systems, we create defenses that survive adversarial pressure  -  not because they're unbreakable, but because they're incomprehensibly adaptable.
+              <Genesis /> is a security platform that embraces nature's wisdom: <strong>decentralization, emergent consensus, unpredictability, and self-healing</strong>. By modeling our architecture on biological systems, we create defenses that survive adversarial pressure  -  not because they're unbreakable, but because they're incomprehensibly adaptable.
             </p>
             <p className="text-slate-400 text-sm italic">
               "Nature doesn't build fortresses. It builds ecosystems."
@@ -352,7 +374,7 @@ export default function WhitepaperPage() {
 
       {/* Footer */}
       <div className="border-t border-teal-500/20 mt-20 py-8 px-6 text-center text-slate-500 text-sm">
-        <p>GENESIS Whitepaper v1.0 | September 2026</p>
+        <p><Genesis /> Whitepaper v1.0 | September 2026</p>
         <p className="text-xs mt-2">Nature-Inspired Security Architecture</p>
       </div>
     </div>

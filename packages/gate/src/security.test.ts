@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { validateAnalyzeRequest } from "./security.js";
+import { validateAnalyzeRequest, validateBulkAnalyzeRequest } from "./security.js";
 
 const FROM = "0x1111111111111111111111111111111111111111";
 const TO = "0x2222222222222222222222222222222222222222";
@@ -33,5 +33,32 @@ describe("validateAnalyzeRequest", () => {
       tx: { chainId: 1, to: TO, data: "0x" },
     });
     expect(errors.some((e) => e.field === "tx.from")).toBe(true);
+  });
+});
+
+describe("validateBulkAnalyzeRequest", () => {
+  it("accepts 1 to 5 valid addresses", () => {
+    expect(validateBulkAnalyzeRequest({ addresses: [FROM] })).toEqual([]);
+    expect(validateBulkAnalyzeRequest({ addresses: [FROM, TO, FROM, TO, FROM] })).toEqual([]);
+  });
+
+  it("rejects an empty array", () => {
+    const errors = validateBulkAnalyzeRequest({ addresses: [] });
+    expect(errors.some((e) => e.field === "addresses")).toBe(true);
+  });
+
+  it("rejects more than 5 addresses", () => {
+    const errors = validateBulkAnalyzeRequest({ addresses: [FROM, TO, FROM, TO, FROM, TO] });
+    expect(errors.some((e) => e.field === "addresses")).toBe(true);
+  });
+
+  it("rejects a non-array addresses field", () => {
+    const errors = validateBulkAnalyzeRequest({ addresses: FROM });
+    expect(errors.some((e) => e.field === "addresses")).toBe(true);
+  });
+
+  it("flags individual invalid addresses by index", () => {
+    const errors = validateBulkAnalyzeRequest({ addresses: [FROM, "not-an-address"] });
+    expect(errors.some((e) => e.field === "addresses[1]")).toBe(true);
   });
 });

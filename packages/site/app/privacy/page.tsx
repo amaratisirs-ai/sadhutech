@@ -1,3 +1,5 @@
+import { Genesis } from "@/components/Genesis";
+
 export const metadata = {
   title: "Privacy Policy — GENESIS",
 };
@@ -6,10 +8,10 @@ export default function PrivacyPage() {
   return (
     <div className="max-w-3xl mx-auto space-y-8 py-8 text-slate-200">
       <div className="rounded-xl border-2 border-amber-500/40 bg-amber-500/10 p-4 text-sm text-amber-200">
-        <strong>Draft — pending attorney review.</strong> This page describes what GENESIS actually collects and why,
+        <strong>Draft — pending attorney review.</strong> This page describes what <Genesis /> actually collects and why,
         in plain language, but it has not yet been reviewed by a lawyer and is not a final, binding legal document.
         Do not rely on it for GDPR/CCPA compliance sign-off without legal review; contact{" "}
-        <a href="mailto:contact@bhusoft.com" className="underline">contact@bhusoft.com</a> with questions.
+        <a href="mailto:security@sadhutech.com" className="underline">security@sadhutech.com</a> with questions.
       </div>
 
       <header className="space-y-2">
@@ -22,7 +24,7 @@ export default function PrivacyPage() {
         <ul className="list-disc list-inside space-y-1">
           <li><strong>Wallet addresses</strong> — when you check a transaction, connect a wallet, buy deep-check credits, or submit a threat report. Addresses are pseudonymous, public on-chain data.</li>
           <li><strong>Payment data</strong> — when you buy Pro credits, we record the paying wallet address, amount, and on-chain transaction hash (itself public on Base) to credit your balance and for the audit log described in Section 4. We do not collect card numbers, bank details, or run identity/KYC verification today.</li>
-          <li><strong>Email address</strong> — only if you submit a threat report at <a href="/report" className="underline text-teal-300">/report</a>, to send a one-time confirmation link (Sybil-resistance). We store a one-way hash of your email as your reporter identity, not the raw address, once the report is confirmed.</li>
+          <li><strong>Email address</strong> — if you submit a threat report at <a href="/report" className="underline text-teal-300">/report</a> (to send a one-time confirmation link; we store a one-way hash of it as your reporter identity once confirmed, not the raw address), or if you subscribe to updates via the footer or the wallet-connect consent step. Newsletters and important product/security communications are sent to subscribed addresses; every email includes an unsubscribe link, and you can unsubscribe at any time.</li>
           <li><strong>Transaction/signature data you submit</strong> — to analyze it. This is processed to produce a verdict and is not sold or used for advertising.</li>
           <li><strong>Consent records</strong> — when you connect a wallet, install the Snap, or authorize the Snap's deep checks, we log that a specific address (where available) accepted a specific version of these Terms/this Policy, so we can demonstrate consent was given.</li>
           <li><strong>Basic request metadata</strong> (IP address, timestamps) for rate-limiting and abuse prevention, and for our security/audit logs (see below).</li>
@@ -33,7 +35,7 @@ export default function PrivacyPage() {
         <h2 className="text-xl font-bold text-white">2. What we don't collect</h2>
         <p>
           We never see or request your private keys, seed phrase, or wallet password. We do not track your browsing
-          activity outside GENESIS, and we do not sell personal data to third parties.
+          activity outside <Genesis />, and we do not sell personal data to third parties.
         </p>
       </section>
 
@@ -72,7 +74,7 @@ export default function PrivacyPage() {
         <h2 className="text-xl font-bold text-white">6. Your rights</h2>
         <p>
           Depending on where you live, you may have rights to access, correct, or delete personal data we hold about
-          you (e.g. under GDPR or CCPA). Contact <a href="mailto:contact@bhusoft.com" className="underline text-teal-300">contact@bhusoft.com</a> to
+          you (e.g. under GDPR or CCPA). Contact <a href="mailto:security@sadhutech.com" className="underline text-teal-300">security@sadhutech.com</a> to
           make a request.
         </p>
       </section>
@@ -85,7 +87,7 @@ export default function PrivacyPage() {
       <section className="space-y-3">
         <h2 className="text-xl font-bold text-white">8. Contact</h2>
         <p>
-          <a href="mailto:contact@bhusoft.com" className="underline text-teal-300">contact@bhusoft.com</a>. See
+          <a href="mailto:security@sadhutech.com" className="underline text-teal-300">security@sadhutech.com</a>. See
           also our <a href="/terms" className="underline text-teal-300">Terms of Service</a>.
         </p>
       </section>

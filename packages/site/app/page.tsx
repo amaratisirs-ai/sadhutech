@@ -1,6 +1,8 @@
 "use client";
 
+import Image from "next/image";
 import { Icon } from "@/components/Icon";
+import { Genesis, withGenesisStyle } from "@/components/Genesis";
 
 export default function Home() {
   const flowSteps = [
@@ -139,41 +141,51 @@ export default function Home() {
   return (
     <div className="space-y-16">
       {/* ===== HERO SECTION ===== */}
-      <section className="relative overflow-hidden">
-        <div className="absolute inset-0"></div>
-        <div className="absolute top-0 right-0 w-96 h-96 bg-teal-900/30 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob"></div>
-        <div className="absolute bottom-0 left-0 w-96 h-96 bg-indigo-900/30 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000"></div>
+      <section className="relative overflow-hidden rounded-2xl min-h-[560px] flex items-center">
+        <Image
+          src="/images/hero-homepage.jpg"
+          alt="GENESIS shield decoding a transaction, surrounded by the Hive, Nucleus, Entanglement, and Multiverse concepts"
+          fill
+          priority
+          className="object-cover object-[65%_center]"
+        />
+        <div className="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/85 to-slate-950/20" />
+        <div className="absolute inset-0 bg-gradient-to-t from-slate-950/60 via-transparent to-transparent" />
 
         <div className="relative px-4 sm:px-8 py-12 sm:py-20">
-          <div className="max-w-3xl">
-            <div className="space-y-6">
-              <h1 className="text-4xl sm:text-5xl md:text-7xl font-black text-white leading-tight break-words">
-                Milliseconds Matter
-              </h1>
+          <div className="space-y-6 max-w-2xl">
+            <h1 className="text-4xl sm:text-5xl md:text-6xl font-black text-white leading-tight break-words">
+              Know What You're Really Signing
+            </h1>
 
-              <p className="text-xl text-slate-200 leading-relaxed">
-                Transactions happen in milliseconds. So should your security. <strong>GENESIS analyzes every transaction instantly</strong> against community-verified threats - right inside your wallet.
-              </p>
+            <p className="text-xl text-slate-200 leading-relaxed">
+              Most security tools flash a warning and hope you notice. <strong><Genesis /> decodes the transaction,
+              checks it against threats confirmed by real people</strong>  -  not one company's private blocklist  -
+              and explains the risk in plain English. Free forever. No install, no wallet connection required to check.
+            </p>
 
-              <p className="text-lg text-slate-300">
-                Get a clear verdict before you sign: <span className="font-bold text-green-400">ALLOW</span>, <span className="font-bold text-yellow-400">WARN</span>, or <span className="font-bold text-red-400">BLOCK</span>
-              </p>
+            <p className="text-lg text-slate-300">
+              Get a clear verdict before you sign: <span className="font-bold text-green-400">ALLOW</span>, <span className="font-bold text-yellow-400">WARN</span>, or <span className="font-bold text-red-400">BLOCK</span>
+            </p>
 
-              <div className="flex gap-4 flex-wrap pt-2">
-                <a
-                  href="/check"
-                  className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-teal-500 to-teal-400 text-slate-950 rounded-lg font-bold hover:shadow-xl transition-all hover:shadow-teal-500/50 text-lg"
-                >
-                  <Icon name="search" className="w-5 h-5" /> Check a transaction  -  free
-                </a>
-                <a
-                  href="/threats"
-                  className="px-8 py-4 bg-slate-800 text-white rounded-lg font-bold border-2 border-teal-500 hover:border-teal-400 hover:shadow-lg transition-all"
-                >
-                  See live threats
-                </a>
-              </div>
+            <div className="flex gap-4 flex-wrap pt-2">
+              <a
+                href="/check"
+                className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-teal-500 to-teal-400 text-slate-950 rounded-lg font-bold hover:shadow-xl transition-all hover:shadow-teal-500/50 text-lg"
+              >
+                <Icon name="search" className="w-5 h-5" /> Check a transaction  -  free
+              </a>
+              <a
+                href="/threats"
+                className="px-8 py-4 bg-slate-800/80 text-white rounded-lg font-bold border-2 border-teal-500 hover:border-teal-400 hover:shadow-lg transition-all backdrop-blur-sm"
+              >
+                See live threats
+              </a>
             </div>
+
+            <p className="text-xs text-slate-400 pt-2">
+              The nature-inspired architecture we're building toward  -  <a href="/whitepaper" className="text-teal-300 hover:underline font-semibold">see the vision →</a>
+            </p>
           </div>
         </div>
       </section>
@@ -181,7 +193,7 @@ export default function Home() {
       {/* ===== HOW GENESIS WORKS ===== */}
       <section id="how-it-works" className="space-y-8">
         <div className="text-center">
-          <h2 className="text-4xl md:text-5xl font-black text-white mb-4">How GENESIS Works</h2>
+          <h2 className="text-4xl md:text-5xl font-black text-white mb-4">How <Genesis /> Works</h2>
           <p className="text-slate-200 text-lg">3 simple steps between you and a scam</p>
         </div>
 
@@ -191,11 +203,11 @@ export default function Home() {
               <div className="bg-gradient-to-br from-teal-500/10 to-indigo-500/10 border-2 border-teal-500/30 rounded-2xl p-8 h-full space-y-4">
                 <div className="text-center">
                   {step.icon}
-                  <h3 className="text-xl font-bold text-white mt-3">{step.label}</h3>
+                  <h3 className="text-xl font-bold text-white mt-3">{withGenesisStyle(step.label)}</h3>
                 </div>
                 <p className="text-slate-300 text-sm text-center">
                   {i === 0 && "Click 'send' or 'approve' in any app. Uniswap, OpenSea, etc."}
-                  {i === 1 && "GENESIS checks against community threat data in real-time. <200ms analysis."}
+                  {i === 1 && <><Genesis /> checks against community threat data in real-time. &lt;200ms analysis.</>}
                   {i === 2 && "Clear verdict: is it safe to sign? Yes, maybe, or absolutely not."}
                 </p>
               </div>
@@ -269,11 +281,11 @@ export default function Home() {
         </div>
 
         <div className="bg-slate-900 border-2 border-teal-500/50 rounded-xl p-8 space-y-4 glow-teal">
-          <h3 className="text-2xl font-black text-white">That's where GENESIS comes in:</h3>
+          <h3 className="text-2xl font-black text-white">That's where <Genesis /> comes in:</h3>
           <div className="space-y-3">
             <div className="flex gap-3">
               <div className="text-2xl flex-shrink-0 text-teal-400">✓</div>
-              <p className="text-slate-200 font-medium"><strong>See what you're actually signing.</strong> GENESIS decodes the transaction and explains it in plain English.</p>
+              <p className="text-slate-200 font-medium"><strong>See what you're actually signing.</strong> <Genesis /> decodes the transaction and explains it in plain English.</p>
             </div>
             <div className="flex gap-3">
               <div className="text-2xl flex-shrink-0 text-teal-400">✓</div>
@@ -306,7 +318,8 @@ export default function Home() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
               </svg>
             </div>
-            <h3 className="text-2xl font-bold text-white">Verify Transactions</h3>
+            <p className="text-xs font-bold uppercase tracking-wide text-teal-400"><Genesis /> Check</p>
+            <h3 className="text-2xl font-bold text-white -mt-3">Verify Transactions</h3>
             <p className="text-sm text-slate-300 font-medium">Analyze real transactions and get instant verdicts. No signup required.</p>
             <div className="pt-2 space-y-2">
               <p className="text-sm font-semibold text-slate-200">✓ Real verdicts</p>
@@ -328,18 +341,19 @@ export default function Home() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
               </svg>
             </div>
-            <h3 className="text-2xl font-bold text-white">Automatic protection</h3>
-            <p className="text-sm text-slate-300 font-medium">Coming soon: real-time checks built into your browser and wallet, so every transaction is screened as you sign.</p>
+            <p className="text-xs font-bold uppercase tracking-wide text-teal-400"><Genesis /> Snap</p>
+            <h3 className="text-2xl font-bold text-white -mt-3">In-Wallet Protection</h3>
+            <p className="text-sm text-slate-300 font-medium">Install <Genesis /> as a MetaMask Snap and get a verdict inside your wallet, right before you sign  -  no copy-pasting.</p>
             <div className="pt-2 space-y-2">
-              <p className="text-sm font-semibold text-slate-200">✓ Browser extension (in progress)</p>
-              <p className="text-sm font-semibold text-slate-200">✓ In-wallet protection</p>
-              <p className="text-sm font-semibold text-slate-200">✓ Same community threat feed</p>
+              <p className="text-sm font-semibold text-slate-200">✓ Live now  -  install via direct link</p>
+              <p className="text-sm font-semibold text-slate-200">✓ Real-time verdicts inside MetaMask</p>
+              <p className="text-sm font-semibold text-slate-200">✓ Official MetaMask directory listing pending</p>
             </div>
             <a
-              href="/whitepaper"
+              href="/snap-install"
               className="inline-block mt-2 px-6 py-3 bg-slate-800 border border-slate-600 hover:border-teal-400 text-white rounded-lg font-bold transition"
             >
-              See the roadmap →
+              Install in MetaMask →
             </a>
           </div>
 
@@ -350,7 +364,8 @@ export default function Home() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 20l4-16m4 4l4 4m0 0l-4 4m4-4H3" />
               </svg>
             </div>
-            <h3 className="text-2xl font-bold text-white">API Integration</h3>
+            <p className="text-xs font-bold uppercase tracking-wide text-teal-400"><Genesis /> API</p>
+            <h3 className="text-2xl font-bold text-white -mt-3">API Integration</h3>
             <p className="text-sm text-slate-300 font-medium">For developers. Build safer wallets and dapps with our HTTP API.</p>
             <div className="pt-2 space-y-2">
               <p className="text-sm font-semibold text-slate-200">✓ Production-ready</p>
@@ -364,6 +379,26 @@ export default function Home() {
               Developer docs →
             </a>
           </div>
+        </div>
+      </section>
+
+      {/* ===== WHAT'S NEXT (sadhutech roadmap) ===== */}
+      <section className="space-y-6">
+        <div className="text-center">
+          <p className="text-xs font-bold uppercase tracking-[0.2em] text-teal-300">sadhutech</p>
+          <h2 className="text-3xl md:text-4xl font-black text-white mt-2"><Genesis /> is our first product. More are coming.</h2>
+          <p className="text-slate-300 mt-2 max-w-2xl mx-auto">
+            <Genesis /> Wallet Guard  -  automatic protection built into any wallet, not just MetaMask  -  is next on the
+            roadmap, alongside protection for mobile, laptop, and SaaS.
+          </p>
+        </div>
+        <div className="flex justify-center">
+          <a
+            href="/products"
+            className="inline-flex items-center gap-2 px-6 py-3 bg-slate-800 border border-slate-600 hover:border-teal-400 text-white rounded-lg font-bold transition"
+          >
+            See all products &amp; the roadmap →
+          </a>
         </div>
       </section>
 
@@ -417,7 +452,7 @@ export default function Home() {
       {/* ===== CORE FEATURES ===== */}
       <section className="space-y-8">
         <div>
-          <h2 className="text-4xl md:text-5xl font-black text-white mb-4">Why use GENESIS?</h2>
+          <h2 className="text-4xl md:text-5xl font-black text-white mb-4">Why use <Genesis />?</h2>
           <p className="text-slate-400 text-lg">Built for everyday crypto users and power users alike</p>
         </div>
 
@@ -441,7 +476,7 @@ export default function Home() {
       <section className="space-y-6 py-8">
         <div className="text-center">
           <h2 className="text-4xl md:text-5xl font-black text-white mb-4">The bigger picture</h2>
-          <p className="text-slate-300 text-lg max-w-2xl mx-auto">Checking crypto transactions is step one. Underneath, GENESIS is a simple idea: catch a risky action and explain it in plain English <em>before</em> you commit to it.</p>
+          <p className="text-slate-300 text-lg max-w-2xl mx-auto">Checking crypto transactions is step one. Underneath, <Genesis /> is a simple idea: catch a risky action and explain it in plain English <em>before</em> you commit to it.</p>
         </div>
         <div className="bg-slate-900 border-2 border-teal-500/50 rounded-xl p-8 text-center space-y-4 max-w-3xl mx-auto">
           <p className="text-slate-300 leading-relaxed">
@@ -462,8 +497,8 @@ export default function Home() {
         <div className="grid gap-6">
           {faqItems.map((item, i) => (
             <div key={i} className="bg-slate-900 rounded-lg border-2 border-teal-500/30 p-6 space-y-3 hover:border-teal-400 transition">
-              <h3 className="font-bold text-white text-lg">{item.title}</h3>
-              <p className="text-slate-300 leading-relaxed">{item.answer}</p>
+              <h3 className="font-bold text-white text-lg">{withGenesisStyle(item.title)}</h3>
+              <p className="text-slate-300 leading-relaxed">{withGenesisStyle(item.answer)}</p>
             </div>
           ))}
         </div>
@@ -472,7 +507,7 @@ export default function Home() {
       {/* ===== INTEGRATION OPTIONS ===== */}
       <section className="space-y-8">
         <div>
-          <h2 className="text-3xl font-bold text-slate-900 dark:text-white mb-2">How to use GENESIS</h2>
+          <h2 className="text-3xl font-bold text-slate-900 dark:text-white mb-2">How to use <Genesis /></h2>
           <p className="text-slate-700 dark:text-slate-400">Choose what works best for you</p>
         </div>
 
@@ -482,16 +517,19 @@ export default function Home() {
             <div className="flex items-center gap-3">
               <span className="text-orange-500"><Icon name="wallet" className="w-9 h-9" /></span>
               <div>
-                <h3 className="font-bold text-lg text-slate-900 dark:text-white">MetaMask Snap</h3>
-                <p className="text-sm text-slate-700 dark:text-slate-400">One-click install</p>
+                <h3 className="font-bold text-lg text-slate-900 dark:text-white"><Genesis /> Snap</h3>
+                <p className="text-sm text-slate-700 dark:text-slate-400">MetaMask, one-click install</p>
               </div>
             </div>
             <p className="text-slate-900 dark:text-slate-300">
-              Add GENESIS to MetaMask. Every time you're about to sign a transaction, we'll pop up with a verdict.
+              Add <Genesis /> to MetaMask. Every time you're about to sign a transaction, we'll pop up with a verdict.
             </p>
-            <div className="bg-white/60 dark:bg-slate-700 rounded-lg p-3 text-xs font-mono text-slate-800 dark:text-slate-300">
-              Coming soon: Full snap integration with MetaMask
-            </div>
+            <a
+              href="/snap-install"
+              className="inline-block bg-orange-600 hover:bg-orange-700 dark:bg-orange-700 dark:hover:bg-orange-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition"
+            >
+              Install the Snap →
+            </a>
           </div>
 
           {/* HTTP API */}
@@ -499,7 +537,7 @@ export default function Home() {
             <div className="flex items-center gap-3">
               <span className="text-indigo-500"><Icon name="code" className="w-9 h-9" /></span>
               <div>
-                <h3 className="font-bold text-lg text-slate-900 dark:text-white">HTTP API</h3>
+                <h3 className="font-bold text-lg text-slate-900 dark:text-white"><Genesis /> API</h3>
                 <p className="text-sm text-slate-700 dark:text-slate-400">For developers</p>
               </div>
             </div>
@@ -520,8 +558,8 @@ export default function Home() {
       {/* ===== WHO IS THIS FOR ===== */}
       <section className="space-y-8">
         <div>
-          <h2 className="text-3xl font-bold text-slate-900 dark:text-white mb-2">Who is GENESIS for?</h2>
-          <p className="text-slate-700 dark:text-slate-400">If you use crypto, GENESIS is built for you.</p>
+          <h2 className="text-3xl font-bold text-slate-900 dark:text-white mb-2">Who is <Genesis /> for?</h2>
+          <p className="text-slate-700 dark:text-slate-400">If you use crypto, <Genesis /> is built for you.</p>
         </div>
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -536,7 +574,7 @@ export default function Home() {
                   <Icon name={p.icon} className="w-6 h-6" />
                 </div>
                 <h3 className="font-bold text-slate-900 dark:text-white text-lg">{p.title}</h3>
-                <p className="text-sm text-slate-700 dark:text-slate-300">{p.desc}</p>
+                <p className="text-sm text-slate-700 dark:text-slate-300">{withGenesisStyle(p.desc)}</p>
               </div>
             </div>
           ))}
@@ -600,10 +638,10 @@ export default function Home() {
 
             <div className="relative space-y-3">
               <p className="text-slate-700 dark:text-slate-300">
-                Install GENESIS as a MetaMask Snap and get real-time protection every time you sign. No copy-pasting addresses or leaving your wallet - just one-click safety.
+                Install <Genesis /> as a MetaMask Snap and get real-time protection every time you sign. No copy-pasting addresses or leaving your wallet - just one-click safety.
               </p>
               <p className="text-slate-700 dark:text-slate-300">
-                Works across Ethereum, Polygon, Base, and more. Whether you're trading, collecting NFTs, or doing DeFi, GENESIS watches your back.
+                Works across Ethereum, Polygon, Base, and more. Whether you're trading, collecting NFTs, or doing DeFi, <Genesis /> watches your back.
               </p>
             </div>
           </div>
@@ -671,7 +709,7 @@ export default function Home() {
       {/* ===== CTA ===== */}
       <section className="text-center space-y-6">
         <h2 className="text-3xl font-bold text-slate-900 dark:text-white">Ready to protect your wallet?</h2>
-        <p className="text-slate-600 dark:text-slate-400 text-lg">Join thousands of crypto users already using GENESIS</p>
+        <p className="text-slate-600 dark:text-slate-400 text-lg">Join thousands of crypto users already using <Genesis /></p>
         <div className="flex gap-4 justify-center flex-wrap">
           <a
             href="/check"

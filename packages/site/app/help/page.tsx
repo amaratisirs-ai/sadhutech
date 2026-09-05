@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Icon } from "@/components/Icon";
+import { withGenesisStyle } from "@/components/Genesis";
 
 export default function HelpPage() {
   const [openFaq, setOpenFaq] = useState<number | null>(0);
@@ -12,19 +13,27 @@ export default function HelpPage() {
       questions: [
         {
           q: "How do I use GENESIS?",
-          a: "Go to Check, paste a crypto address or a transaction, and you get a plain-English verdict in seconds. No install, no signup.",
+          a: "Go to Check, choose 'Check an address' or 'Check a transaction', paste it in, and get a plain-English verdict in seconds. No install, no signup.",
+        },
+        {
+          q: "What's the difference between GENESIS Check, GENESIS Snap, and Wallet Guard?",
+          a: "GENESIS Check is the free web tool at /check  -  paste anything, no install. GENESIS Snap is a MetaMask extension that pops up the same verdict right before you sign (live today via direct install). GENESIS Wallet Guard is the broader roadmap vision: automatic protection built into any wallet or browser, not just MetaMask  -  Snap is the first concrete step toward it. See /products for the full picture.",
+        },
+        {
+          q: "Is GENESIS the only thing sadhutech makes?",
+          a: "GENESIS (crypto transaction safety) is sadhutech's first product. Mobile device protection, laptop protection, and SaaS protection are on the roadmap next  -  see /products and /whitepaper.",
         },
         {
           q: "Do I need to connect my wallet?",
-          a: "No. GENESIS never connects to your wallet and never touches your keys or funds. You simply paste the address or transaction you want to check.",
+          a: "No, not for a free check  -  paste an address or transaction and get a verdict with no wallet involved. Connecting a wallet is only needed if you want a Pro deep check: you sign a message to prove ownership and pay in USDC on Base for credits. Even then, GENESIS never sees your keys, seed phrase, or funds.",
         },
         {
           q: "What can I check?",
-          a: "Any EVM address or transaction  -  Ethereum, Polygon, Arbitrum, Optimism, and Avalanche  -  for free. Pro adds cross-chain coverage (BTC, Solana & more) and deeper ChainAbuse-powered checks.",
+          a: "Any EVM address or transaction  -  Ethereum, Polygon, Arbitrum, Optimism, and Avalanche  -  for free. Pro adds deeper ChainAbuse-powered checks on those same chains today; cross-chain coverage (BTC, Solana & more) is on the roadmap, not live yet.",
         },
         {
           q: "Is GENESIS free?",
-          a: "The core check is free forever  -  no payment, no subscription, no account. Pro is optional, pay-as-you-go (from 1 USDC per check) for deeper cross-chain checks. See /pricing for details.",
+          a: "The core check is free forever  -  no payment, no subscription, no account. Pro is optional, pay-as-you-go (from 1 USDC per check, paid in USDC on Base) for deeper checks. See /pricing for details.",
         },
         {
           q: "How much does it cost to use?",
@@ -32,11 +41,11 @@ export default function HelpPage() {
         },
         {
           q: "What's the difference between Free and Pro?",
-          a: "Free covers EVM address & transaction checks against the community threat feed. Pro adds ChainAbuse-powered deep checks and cross-chain coverage (BTC, Solana & more), billed per check. There's also a Business/API tier for wallets, dapps, and security teams  -  see /pricing.",
+          a: "Free covers EVM address & transaction checks against the community threat feed. Pro adds a ChainAbuse-powered deep check per address, billed per credit and paid with USDC on Base  -  no subscription, no account. There's also a Business/API tier for wallets, dapps, and security teams  -  see /pricing.",
         },
         {
           q: "Is my data safe?",
-          a: "Yes. GENESIS has no accounts and never sees your keys or funds. We only receive the address or transaction you choose to check.",
+          a: "Yes. GENESIS has no accounts and never sees your keys or funds. A free check only sends us the address or transaction you're checking. Buying Pro credits also records your wallet address and payment transaction hash so we can credit your balance  -  see /privacy for the full breakdown.",
         },
       ],
     },
@@ -53,7 +62,11 @@ export default function HelpPage() {
         },
         {
           q: "Does it work on all blockchains?",
-          a: "Free checks cover EVM chains  -  Ethereum, Polygon, Arbitrum, Optimism, and Avalanche. Pro adds cross-chain coverage (BTC, Solana & more) via ChainAbuse-powered deep checks.",
+          a: "Today, checks cover EVM chains  -  Ethereum, Polygon, Arbitrum, Optimism, and Avalanche. Non-EVM addresses (Bitcoin, Solana, etc.) are detected and clearly marked as not supported yet rather than given a false result; broader chain coverage is on the roadmap.",
+        },
+        {
+          q: "What does a Pro 'deep check' do?",
+          a: "It cross-checks the address against ChainAbuse's global scam-report database in addition to our community feed. It costs 1 credit, requires a connected wallet to sign a message proving ownership, and never touches your keys or funds.",
         },
         {
           q: "How fast is a check?",
@@ -66,15 +79,15 @@ export default function HelpPage() {
       questions: [
         {
           q: "Does GENESIS see my private keys?",
-          a: "Never. GENESIS has no wallet connection and never sees your keys, recovery phrase, or funds.",
+          a: "Never, even when you connect a wallet for Pro. Signing a message or sending a payment happens inside your own wallet app  -  GENESIS never sees your keys, seed phrase, or password.",
         },
         {
           q: "Does GENESIS track my transactions?",
-          a: "No. We don't log or store what you check  -  the transaction details are used only to produce a verdict.",
+          a: "We don't build a profile of you. Free checks aren't stored beyond basic request metadata (IP, timestamp) used for rate-limiting and abuse prevention. Pro deep-check spending and credit payments are recorded (wallet address + on-chain transaction hash) so we can credit your balance and audit for abuse.",
         },
         {
           q: "Does GENESIS collect my address/wallet data?",
-          a: "Only what you paste. To produce a verdict we send the address or transaction you're checking to our server  -  nothing else. No accounts, no keys, no tracking, and we don't store it.",
+          a: "Only what's needed: the address or transaction you paste for a free check, or your wallet address and payment transaction hash if you buy Pro credits. No accounts, no KYC, no selling your data. Full detail at /privacy.",
         },
         {
           q: "Is GENESIS open source?",
@@ -82,7 +95,7 @@ export default function HelpPage() {
         },
         {
           q: "Who maintains the threat database?",
-          a: "The community. Security researchers and users report threats, and multiple independent reporters confirm them before they count.",
+          a: "The community. Security researchers and users report threats, and multiple independent reporters confirm them before they count. Pro checks also draw on third-party feeds (GoPlus Security, ChainAbuse, Blockaid)  -  see /partners.",
         },
         {
           q: "What's in the threat database?",
@@ -95,7 +108,7 @@ export default function HelpPage() {
       questions: [
         {
           q: "The checker says it's unavailable",
-          a: "The backend is briefly down or waking up. Wait a minute and try again. Status: github.com/amaratisirs-ai/sadhutech/issues.",
+          a: "The backend is briefly down or waking up from idle (the first check after a while can take up to a minute). Wait and try again. Status: github.com/amaratisirs-ai/sadhutech/issues.",
         },
         {
           q: "I got a rate-limit or 'Forbidden' error",
@@ -103,7 +116,11 @@ export default function HelpPage() {
         },
         {
           q: "My address shows no result",
-          a: "Make sure it's a valid EVM address  -  0x followed by 40 characters. ENS names aren't supported yet.",
+          a: "Make sure it's a valid EVM address  -  0x followed by 40 characters. ENS names and non-EVM addresses (Bitcoin, Solana, etc.) aren't supported yet.",
+        },
+        {
+          q: "My Pro payment went through but I don't see credits",
+          a: "Payments on Base can take up to ~30 seconds to confirm. The Pro page automatically checks for it; if credits still don't appear, use 'Already paid? Add checks' on /pro to re-check.",
         },
       ],
     },
@@ -112,11 +129,11 @@ export default function HelpPage() {
       questions: [
         {
           q: "I found a false positive (safe address flagged as dangerous)",
-          a: "Thank you! Report it at sadhutech.com/report with: (1) Address, (2) Screenshot, (3) Your reasoning. Community votes to remove it.",
+          a: "The /report form is for submitting new threats, not disputes. If an address was wrongly flagged, email security@sadhutech.com with the address and your reasoning and we'll review it.",
         },
         {
           q: "I found a false negative (dangerous address not flagged)",
-          a: "Report at /report. Include the address, why it's dangerous, and proof (link to incident, social media reports, etc.).",
+          a: "Report it at /report: enter the address, category, and a description, then confirm via the one-time email link we send you (this stops spam/Sybil abuse). It's added once multiple independent reporters confirm it.",
         },
         {
           q: "How do I suggest a new feature?",
@@ -124,11 +141,11 @@ export default function HelpPage() {
         },
         {
           q: "I want to contribute threat intel",
-          a: "Use /report page. Your submission is verified by the community and added to the threat database.",
+          a: "Use the /report page and confirm via the email link we send you. Once confirmed, it joins the shared threat feed pending confirmation from other reporters.",
         },
         {
           q: "Is there a bug bounty program?",
-          a: "Check github.com/amaratisirs-ai/sadhutech for security policy. Report vulnerabilities responsibly.",
+          a: "Not yet  -  it's on our roadmap. For now, report vulnerabilities responsibly to security@sadhutech.com or via GitHub issues.",
         },
       ],
     },
@@ -168,12 +185,12 @@ export default function HelpPage() {
         </a>
 
         <a
-          href="mailto:contact@bhusoft.com"
+          href="mailto:security@sadhutech.com"
           className="bg-slate-900/50 border border-teal-500/30 rounded-2xl p-8 hover:border-teal-500/60 hover:shadow-lg hover:shadow-teal-500/20 transition-all group"
         >
           <div className="text-teal-400 mb-3"><Icon name="mail" className="w-8 h-8" /></div>
           <h3 className="font-bold text-white group-hover:text-teal-300">Email Support</h3>
-          <p className="text-sm text-slate-400 mt-2">contact@bhusoft.com  -  We usually respond within 24h</p>
+          <p className="text-sm text-slate-400 mt-2">security@sadhutech.com  -  We usually respond within 24h</p>
         </a>
       </div>
 
@@ -197,7 +214,7 @@ export default function HelpPage() {
                       onClick={() => setOpenFaq(isOpen ? null : globalIdx)}
                       className="w-full px-6 py-4 flex justify-between items-start text-left hover:bg-slate-700/50 transition-all"
                     >
-                      <span className="font-bold text-white">{item.q}</span>
+                      <span className="font-bold text-white">{withGenesisStyle(item.q)}</span>
                       <span
                         className={`text-2xl text-teal-300 transition-transform flex-shrink-0 ml-4 ${
                           isOpen ? "rotate-180" : ""
@@ -209,7 +226,7 @@ export default function HelpPage() {
 
                     {isOpen && (
                       <div className="px-6 py-4 bg-slate-900/50 border-t border-slate-700">
-                        <p className="text-slate-300">{item.a}</p>
+                        <p className="text-slate-300">{withGenesisStyle(item.a)}</p>
                       </div>
                     )}
                   </div>
@@ -229,10 +246,10 @@ export default function HelpPage() {
 
         <div className="flex flex-col sm:flex-row gap-4 justify-center mt-6">
           <a
-            href="mailto:contact@bhusoft.com"
+            href="mailto:security@sadhutech.com"
             className="px-6 py-3 bg-teal-500 text-slate-950 font-bold rounded-xl hover:bg-teal-400 transition-all"
           >
-            Email contact@bhusoft.com
+            Email security@sadhutech.com
           </a>
           <a
             href="https://github.com/amaratisirs-ai/sadhutech/discussions"

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Icon } from "@/components/Icon";
+import { Genesis, withGenesisStyle } from "@/components/Genesis";
 
 interface AnalyzeResponse {
   verdict: "allow" | "warn" | "block";
@@ -128,7 +129,7 @@ export default function DemoPage() {
           <h1 className="text-5xl font-black text-white">Interactive Demo</h1>
         </div>
         <p className="text-slate-200 text-lg font-medium">
-          Test GENESIS with sample transactions. Click a scenario to see how GENESIS analyzes it.
+          Test <Genesis /> with sample transactions. Click a scenario to see how <Genesis /> analyzes it.
         </p>
       </div>
 
@@ -151,7 +152,7 @@ export default function DemoPage() {
 
           {expandedHelp === "gateUrl" && (
             <div className="bg-teal-500/10 border border-teal-500/30 rounded-lg p-4 text-sm text-slate-200 space-y-3">
-              <p><strong>What is it?</strong> The GENESIS Gate Server is the backend service that analyzes transactions. It decodes calldata, checks threats, and returns verdicts.</p>
+              <p><strong>What is it?</strong> The <Genesis /> Gate Server is the backend service that analyzes transactions. It decodes calldata, checks threats, and returns verdicts.</p>
               
               <p><strong>Default URL:</strong> This demo uses <code className="bg-slate-800 px-2 py-1 rounded text-teal-300 font-mono">https://genesis-gate.onrender.com</code> (production). For local testing, use <code className="bg-slate-800 px-2 py-1 rounded text-teal-300 font-mono">http://localhost:10000</code></p>
               
@@ -165,7 +166,7 @@ export default function DemoPage() {
 
               <div>
                 <p className="font-semibold text-slate-100 mb-2">Can I change the URL?</p>
-                <p className="text-slate-300">Yes! If you're running GENESIS on a different server or port, update the URL here and it will use that instead.</p>
+                <p className="text-slate-300">Yes! If you're running <Genesis /> on a different server or port, update the URL here and it will use that instead.</p>
               </div>
 
               <div className="bg-slate-800/50 border border-slate-600 rounded p-3">
@@ -206,14 +207,14 @@ export default function DemoPage() {
 
         {expandedHelp === "scenarios" && (
           <div className="bg-teal-500/10 border border-teal-500/30 rounded-lg p-4 text-sm text-slate-200 space-y-2">
-            <p><strong>What are these?</strong> Pre-built sample transactions showing different real-world scenarios. Click "Run" on any scenario to see how GENESIS analyzes it.</p>
+            <p><strong>What are these?</strong> Pre-built sample transactions showing different real-world scenarios. Click "Run" on any scenario to see how <Genesis /> analyzes it.</p>
             <ul className="list-disc list-inside space-y-1 text-slate-300">
               <li><strong>Simple Token Transfer:</strong> A normal, safe transaction (ALLOW)</li>
               <li><strong>Unlimited Approval:</strong> Granting dangerous unlimited spending access (WARN)</li>
               <li><strong>NFT Collection Approval:</strong> Giving access to manage your whole NFT collection (WARN)</li>
               <li><strong>Approve to Known Drainer:</strong> Approving to a verified malicious address (BLOCK)</li>
             </ul>
-            <p className="text-xs text-teal-300 pt-2">Use these to learn how GENESIS works before analyzing your own transactions.</p>
+            <p className="text-xs text-teal-300 pt-2">Use these to learn how <Genesis /> works before analyzing your own transactions.</p>
           </div>
         )}
 
@@ -235,7 +236,7 @@ export default function DemoPage() {
                   <span className="text-xs font-bold text-teal-400">Run →</span>
                 </div>
                 <p className="font-bold text-white group-hover:text-teal-300 transition">{s.name}</p>
-                <p className="text-sm text-slate-400 mt-1">{s.desc}</p>
+                <p className="text-sm text-slate-400 mt-1">{withGenesisStyle(s.desc)}</p>
               </div>
             </button>
           ))}

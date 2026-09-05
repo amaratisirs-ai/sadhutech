@@ -71,6 +71,15 @@ export function isValidEthAddress(addr: unknown): addr is string {
 }
 
 /**
+ * Validate email address format (simple, not exhaustive RFC 5322).
+ */
+export function isValidEmail(email: unknown): email is string {
+  if (typeof email !== "string") return false;
+  if (email.length > 254) return false;
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
+/**
  * Validate transaction category.
  */
 export function isValidCategory(cat: unknown): cat is string {
@@ -169,6 +178,38 @@ export function validateAnalyzeRequest(body: unknown): ValidationError[] {
       error: `Invalid 'data': must be 0x-prefixed hex string. Got: ${tx.data}`,
     });
   }
+
+  return errors;
+}
+
+/**
+ * Validate a bulk address-check request body: { addresses: string[] (1-5) }.
+ */
+export function validateBulkAnalyzeRequest(body: unknown): ValidationError[] {
+  const errors: ValidationError[] = [];
+
+  if (!body || typeof body !== "object") {
+    errors.push({ field: "body", error: "Request body must be a JSON object" });
+    return errors;
+  }
+
+  const req = body as any;
+
+  if (!Array.isArray(req.addresses)) {
+    errors.push({ field: "addresses", error: "addresses must be an array" });
+    return errors;
+  }
+
+  if (req.addresses.length < 1 || req.addresses.length > 5) {
+    errors.push({ field: "addresses", error: "addresses must contain between 1 and 5 entries" });
+    return errors;
+  }
+
+  req.addresses.forEach((addr: unknown, i: number) => {
+    if (!isValidEthAddress(addr)) {
+      errors.push({ field: `addresses[${i}]`, error: `Invalid address: must be 0x-prefixed 40 hex chars. Got: ${addr ?? "(missing)"}` });
+    }
+  });
 
   return errors;
 }

@@ -3,6 +3,7 @@
 import { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { Icon } from "@/components/Icon";
+import { Genesis } from "@/components/Genesis";
 
 function VerifyContent() {
   const params = useSearchParams();
@@ -49,7 +50,7 @@ function VerifyContent() {
           <div className="flex justify-center text-emerald-400"><Icon name="checkCircle" className="w-16 h-16" /></div>
           <h1 className="text-3xl font-black text-white">Report confirmed</h1>
           <p className="text-slate-300">
-            Thank you for helping protect the community. Your report is now in the GENESIS threat feed and will be trusted
+            Thank you for helping protect the community. Your report is now in the <Genesis /> threat feed and will be trusted
             once other reporters confirm it.
           </p>
           <div className="flex gap-3 justify-center pt-2">

@@ -1,18 +1,19 @@
 "use client";
 
 import { useEffect, useRef, useState, type ReactNode } from "react";
-import { Dancing_Script } from "next/font/google";
 import { ThemeProvider } from "./theme-provider";
 import { Web3Provider } from "./web3-provider";
 import { Icon } from "@/components/Icon";
 import { AccountWidget } from "@/components/AccountWidget";
 import { GateStatusProvider, useGateStatus } from "@/src/gate-status";
 
-const dancingScript = Dancing_Script({ subsets: ["latin"], weight: "700" });
+const GATE_URL = process.env.NEXT_PUBLIC_GATE_URL || "https://genesis-gate.onrender.com";
 
 export function LayoutClient({ children }: { children: ReactNode }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [showScrollTop, setShowScrollTop] = useState(false);
+  const [subscribeEmail, setSubscribeEmail] = useState("");
+  const [subscribeStatus, setSubscribeStatus] = useState<"idle" | "loading" | "ok" | "error">("idle");
 
   useEffect(() => {
     const handleScroll = () => setShowScrollTop(window.scrollY > 400);
@@ -22,6 +23,25 @@ export function LayoutClient({ children }: { children: ReactNode }) {
   }, []);
 
   const scrollToTop = () => window.scrollTo({ top: 0, behavior: "smooth" });
+
+  const handleSubscribe = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const email = subscribeEmail.trim();
+    if (!email) return;
+    setSubscribeStatus("loading");
+    try {
+      const res = await fetch(`${GATE_URL}/v1/newsletter/subscribe`, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ email, source: "footer" }),
+      });
+      if (!res.ok) throw new Error("subscribe failed");
+      setSubscribeStatus("ok");
+      setSubscribeEmail("");
+    } catch {
+      setSubscribeStatus("error");
+    }
+  };
 
   return (
     <Web3Provider>
@@ -35,13 +55,17 @@ export function LayoutClient({ children }: { children: ReactNode }) {
               {/* Logo */}
               <a href="/" className="flex items-center gap-3 group" onClick={() => setMobileMenuOpen(false)}>
                 <img src="/logo.png" alt="GENESIS" className="w-14 h-14 object-contain" />
-                <span className={`${dancingScript.className} text-3xl tracking-wide hidden sm:inline bg-gradient-to-r from-white via-slate-200 to-teal-300 bg-clip-text text-transparent`}>
-                  Genesis
+                <span className="hidden sm:flex flex-col leading-none">
+                  <span className="font-script text-3xl tracking-wide bg-gradient-to-r from-white via-slate-200 to-teal-300 bg-clip-text text-transparent">
+                    Genesis
+                  </span>
+                  <span className="text-[10px] font-semibold tracking-widest text-teal-400/70 uppercase mt-0.5">by sadhutech</span>
                 </span>
               </a>
 
               {/* Desktop Nav */}
               <div className="hidden md:flex items-center gap-1">
+                <NavLink href="/products">Products</NavLink>
                 <NavLink href="/check">Check</NavLink>
                 <NavLink href="/threats">Threats Hub</NavLink>
                 <NavLink href="/pricing">Pricing</NavLink>
@@ -50,6 +74,7 @@ export function LayoutClient({ children }: { children: ReactNode }) {
                   items={[
                     { href: "/report", label: "Report a Threat" },
                     { href: "/community", label: "Community" },
+                    { href: "/news", label: "News & Articles" },
                     { href: "https://github.com/amaratisirs-ai/sadhutech", label: "GitHub", external: true },
                   ]}
                 />
@@ -94,12 +119,14 @@ export function LayoutClient({ children }: { children: ReactNode }) {
             <div className="md:hidden border-t border-teal-500/20 bg-slate-900 py-4">
               <div className="space-y-1">
                 <MobileNavLink href="/" onClick={() => setMobileMenuOpen(false)}>Home</MobileNavLink>
+                <MobileNavLink href="/products" onClick={() => setMobileMenuOpen(false)}>Products</MobileNavLink>
                 <MobileNavLink href="/threats" onClick={() => setMobileMenuOpen(false)}>Threats Hub</MobileNavLink>
                 <MobileNavLink href="/pricing" onClick={() => setMobileMenuOpen(false)}>Pricing</MobileNavLink>
 
                 <MobileSectionLabel>Community</MobileSectionLabel>
                 <MobileNavLink href="/report" onClick={() => setMobileMenuOpen(false)}>Report a Threat</MobileNavLink>
                 <MobileNavLink href="/community" onClick={() => setMobileMenuOpen(false)}>Community</MobileNavLink>
+                <MobileNavLink href="/news" onClick={() => setMobileMenuOpen(false)}>News & Articles</MobileNavLink>
                 <MobileNavLink href="https://github.com/amaratisirs-ai/sadhutech" onClick={() => setMobileMenuOpen(false)}>GitHub</MobileNavLink>
 
                 <MobileSectionLabel>Resources</MobileSectionLabel>
@@ -142,10 +169,39 @@ export function LayoutClient({ children }: { children: ReactNode }) {
       {/* Footer */}
       <footer className="border-t-2 border-teal-500 bg-slate-950 backdrop-blur-xl mt-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-28 md:pb-8">
+          <div className="mb-10 pb-8 border-b border-teal-500/20 flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+              <h4 className="font-bold text-white">Stay updated</h4>
+              <p className="text-sm text-teal-300 mt-1 max-w-md">Threat feed highlights, product updates, and occasional newsletters. Unsubscribe anytime.</p>
+            </div>
+            <div className="w-full md:w-auto">
+              <form onSubmit={handleSubscribe} className="flex flex-col sm:flex-row gap-2 w-full md:w-auto">
+                <input
+                  type="email"
+                  required
+                  value={subscribeEmail}
+                  onChange={(e) => { setSubscribeEmail(e.target.value); setSubscribeStatus("idle"); }}
+                  placeholder="you@example.com"
+                  className="px-4 py-2 rounded-lg bg-slate-900 border-2 border-slate-700 focus:border-teal-400 text-white text-sm outline-none w-full sm:w-64"
+                />
+                <button
+                  type="submit"
+                  disabled={subscribeStatus === "loading"}
+                  className="px-5 py-2 rounded-lg bg-teal-500 text-slate-950 font-bold text-sm hover:bg-teal-400 disabled:opacity-50 transition whitespace-nowrap"
+                >
+                  {subscribeStatus === "loading" ? "Subscribing…" : "Subscribe"}
+                </button>
+              </form>
+              {subscribeStatus === "ok" && <p className="text-xs text-emerald-300 mt-1.5">Subscribed  -  thanks!</p>}
+              {subscribeStatus === "error" && <p className="text-xs text-rose-300 mt-1.5">Couldn&apos;t subscribe right now. Please try again.</p>}
+            </div>
+          </div>
+
           <div className="grid md:grid-cols-4 gap-8 mb-8">
             <div>
               <h4 className="font-bold text-white mb-4">Product</h4>
               <ul className="space-y-2 text-sm text-teal-300">
+                <li><a href="/products" className="hover:text-white transition">All products</a></li>
                 <li><a href="/check" className="hover:text-white transition">Check a transaction</a></li>
                 <li><a href="/after-install" className="hover:text-white transition">Getting Started</a></li>
                 <li><a href="/threats" className="hover:text-white transition">Threats Hub</a></li>
@@ -157,6 +213,7 @@ export function LayoutClient({ children }: { children: ReactNode }) {
               <ul className="space-y-2 text-sm text-teal-300">
                 <li><a href="/report" className="hover:text-white transition">Report Threat</a></li>
                 <li><a href="/community" className="hover:text-white transition">Community</a></li>
+                <li><a href="/news" className="hover:text-white transition">News & Articles</a></li>
                 <li><a href="https://github.com/amaratisirs-ai/sadhutech" className="hover:text-white transition">GitHub</a></li>
               </ul>
             </div>
@@ -165,7 +222,7 @@ export function LayoutClient({ children }: { children: ReactNode }) {
               <ul className="space-y-2 text-sm text-teal-300">
                 <li><a href="/help" className="hover:text-white transition">Help Center</a></li>
                 <li><a href="/whitepaper" className="hover:text-white transition">Vision & roadmap</a></li>
-                <li><a href="mailto:contact@bhusoft.com" className="hover:text-white transition">Email Support</a></li>
+                <li><a href="mailto:security@sadhutech.com" className="hover:text-white transition">Email Support</a></li>
               </ul>
             </div>
             <div>
@@ -179,7 +236,10 @@ export function LayoutClient({ children }: { children: ReactNode }) {
           </div>
 
           <div className="border-t border-teal-500/20 pt-8 text-center text-sm text-teal-200">
-            <p className="font-medium">GENESIS Firewall v0.1  -  Community-powered pre-sign gate for crypto wallets</p>
+            <p className="font-medium"><span className="font-script text-base">GENESIS</span> Firewall v0.1  -  Community-powered pre-sign gate for crypto wallets</p>
+            <p className="mt-2 text-xs text-teal-300">
+              <span className="font-script text-sm">GENESIS</span> is <a href="https://sadhutech.com" className="text-teal-300 hover:text-teal-100 underline transition">sadhutech</a>'s first product  -  <a href="/products" className="text-teal-300 hover:text-teal-100 underline transition">see what's next</a>
+            </p>
             <p className="mt-2 text-xs text-teal-300">
               Powered by <a href="https://bhusoft.com" className="text-teal-300 hover:text-teal-100 underline transition">Bhusoft LLC</a> • <a href="https://github.com/amaratisirs-ai" className="text-teal-300 hover:text-teal-100 underline transition">Open Source</a>
             </p>

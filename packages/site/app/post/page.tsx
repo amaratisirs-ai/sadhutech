@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { Genesis } from "@/components/Genesis";
 
 export default function PostPage() {
   const router = useRouter();
@@ -69,7 +70,7 @@ export default function PostPage() {
           </h1>
           <p className="text-lg text-slate-300 max-w-2xl">
             Unsure about a transaction you're about to sign? Copy the details from your wallet and paste them here. 
-            GENESIS will check it against known scams and give you a clear verdict in seconds.
+            <Genesis /> will check it against known scams and give you a clear verdict in seconds.
           </p>
         </div>
       </section>

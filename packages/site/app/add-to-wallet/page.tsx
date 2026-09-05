@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { Icon } from "@/components/Icon";
+import { Genesis, withGenesisStyle } from "@/components/Genesis";
 
 export default function AddToWallet() {
   const router = useRouter();
@@ -54,7 +55,7 @@ export default function AddToWallet() {
         <div className="grid md:grid-cols-2 gap-4 text-sm text-slate-200">
           <div className="rounded-xl border border-slate-700 bg-slate-950/40 p-4 space-y-2">
             <p className="font-bold text-white">MetaMask</p>
-            <p>Best for desktop MetaMask users who want GENESIS inside the wallet.</p>
+            <p>Best for desktop MetaMask users who want <Genesis /> inside the wallet.</p>
           </div>
           <div className="rounded-xl border border-slate-700 bg-slate-950/40 p-4 space-y-2">
             <p className="font-bold text-white">WalletConnect</p>
@@ -93,7 +94,7 @@ export default function AddToWallet() {
             {/* Content */}
             <div className="space-y-3">
               <h3 className="text-2xl font-bold text-white">{wallet.name}</h3>
-              <p className="text-sm text-slate-200">{wallet.description}</p>
+              <p className="text-sm text-slate-200">{withGenesisStyle(wallet.description)}</p>
             </div>
 
             {/* Features */}
