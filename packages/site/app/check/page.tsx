@@ -57,15 +57,28 @@ function short(a: string) {
 
 const WALLET_SIGN_TIMEOUT_MS = 60_000;
 
+class WalletTimeoutError extends Error {}
+
 // Guards against wallets that never resolve/reject a signature prompt (e.g. dismissed silently).
 function withTimeout<T>(promise: Promise<T>, ms: number, message: string): Promise<T> {
   return new Promise((resolve, reject) => {
-    const timer = setTimeout(() => reject(new Error(message)), ms);
+    const timer = setTimeout(() => reject(new WalletTimeoutError(message)), ms);
     promise.then(
       (v) => { clearTimeout(timer); resolve(v); },
       (e) => { clearTimeout(timer); reject(e); }
     );
   });
+}
+
+// Timeouts already carry a friendly message - only route real wallet/RPC errors through friendlyWalletError.
+// Appends the raw error in brackets so real failures are diagnosable from the UI, not just guessed at.
+function describeError(e: unknown): string {
+  const friendly = e instanceof WalletTimeoutError ? e.message : friendlyWalletError(e);
+  const raw =
+    e instanceof Error
+      ? `${e.name}: ${e.message}${typeof (e as { code?: unknown }).code !== "undefined" ? ` [${(e as { code?: unknown }).code}]` : ""}`
+      : String(e);
+  return `${friendly} (${raw.slice(0, 200)})`;
 }
 
 // Splits on newlines/commas/whitespace, trims, drops empties, de-dupes, caps at the max.
@@ -302,8 +315,8 @@ export default function CheckPage() {
         findings: data.findings ?? [],
       }));
       if (typeof data.creditsLeft === "number") setCredits(data.creditsLeft);
-    } catch (e: any) {
-      setDeepMsg(friendlyWalletError(e));
+    } catch (e: unknown) {
+      setDeepMsg(describeError(e));
     } finally {
       setDeepBusy(false);
     }
@@ -362,8 +375,8 @@ export default function CheckPage() {
       });
       setBulkResults(results);
       if (typeof data.creditsLeft === "number") setCredits(data.creditsLeft);
-    } catch (e: any) {
-      setBulkMsg(friendlyWalletError(e));
+    } catch (e: unknown) {
+      setBulkMsg(describeError(e));
     } finally {
       setBulkBusy(false);
     }
