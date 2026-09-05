@@ -14,6 +14,13 @@ export function useWallet() {
     isConnected,
     chainId,
     connect: () => open(),
-    disconnect: () => disconnectAsync(),
+    disconnect: () => {
+      try {
+        localStorage.removeItem("genesis_pro_auth");
+      } catch {
+        // ignore storage failures
+      }
+      return disconnectAsync();
+    },
   };
 }
