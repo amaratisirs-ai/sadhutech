@@ -1,21 +1,25 @@
 /**
  * Snap configuration - controls which snap ID to use
- * 
- * Development/Testing: Uses direct bundle URL (no registry approval needed)
- * Production (after registry approval): Uses npm:genesis-snap from MetaMask registry
+ *
+ * MetaMask's wallet_requestSnaps only accepts "npm:<package>" (or "local:<url>"
+ * for local Flask dev serving) as a snap ID - an arbitrary https:// bundle URL
+ * is NOT a valid snap ID and always fails with "Installation Failed". The old
+ * bundleUrl mode below is kept only for reference/rollback; npm is the only
+ * scheme that actually works with wallet_requestSnaps.
  */
 
 export const SNAP_CONFIG = {
-  // Toggle between testing (direct bundle) and production (npm registry)
-  // Set to true to use npm:genesis-snap (after MetaMask registry approval)
-  // Set to false to use direct bundle URL (for testing)
-  useRegistrySnap: process.env.NEXT_PUBLIC_USE_REGISTRY_SNAP === "true",
+  // Set NEXT_PUBLIC_USE_REGISTRY_SNAP=false to force the (non-functional)
+  // legacy bundle-URL id for debugging; defaults to the real npm snap ID.
+  useRegistrySnap: process.env.NEXT_PUBLIC_USE_REGISTRY_SNAP !== "false",
 
-  // Direct bundle URL (testing mode)
+  // Legacy direct bundle URL - NOT a valid wallet_requestSnaps id, do not use.
   bundleUrl: (origin?: string) =>
     `${origin || "https://sadhutech.com"}/snap-bundle.js`,
 
-  // npm registry snap ID (production mode - after approval)
+  // npm registry snap ID (published; still pending MetaMask Snaps Directory
+  // allowlisting for endowment:network-access, so install currently only
+  // succeeds on MetaMask Flask)
   registrySnapId: "npm:genesis-snap",
 
   // Get the appropriate snap ID based on configuration

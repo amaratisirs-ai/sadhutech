@@ -103,13 +103,12 @@ export default function SnapInstallPage() {
 
     setState("installing");
     try {
-      // Use environment-configurable snap ID
-      // NEXT_PUBLIC_USE_REGISTRY_SNAP=true → uses npm:genesis-snap (production after registry approval)
-      // NEXT_PUBLIC_USE_REGISTRY_SNAP=false/unset → uses direct bundle URL (testing)
+      // npm:genesis-snap is the only valid wallet_requestSnaps id - an https bundle
+      // URL is rejected outright by MetaMask, so getSnapId() defaults to npm.
       const snapId = typeof window !== "undefined"
         ? SNAP_CONFIG.getSnapId(window.location.origin)
-        : SNAP_CONFIG.bundleUrl();
-      
+        : SNAP_CONFIG.registrySnapId;
+
       await getMetaMask()!.request({
         method: "wallet_requestSnaps",
         params: {
@@ -119,13 +118,18 @@ export default function SnapInstallPage() {
       setState("done");
     } catch (err) {
       setState("error");
-      setErrorMsg(
-        err instanceof Error && err.message.includes("User rejected")
-          ? "You cancelled the installation. Try again if you change your mind."
-          : err instanceof Error
-            ? err.message
-            : "Installation failed. Please try again."
-      );
+      // MetaMask RPC errors are plain {code, message} objects, not Error instances.
+      const message =
+        err && typeof err === "object" && "message" in err ? String((err as { message: unknown }).message) : undefined;
+      if (message?.includes("User rejected")) {
+        setErrorMsg("You cancelled the installation. Try again if you change your mind.");
+      } else if (message && /permission|not allowed|disallowed|not supported/i.test(message)) {
+        setErrorMsg(
+          `${message} — GENESIS Snap is still pending MetaMask's Snaps Directory review (required because it requests network access to check the community threat feed). Until it's approved, install only works on MetaMask Flask.`
+        );
+      } else {
+        setErrorMsg(message || "Installation failed. Please try again.");
+      }
     }
   };
 
@@ -242,6 +246,13 @@ export default function SnapInstallPage() {
 
                 <p className="text-xs text-slate-500 text-center">
                   You'll be prompted to approve in MetaMask
+                </p>
+                <p className="text-xs text-amber-400/80 text-center">
+                  Pending MetaMask Snaps Directory approval — installs today only on{" "}
+                  <a href="https://metamask.io/flask/" target="_blank" rel="noreferrer" className="underline">
+                    MetaMask Flask
+                  </a>
+                  . On regular MetaMask, try <a href="/check" className="underline">GENESIS Check</a> instead.
                 </p>
               </div>
             )}
