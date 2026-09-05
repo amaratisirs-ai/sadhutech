@@ -5,6 +5,7 @@ import { QRCodeCanvas } from "qrcode.react";
 import { SNAP_CONFIG } from "@/config/snap-config";
 import { Icon } from "@/components/Icon";
 import { Genesis } from "@/components/Genesis";
+import { useWallet } from "@/src/wallet/useWallet";
 
 declare global {
   interface Window {
@@ -28,12 +29,36 @@ const GATE_URL = process.env.NEXT_PUBLIC_GATE_URL || "https://genesis-gate.onren
 const CONSENT_VERSION = "2026-09";
 
 export default function SnapInstallPage() {
+  const { address, isConnected, connect, disconnect } = useWallet();
   const [platform, setPlatform] = useState<Platform>("desktop");
   const [state, setState] = useState<State>("detecting");
   const [hasMetaMask, setHasMetaMask] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [showQR, setShowQR] = useState(false);
   const [agreedToTerms, setAgreedToTerms] = useState(false);
+  const [awaitingWalletConnect, setAwaitingWalletConnect] = useState(false);
+  const [permissionsDetailsOpen, setPermissionsDetailsOpen] = useState(false);
+
+  // Once a connection completes after clicking "Use WalletConnect", head to /check -
+  // that's where a non-MetaMask wallet is actually useful (Snaps require the real extension).
+  useEffect(() => {
+    if (awaitingWalletConnect && isConnected && address) {
+      window.location.href = "/check";
+    }
+  }, [awaitingWalletConnect, isConnected, address]);
+
+  // isConnected here (wagmi/AppKit) is a separate concern from hasMetaMask (the actual
+  // browser extension) - clears any existing connection first so there's no stale/mixed
+  // session, then opens AppKit's connect modal (shows a WalletConnect QR on desktop).
+  const handleUseWalletConnect = async () => {
+    setAwaitingWalletConnect(true);
+    try {
+      if (isConnected) await disconnect();
+    } catch {
+      // ignore disconnect failures; proceed to connect regardless
+    }
+    connect();
+  };
 
   useEffect(() => {
     // Detect platform
@@ -306,8 +331,13 @@ export default function SnapInstallPage() {
               <div className="bg-gradient-to-br from-orange-500/10 to-red-500/10 border-2 border-orange-500/30 rounded-2xl p-8 space-y-6">
                 <div className="text-center space-y-2">
                   <div className="flex justify-center text-orange-400"><Icon name="warning" className="w-14 h-14" /></div>
-                  <h3 className="text-xl font-bold text-white">MetaMask Not Found</h3>
-                  <p className="text-sm text-orange-300">Install the extension first or use WalletConnect if you already have another wallet</p>
+                  <h3 className="text-xl font-bold text-white">MetaMask Extension Not Found</h3>
+                  <p className="text-sm text-orange-300">Snaps only run inside the actual MetaMask browser extension - install it, or use GENESIS Check with any other wallet instead</p>
+                  {isConnected && (
+                    <p className="text-xs text-slate-400 pt-1">
+                      Note: you have a wallet connected in the header, but that's a separate connection (e.g. WalletConnect) - it doesn't mean the MetaMask extension is installed in this browser.
+                    </p>
+                  )}
                 </div>
 
                 <div className="bg-slate-900/50 rounded-lg p-4 space-y-3">
@@ -348,13 +378,19 @@ export default function SnapInstallPage() {
                 </a>
 
                 <div className="flex flex-col sm:flex-row gap-3">
-                  <a
-                    href="/wallet-connect"
+                  <button
+                    type="button"
+                    onClick={handleUseWalletConnect}
                     className="flex-1 px-6 py-3 bg-teal-500 text-slate-950 font-bold rounded-xl hover:bg-teal-400 transition-all text-center"
                   >
-                    Use WalletConnect Instead
-                  </a>
+                    {isConnected ? "Reconnect a different wallet →" : "Use WalletConnect Instead"}
+                  </button>
                 </div>
+                {platform === "desktop" && (
+                  <p className="text-xs text-slate-500 text-center -mt-3">
+                    Opens a QR code you can scan with any mobile wallet, then takes you to GENESIS Check.
+                  </p>
+                )}
 
                 <button
                   onClick={() => window.location.reload()}
@@ -440,10 +476,21 @@ export default function SnapInstallPage() {
         {/* Permissions Section */}
         <div className="bg-indigo-500/10 border-2 border-indigo-500/30 rounded-2xl p-12">
           <h2 className="text-2xl font-bold text-white mb-6">About Snap Permissions</h2>
-          <p className="text-slate-300 mb-8">
-            When you install <Genesis />, MetaMask asks for a few permissions. Here's why we need them and how they keep you safe:
+          <p className="text-slate-300 mb-4">
+            When you install <Genesis />, MetaMask asks for 3 permissions: to see transactions and signature requests
+            before you sign them (so it can screen for risk), and network access to fetch the latest threat data. It
+            can't access your keys, funds, or personal info — full breakdown below if you want it.
           </p>
+          <button
+            type="button"
+            onClick={() => setPermissionsDetailsOpen((v) => !v)}
+            className="text-sm font-semibold text-teal-300 hover:text-teal-200 underline mb-8"
+          >
+            {permissionsDetailsOpen ? "Hide details" : "Show details"}
+          </button>
 
+          {permissionsDetailsOpen && (
+          <>
           <div className="grid md:grid-cols-2 gap-8">
             <div className="space-y-4">
               <div className="bg-slate-900/50 rounded-lg p-6 border border-indigo-500/20">
@@ -538,6 +585,8 @@ export default function SnapInstallPage() {
               after that. This is entirely optional and only spends credits you've already purchased.
             </p>
           </div>
+          </>
+          )}
         </div>
       </div>
     );
