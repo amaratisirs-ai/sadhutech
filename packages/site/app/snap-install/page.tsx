@@ -38,6 +38,18 @@ export default function SnapInstallPage() {
   const [agreedToTerms, setAgreedToTerms] = useState(false);
   const [awaitingWalletConnect, setAwaitingWalletConnect] = useState(false);
   const [permissionsDetailsOpen, setPermissionsDetailsOpen] = useState(false);
+  const [mobileDetailsOpen, setMobileDetailsOpen] = useState(false);
+  const [linkCopied, setLinkCopied] = useState(false);
+
+  const copyInstallLink = async () => {
+    try {
+      await navigator.clipboard.writeText("https://sadhutech.com/snap-install");
+      setLinkCopied(true);
+      setTimeout(() => setLinkCopied(false), 2000);
+    } catch {
+      // clipboard access denied - the URL is already shown as plain text
+    }
+  };
 
   // Once a connection completes after clicking "Use WalletConnect", head to /check -
   // that's where a non-MetaMask wallet is actually useful (Snaps require the real extension).
@@ -603,144 +615,69 @@ export default function SnapInstallPage() {
         <p className="text-sm text-teal-200">MetaMask Snap for MetaMask users. WalletConnect users should use the connect flow instead.</p>
       </div>
 
-      {/* Mobile Info - Desktop Only */}
+      {/* Primary guide - simple, 2 clear options */}
       <div className="bg-gradient-to-r from-indigo-500/20 to-blue-500/20 border-2 border-indigo-500 rounded-lg p-5 space-y-4">
         <div className="flex gap-3 items-start">
           <span className="text-teal-400"><Icon name="monitor" className="w-8 h-8" /></span>
           <div className="flex-1">
-            <h2 className="font-bold text-white text-lg">Desktop Only: MetaMask Snaps</h2>
-            <p className="text-xs text-indigo-100 mt-1">Snaps require the MetaMask browser extension on desktop</p>
+            <h2 className="font-bold text-white text-lg">Desktop Required for Snaps</h2>
+            <p className="text-xs text-indigo-100 mt-1">Not supported on mobile yet, regardless of which wallet app you have installed - here's what to do instead:</p>
+          </div>
+        </div>
 
-            <div className="bg-slate-900/60 rounded-lg p-4 mt-3 space-y-3">
-              <div className="space-y-2 text-xs text-indigo-200">
-                <p><strong>What Works:</strong></p>
-                <ul className="list-disc list-inside space-y-1">
-                  <li>Desktop browsers: Chrome, Firefox, Safari, Brave</li>
-                  <li>MetaMask browser extension installed</li>
-                  <li>Visit this site and click "Install <Genesis /> Snap"</li>
-                </ul>
-              </div>
+        <div className="space-y-3">
+          <a
+            href="/check"
+            className="block w-full px-4 py-3 bg-teal-500 text-slate-950 font-bold rounded-lg text-center text-sm"
+          >
+            Continue on GENESIS Check → (works now, any wallet)
+          </a>
 
-              <div className="space-y-2 text-xs text-slate-400 pt-3 border-t border-slate-700">
-                <p><strong>Doesn't Work on Mobile:</strong></p>
-                <ul className="list-disc list-inside space-y-1">
-                  <li>MetaMask mobile app (no Snap support yet)</li>
-                  <li>Safari / Chrome on iPhone or Android</li>
-                  <li>Any mobile browser</li>
-                </ul>
-              </div>
-
-              <div className="mt-3 p-3 bg-blue-900/50 rounded text-xs text-blue-200 border border-blue-500/30">
-                <strong>Tip:</strong> Use the QR code on desktop to share this page. Then open on your computer with MetaMask extension installed.
-              </div>
-
-              <div className="flex flex-col sm:flex-row gap-3 mt-3">
-                <a
-                  href="/wallet-connect"
-                  className="flex-1 px-4 py-2 bg-teal-500 text-slate-950 font-bold rounded-lg text-center text-sm"
-                >
-                  Use WalletConnect Instead
-                </a>
-              </div>
+          <div className="bg-slate-900/60 rounded-lg p-4 space-y-2">
+            <p className="text-xs text-indigo-200">To install the Snap, open this page on a desktop browser with MetaMask:</p>
+            <div className="flex items-center gap-2 bg-slate-800 rounded px-3 py-2">
+              <code className="text-xs text-teal-300 truncate flex-1">sadhutech.com/snap-install</code>
+              <button
+                type="button"
+                onClick={copyInstallLink}
+                className="text-xs font-semibold text-teal-300 hover:text-teal-200 shrink-0"
+              >
+                {linkCopied ? "Copied!" : "Copy"}
+              </button>
             </div>
           </div>
         </div>
+
+        <button
+          type="button"
+          onClick={() => setMobileDetailsOpen((v) => !v)}
+          className="text-xs font-semibold text-teal-300 hover:text-teal-200 underline"
+        >
+          {mobileDetailsOpen ? "Hide details" : "Show details"}
+        </button>
+
+        {mobileDetailsOpen && (
+          <div className="bg-slate-900/60 rounded-lg p-4 space-y-3">
+            <div className="space-y-2 text-xs text-indigo-200">
+              <p><strong>What Works:</strong></p>
+              <ul className="list-disc list-inside space-y-1">
+                <li>Desktop browsers: Chrome, Firefox, Safari, Brave</li>
+                <li>MetaMask browser extension installed</li>
+                <li>Visit this site and click "Install <Genesis /> Snap"</li>
+              </ul>
+            </div>
+
+            <div className="space-y-2 text-xs text-slate-400 pt-3 border-t border-slate-700">
+              <p><strong>Doesn't Work on Mobile:</strong></p>
+              <ul className="list-disc list-inside space-y-1">
+                <li>MetaMask mobile app (no Snap support yet)</li>
+                <li>Safari / Chrome on iPhone or Android</li>
+                <li>Any mobile browser</li>
+              </ul>
+            </div>
+          </div>
+        )}
       </div>
-
-      {/* Install Button - Shows when in MetaMask app */}
-      {hasMetaMask && (
-        <div className="bg-gradient-to-br from-teal-500/10 to-indigo-500/10 border-2 border-teal-500/30 rounded-lg p-6 space-y-4">
-          {state === "ready" && (
-            <>
-              <div className="text-center">
-                <p className="text-sm text-green-300 font-semibold mb-3">✓ MetaMask Browser Detected</p>
-                <label className="flex items-start gap-2 text-xs text-slate-400 cursor-pointer text-left mb-3">
-                  <input
-                    type="checkbox"
-                    checked={agreedToTerms}
-                    onChange={(e) => setAgreedToTerms(e.target.checked)}
-                    className="mt-0.5 accent-teal-400"
-                  />
-                  <span>
-                    I have read and agree to the{" "}
-                    <a href="/terms" target="_blank" className="text-teal-300 underline">Terms of Service</a> and{" "}
-                    <a href="/privacy" target="_blank" className="text-teal-300 underline">Privacy Policy</a>.
-                  </span>
-                </label>
-                <button
-                  onClick={handleInstallClick}
-                  disabled={!agreedToTerms}
-                  className="w-full px-4 py-3 bg-gradient-to-r from-teal-500 to-teal-400 text-slate-950 font-bold rounded-lg hover:shadow-lg transition-all text-base disabled:opacity-40 disabled:cursor-not-allowed"
-                >
-                  + Install <Genesis /> Snap
-                </button>
-              </div>
-            </>
-          )}
-
-          {state === "installing" && (
-            <div className="text-center space-y-3">
-              <div className="inline-block">
-                <div className="w-12 h-12 rounded-full bg-indigo-500/20 flex items-center justify-center animate-spin">
-                  <svg className="w-6 h-6 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                </div>
-              </div>
-              <p className="text-white font-semibold">Installing...</p>
-              <p className="text-xs text-slate-400">Check MetaMask for approval prompt</p>
-            </div>
-          )}
-
-          {state === "done" && (
-            <div className="text-center space-y-3">
-              <div className="flex justify-center text-green-400"><Icon name="checkCircle" className="w-12 h-12" /></div>
-              <h3 className="font-bold text-white">Installation Complete!</h3>
-              <p className="text-xs text-slate-400"><Genesis /> is now protecting your transactions</p>
-              <a href="/after-install" className="block mt-3 px-4 py-2 bg-teal-500 text-slate-950 font-bold rounded-lg text-center text-sm">
-                What's Next?
-              </a>
-            </div>
-          )}
-
-          {state === "error" && (
-            <div className="text-center space-y-3">
-              <div className="flex justify-center text-red-400"><Icon name="block" className="w-10 h-10" /></div>
-              <p className="text-red-300 text-sm">{errorMsg}</p>
-              <button
-                onClick={() => {
-                  setState("ready");
-                  setErrorMsg(null);
-                }}
-                className="w-full px-4 py-2 bg-red-600 text-white font-bold rounded-lg text-sm"
-              >
-                Try Again
-              </button>
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* Don't Have MetaMask */}
-      {!hasMetaMask && (
-        <div className="bg-red-500/10 border-2 border-red-500/30 rounded-lg p-5">
-          <p className="text-sm text-red-300 mb-3">Don't have MetaMask? Get it free, or use WalletConnect if you already use another wallet:</p>
-          <a
-            href="https://metamask.io"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="block w-full px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-bold rounded-lg text-center text-sm"
-          >
-            Download MetaMask App
-          </a>
-          <a
-            href="/wallet-connect"
-            className="block w-full mt-3 px-4 py-2 bg-teal-500 text-slate-950 font-bold rounded-lg text-center text-sm"
-          >
-            Use WalletConnect Instead
-          </a>
-        </div>
-      )}
 
       {/* Why GENESIS - Quick Card */}
       <div className="bg-slate-900/50 rounded-lg p-4 space-y-3">
