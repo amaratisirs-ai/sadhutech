@@ -153,20 +153,22 @@ export default function Home() {
         <div className="absolute inset-0 bg-gradient-to-t from-slate-950/60 via-transparent to-transparent" />
 
         <div className="relative px-4 sm:px-8 py-12 sm:py-20">
-          <div className="space-y-6 max-w-2xl">
+          <div className="space-y-5 max-w-xl">
             <h1 className="text-4xl sm:text-5xl md:text-6xl font-black text-white leading-tight break-words">
               Know What You're Really Signing
             </h1>
 
-            <p className="text-xl text-slate-200 leading-relaxed">
-              Most security tools flash a warning and hope you notice. <strong><Genesis /> decodes the transaction,
-              checks it against threats confirmed by real people</strong>  -  not one company's private blocklist  -
-              and explains the risk in plain English. Free forever. No install, no wallet connection required to check.
+            <p className="text-lg sm:text-xl text-slate-200 leading-relaxed">
+              <Genesis /> decodes your transaction and checks it against threats confirmed by real people
+              -  not one company's private blocklist. Free forever, no install required.
             </p>
 
-            <p className="text-lg text-slate-300">
-              Get a clear verdict before you sign: <span className="font-bold text-green-400">ALLOW</span>, <span className="font-bold text-yellow-400">WARN</span>, or <span className="font-bold text-red-400">BLOCK</span>
-            </p>
+            <div className="flex items-center gap-3 flex-wrap text-sm font-bold">
+              <span className="px-3 py-1 rounded-full bg-green-500/15 text-green-400 border border-green-500/30">ALLOW</span>
+              <span className="px-3 py-1 rounded-full bg-yellow-500/15 text-yellow-400 border border-yellow-500/30">WARN</span>
+              <span className="px-3 py-1 rounded-full bg-red-500/15 text-red-400 border border-red-500/30">BLOCK</span>
+              <span className="text-slate-400 font-normal">- before you sign, not after</span>
+            </div>
 
             <div className="flex gap-4 flex-wrap pt-2">
               <a
