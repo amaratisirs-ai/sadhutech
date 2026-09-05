@@ -55,6 +55,19 @@ function short(a: string) {
   return a ? `${a.slice(0, 6)}…${a.slice(-4)}` : "";
 }
 
+const WALLET_SIGN_TIMEOUT_MS = 60_000;
+
+// Guards against wallets that never resolve/reject a signature prompt (e.g. dismissed silently).
+function withTimeout<T>(promise: Promise<T>, ms: number, message: string): Promise<T> {
+  return new Promise((resolve, reject) => {
+    const timer = setTimeout(() => reject(new Error(message)), ms);
+    promise.then(
+      (v) => { clearTimeout(timer); resolve(v); },
+      (e) => { clearTimeout(timer); reject(e); }
+    );
+  });
+}
+
 // Splits on newlines/commas/whitespace, trims, drops empties, de-dupes, caps at the max.
 function parseBulkAddresses(raw: string): string[] {
   const seen = new Set<string>();
@@ -140,6 +153,7 @@ export default function CheckPage() {
   const [lastTx, setLastTx] = useState<Record<string, unknown> | null>(null);
   const [deepBusy, setDeepBusy] = useState(false);
   const [deepMsg, setDeepMsg] = useState<string | null>(null);
+  const [deepDetailsOpen, setDeepDetailsOpen] = useState(false);
   const [pendingDeepCheck, setPendingDeepCheck] = useState(false);
   const [bulkInput, setBulkInput] = useState("");
   const [bulkResults, setBulkResults] = useState<BulkResult[] | null>(null);
@@ -264,10 +278,14 @@ export default function CheckPage() {
     setDeepBusy(true);
     try {
       const s = await refreshStatus(address);
-      if (!s?.premium) { setDeepMsg("Deep checks (global ChainAbuse intel) are launching soon."); return; }
+      if (!s?.premium) { setDeepMsg("Deep checks (global scam-address intel) are launching soon."); return; }
       if (!s.credits || s.credits < 1) { setDeepMsg("no-credits"); return; }
       const message = `SadhuTech deep check\nwallet: ${address}\nts: ${new Date().toISOString()}`;
-      const signature = await signMessageAsync({ message });
+      const signature = await withTimeout(
+        signMessageAsync({ message }),
+        WALLET_SIGN_TIMEOUT_MS,
+        "No response from your wallet. Check for a pending signature request, or try again."
+      );
       const res = await fetch(`${GATE_URL}/v1/analyze`, {
         method: "POST",
         headers: { "content-type": "application/json" },
@@ -324,7 +342,11 @@ export default function CheckPage() {
       if (!s?.premium) { setBulkMsg("Bulk check (like deep checks) is launching soon."); return; }
       if (!s.credits || s.credits < addresses.length) { setBulkMsg("no-credits"); return; }
       const message = `SadhuTech bulk check\nwallet: ${address}\nts: ${new Date().toISOString()}`;
-      const signature = await signMessageAsync({ message });
+      const signature = await withTimeout(
+        signMessageAsync({ message }),
+        WALLET_SIGN_TIMEOUT_MS,
+        "No response from your wallet. Check for a pending signature request, or try again."
+      );
       const res = await fetch(`${GATE_URL}/v1/analyze/bulk`, {
         method: "POST",
         headers: { "content-type": "application/json" },
@@ -534,7 +556,16 @@ export default function CheckPage() {
         <div className="rounded-xl border border-amber-500/30 bg-amber-900/10 p-4 flex flex-col sm:flex-row sm:items-center gap-3 justify-between">
           <div>
             <p className="text-sm font-semibold text-white flex items-center gap-1.5"><Icon name="lock" className="w-4 h-4" /> Deep check <span className="text-xs font-normal text-amber-300/80">· Pro</span></p>
-            <p className="text-xs text-slate-400 mt-0.5">Cross-checks this address against ChainAbuse&apos;s global scam reports. Costs 1 credit.</p>
+            <p className="text-xs text-slate-400 mt-0.5">
+              Cross-checks this address against a database of 1M+ reported scam addresses. Costs 1 credit.{" "}
+              <button
+                type="button"
+                onClick={() => setDeepDetailsOpen((v) => !v)}
+                className="underline font-semibold text-amber-300/90 hover:text-amber-200"
+              >
+                {deepDetailsOpen ? "Hide details" : "Details"}
+              </button>
+            </p>
           </div>
           <div className="flex items-center gap-3 shrink-0">
             {credits !== null && <span className="text-xs text-slate-400">{credits} left</span>}
@@ -546,6 +577,12 @@ export default function CheckPage() {
               {deepBusy ? "Working…" : isConnected ? "Deep check (1 credit)" : "Connect & deep check"}
             </button>
           </div>
+        </div>
+      )}
+      {deepDetailsOpen && (
+        <div className="rounded-xl border border-slate-700 bg-slate-900/60 p-4 text-xs text-slate-300 space-y-2">
+          <p>A deep check queries an independent, continuously-updated database of over a million confirmed scam addresses, drainer contracts, and sanctioned wallets - built from security researchers and community reports.</p>
+          <p>It's a second, deeper layer on top of GENESIS's own community threat feed, useful for addresses that are new or not yet reported anywhere else. Costs 1 credit per address checked.</p>
         </div>
       )}
       {deepMsg && deepMsg !== "no-credits" && (
