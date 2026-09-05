@@ -1,0 +1,30 @@
+{
+  "manifest_version": 3,
+  "name": "GENESIS - Transaction Firewall",
+  "short_name": "GENESIS",
+  "version": "0.0.1",
+  "description": "Screens every transaction and signature request against community-verified threats before you sign, no matter which wallet you use.",
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "GENESIS Firewall"
+  },
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["inject.js"],
+      "world": "MAIN",
+      "run_at": "document_start"
+    },
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content-script.js"],
+      "run_at": "document_start"
+    }
+  ],
+  "permissions": ["storage"],
+  "host_permissions": ["https://genesis-gate.onrender.com/*"]
+}

@@ -1,0 +1,17 @@
+{
+  "name": "genesis-extension",
+  "version": "0.0.1",
+  "description": "GENESIS pre-sign transaction firewall - standalone browser extension, works with any wallet (MetaMask, Trust Wallet, Coinbase Wallet, Rabby, etc.)",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "build": "node build.mjs",
+    "watch": "node build.mjs --watch"
+  },
+  "devDependencies": {
+    "@types/chrome": "^0.0.280",
+    "esbuild": "^0.24.0",
+    "typescript": "^5.6.0"
+  }
+}
