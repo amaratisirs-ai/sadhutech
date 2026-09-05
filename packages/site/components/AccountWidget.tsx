@@ -116,6 +116,9 @@ export function AccountWidget() {
                 <a href="/terms" target="_blank" className="text-teal-300 underline">Terms of Service</a> and{" "}
                 <a href="/privacy" target="_blank" className="text-teal-300 underline">Privacy Policy</a>.
               </p>
+              <p className="text-xs text-slate-400 bg-slate-800/60 rounded-lg p-2.5">
+                Tip: for the most reliable connection, scan the QR code using your intended wallet's own scanner.
+              </p>
               <div>
                 <label htmlFor="consent-email" className="block text-xs font-semibold text-slate-300 mb-1.5">Email</label>
                 <input

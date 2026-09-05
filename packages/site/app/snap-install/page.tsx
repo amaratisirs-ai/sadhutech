@@ -560,7 +560,7 @@ export default function SnapInstallPage() {
           <span className="text-teal-400"><Icon name="monitor" className="w-8 h-8" /></span>
           <div className="flex-1">
             <h2 className="font-bold text-white text-lg">Desktop Required for Snaps</h2>
-            <p className="text-xs text-indigo-100 mt-1">Not supported on mobile yet, regardless of which wallet app you have installed - here's what to do instead:</p>
+            <p className="text-xs text-indigo-100 mt-1">Not supported on mobile yet (MetaMask has this on their roadmap, no confirmed date), regardless of which wallet app you have installed - here's what to do instead:</p>
           </div>
         </div>
 
