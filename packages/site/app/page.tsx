@@ -613,11 +613,16 @@ export default function Home() {
                 We've built a working gate that checks crypto transactions before you sign. It blocks known scams, warns you about risky moves, and explains everything in plain English - no crypto jargon.
               </p>
               <p className="text-slate-700 dark:text-slate-300">
-                Try it with real transactions on our demo. The system learns from community reports, so it gets smarter over time.
+                Try it on the web, or install the <Genesis /> browser extension for real-time protection with any wallet - no copy-pasting addresses, no leaving your wallet.
               </p>
-              <a href="/check" className="inline-flex items-center gap-2 text-emerald-600 dark:text-emerald-400 font-semibold hover:underline">
-                → Try the free checker
-              </a>
+              <div className="flex flex-wrap gap-x-6 gap-y-2">
+                <a href="/check" className="inline-flex items-center gap-2 text-emerald-600 dark:text-emerald-400 font-semibold hover:underline">
+                  → Try the free checker
+                </a>
+                <a href="/extension" className="inline-flex items-center gap-2 text-emerald-600 dark:text-emerald-400 font-semibold hover:underline">
+                  → Get the browser extension
+                </a>
+              </div>
             </div>
           </div>
 
@@ -630,8 +635,8 @@ export default function Home() {
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
                   Q4 2026
                 </div>
-                <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">Phase 2: In Your Wallet (Q4 2026)</h3>
-                <p className="text-slate-700 dark:text-slate-300 mb-4 font-medium">Protection built directly into MetaMask</p>
+                <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">Phase 2: Wider Adoption (Q4 2026)</h3>
+                <p className="text-slate-700 dark:text-slate-300 mb-4 font-medium">Published to browser extension stores, more chains covered</p>
               </div>
               <div className="w-12 h-12 rounded-lg bg-indigo-100 dark:bg-indigo-500/20 flex items-center justify-center flex-shrink-0">
                 <svg className="w-6 h-6 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3v-6" /></svg>
@@ -640,7 +645,7 @@ export default function Home() {
 
             <div className="relative space-y-3">
               <p className="text-slate-700 dark:text-slate-300">
-                Install <Genesis /> as a browser extension and get real-time protection every time you sign. No copy-pasting addresses or leaving your wallet - just one-click safety.
+                Get <Genesis /> onto the Chrome Web Store and other browser stores so anyone can install it in one click, no manual setup.
               </p>
               <p className="text-slate-700 dark:text-slate-300">
                 Works across Ethereum, Polygon, Base, and more. Whether you're trading, collecting NFTs, or doing DeFi, <Genesis /> watches your back.
