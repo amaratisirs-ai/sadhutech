@@ -27,6 +27,25 @@ one wallet's plugin API.
 Fails open throughout: any network/gate error results in `allow`, never a
 false block.
 
+## Coverage: what it can and can't see
+
+Any browser extension (this one included) can only intercept transactions
+that a **website** asks the wallet to sign via `window.ethereum` - it cannot
+reach into another extension's own sandboxed UI. A wallet's native, built-in
+features (its own in-wallet swap/send/buy screens) never touch a webpage's
+`window.ethereum`, so no browser extension can see or protect those.
+
+| | Dapp-initiated txs (Uniswap, OpenSea, etc.) | Wallet's own native swap/send |
+|---|---|---|
+| This extension (any wallet) | Protected | Not visible - can't intercept |
+| [GENESIS Snap](../snap) (MetaMask only) | Protected | Protected (MetaMask only, via `onTransaction`/`onSignature`) |
+
+The Snap gets the extra native-flow coverage because MetaMask specifically
+exposes `onTransaction`/`onSignature` hooks that fire for *any* transaction
+it's about to confirm, regardless of origin - other wallets (Trust Wallet,
+Coinbase Wallet, Rabby, ...) have no equivalent third-party plugin hook, so
+this can't be replicated for them by an extension.
+
 ## Build
 
 ```bash

@@ -1,5 +1,5 @@
 {
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "GENESIS pre-sign transaction firewall — A Bhusoft LLC product",
   "proposedName": "GENESIS Firewall (Bhusoft)",
   "repository": {
@@ -8,7 +8,7 @@
     "directory": "packages/snap"
   },
   "source": {
-    "shasum": "1W8atXd2YR78CDbfJvjsi+d+5GYhOy+lbamXAhBVoiQ=",
+    "shasum": "2Oo06tM9C71WfVP5mnPmlekIPTzBJoe7r1vScGPZ0TM=",
     "location": {
       "npm": {
         "filePath": "dist/bundle.js",

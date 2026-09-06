@@ -73,7 +73,7 @@ export default function ProductsPage() {
             <Genesis /> isn't one single thing  -  it's three ways to get the same community-verified verdict before you sign.
           </p>
         </div>
-        <div className="grid md:grid-cols-3 gap-6">
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
           <ProductCard
             icon={<Icon name="search" className="w-6 h-6" />}
             name="GENESIS Check"
@@ -93,14 +93,52 @@ export default function ProductsPage() {
             cta="Install the Snap"
           />
           <ProductCard
+            icon={<Icon name="shieldAlert" className="w-6 h-6" />}
+            name="GENESIS Extension"
+            status="Dev preview"
+            statusColor="bg-amber-500/15 text-amber-300"
+            desc="A wallet-agnostic browser extension - works with MetaMask, Trust Wallet, Coinbase Wallet, or any wallet that injects window.ethereum. Functional today; not yet published to any browser's extension store, so install is manual (load unpacked) for now."
+            href="https://github.com/amaratisirs-ai/sadhutech/tree/main/packages/extension"
+            cta="View source on GitHub"
+          />
+          <ProductCard
             icon={<Icon name="wallet" className="w-6 h-6" />}
             name="GENESIS Wallet Guard"
             status="Roadmap"
             statusColor="bg-amber-500/15 text-amber-300"
-            desc="The broader vision: automatic, real-time protection built into any wallet or browser, not just MetaMask. GENESIS Snap is the first concrete step toward it."
+            desc="The broader vision: automatic, real-time protection built into any wallet or browser, not just MetaMask. GENESIS Snap and GENESIS Extension are the first concrete steps toward it."
             href="/whitepaper"
             cta="See the vision"
           />
+        </div>
+
+        <div className="bg-slate-900/60 border border-slate-700 rounded-2xl p-6 overflow-x-auto">
+          <p className="text-sm font-bold text-white mb-1">What each surface can actually see</p>
+          <p className="text-sm text-slate-400 mb-4">
+            Any browser extension can only screen transactions a <em>website</em> asks your wallet to sign - it can't
+            reach into another extension's own sandboxed UI, like a wallet's built-in swap/send screens.
+          </p>
+          <table className="w-full text-sm text-left min-w-[480px]">
+            <thead>
+              <tr className="border-b border-slate-700 text-slate-400">
+                <th className="py-2 pr-4 font-semibold"> </th>
+                <th className="py-2 pr-4 font-semibold">Dapp-initiated transactions</th>
+                <th className="py-2 font-semibold">Wallet's own native swap/send</th>
+              </tr>
+            </thead>
+            <tbody className="text-slate-300">
+              <tr className="border-b border-slate-800">
+                <td className="py-2 pr-4 font-semibold text-white">GENESIS Extension (any wallet)</td>
+                <td className="py-2 pr-4 text-emerald-400">Protected</td>
+                <td className="py-2 text-slate-500">Not visible - can't intercept</td>
+              </tr>
+              <tr>
+                <td className="py-2 pr-4 font-semibold text-white">GENESIS Snap (MetaMask only)</td>
+                <td className="py-2 pr-4 text-emerald-400">Protected</td>
+                <td className="py-2 text-emerald-400">Protected (MetaMask only)</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </section>
 
