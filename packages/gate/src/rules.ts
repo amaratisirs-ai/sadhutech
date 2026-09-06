@@ -1,4 +1,5 @@
 import type { RiskFinding, SimulationResult } from "@genesis/shared";
+import { KNOWN_INFRASTRUCTURE_SPENDERS } from "@genesis/shared";
 import { ThreatIntel } from "./intel.js";
 import { ThreatIntelPostgres } from "./intel-postgres.js";
 import { lookupMaliciousAddress } from "./goplus-lookup.js";
@@ -81,6 +82,17 @@ export async function evaluate(
         description:
           `setApprovalForAll would let ${ap.spender} transfer every NFT you own ` +
           `in ${ap.token}. This is a common NFT-drainer pattern.`,
+        subject: ap.spender,
+      });
+    } else if (ap.unlimited && KNOWN_INFRASTRUCTURE_SPENDERS.has(ap.spender.toLowerCase())) {
+      findings.push({
+        id: "approval.unlimited-trusted-infra",
+        severity: "low",
+        title: "Unlimited allowance to a known infrastructure contract",
+        description:
+          `${ap.spender} would be able to move an unlimited amount of ${ap.token}, ` +
+          `but this is a widely-used, audited contract (e.g. Uniswap's Permit2) - ` +
+          `unlimited approvals to it are standard practice, not a scam signal by itself.`,
         subject: ap.spender,
       });
     } else if (ap.unlimited) {

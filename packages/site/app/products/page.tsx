@@ -140,6 +140,23 @@ export default function ProductsPage() {
             </tbody>
           </table>
         </div>
+
+        <div className="bg-gradient-to-br from-slate-900/80 to-slate-900/40 border border-slate-700 rounded-2xl p-6 space-y-3">
+          <p className="text-sm font-bold text-white">What GENESIS protects - and what it can't</p>
+          <p className="text-sm text-slate-300">
+            <strong className="text-white">Protected:</strong> anything your own self-custody wallet
+            (MetaMask, Trust Wallet, Coinbase Wallet, etc.) is asked to sign by a website - a DeFi swap, an
+            NFT purchase, connecting to a new dapp. This works the same way no matter which token or chain
+            is involved, because it's about <em>how</em> the transaction is created, not what it moves.
+          </p>
+          <p className="text-sm text-slate-300">
+            <strong className="text-white">Not protected:</strong> transfers from a custodial exchange app
+            (Robinhood, Coinbase's exchange, Binance, Kraken, etc.). Those platforms hold your funds and send
+            them from their own backend - there's no wallet-signing step in your browser for anything to
+            screen. Same for non-EVM chains like Bitcoin or Dogecoin, and a wallet's own built-in swap/send
+            screens (see the table above).
+          </p>
+        </div>
       </section>
 
       <section className="space-y-6">

@@ -178,6 +178,20 @@ export const DEFAULT_QUORUM = 3;
 export const UNLIMITED_THRESHOLD =
   BigInt(2) ** BigInt(255); // half of max-uint256; comfortably "infinite" in practice
 
+/**
+ * Canonical, widely-audited infrastructure contracts (same address on every EVM
+ * chain) that legitimately request unlimited approvals as standard UX (e.g. a
+ * one-time Permit2 approval so a dapp never has to ask again). An unlimited
+ * approval to one of these is still disclosed to the user, just not treated as
+ * scary/high-severity the way an unlimited approval to an unknown address is.
+ * Deliberately NOT including DEX aggregators/routers, which vary per chain and
+ * aren't uniformly audited the way Permit2 is - only add addresses here that are
+ * genuinely canonical across the ecosystem.
+ */
+export const KNOWN_INFRASTRUCTURE_SPENDERS: ReadonlySet<string> = new Set([
+  "0x000000000022d473030f116ddee9f6b43ac78ba3", // Uniswap Permit2 (same address on all EVM chains)
+]);
+
 // Re-export API configuration and security policies
 export * from "./api-config.js";
 

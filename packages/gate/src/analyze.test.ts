@@ -97,6 +97,20 @@ describe("Chakravyuha pre-sign gate", () => {
     expect(result.findings.map((f) => f.id)).toContain("approval.unlimited");
   });
 
+  it("downgrades an unlimited approval TO the real Permit2 contract, but not to an unknown spender", async () => {
+    const REAL_PERMIT2 = "0x000000000022d473030f116ddee9f6b43ac78ba3" as Address;
+    const permit2Data = encodeFunctionData({ abi: ABI, functionName: "approve", args: [REAL_PERMIT2, maxUint256] });
+    const permit2Result = await analyze({ tx: tx({ to: TOKEN, data: permit2Data }) }, createIntel());
+    expect(permit2Result.findings.map((f) => f.id)).toContain("approval.unlimited-trusted-infra");
+    expect(permit2Result.findings.map((f) => f.id)).not.toContain("approval.unlimited");
+    expect(permit2Result.verdict).toBe("allow");
+
+    const unknownData = encodeFunctionData({ abi: ABI, functionName: "approve", args: [SPENDER, maxUint256] });
+    const unknownResult = await analyze({ tx: tx({ to: TOKEN, data: unknownData }) }, createIntel());
+    expect(unknownResult.findings.map((f) => f.id)).toContain("approval.unlimited");
+    expect(unknownResult.verdict).toBe("warn");
+  });
+
   it("flags a batched multicall as hiding its actions", async () => {
     const inner = encodeFunctionData({ abi: ABI, functionName: "approve", args: [SPENDER, 1n] });
     const data = encodeFunctionData({ abi: ABI, functionName: "multicall", args: [[inner]] });
