@@ -26,6 +26,7 @@ export interface AdminAnalyticsSummary {
   errorCount: number;
   stuckCount: number;
   uniqueWallets: number;
+  totalUsers: number;
   pro: { walletsWithCredits: number; totalCredits: number; avgCredits: number };
   creditsBought: { purchases: number; totalUsdc: number };
   recentEvents: {
@@ -80,7 +81,7 @@ export class AnalyticsService {
 
   /** Aggregated view for the admin dashboard, covering the last `hours`. */
   async getSummary(hours = 24 * 7): Promise<AdminAnalyticsSummary> {
-    const [loginsByHour, loginsByDay, pageViews, txByHour, txByVerdict, errors, stuck, uniqueWallets, proStats, creditsBought, recentEvents] =
+    const [loginsByHour, loginsByDay, pageViews, txByHour, txByVerdict, errors, stuck, uniqueWallets, totalUsers, proStats, creditsBought, recentEvents] =
       await Promise.all([
         this.pool.query(
           `SELECT date_trunc('hour', created_at) AS bucket, COUNT(*) AS count
@@ -123,6 +124,15 @@ export class AnalyticsService {
           `SELECT COUNT(DISTINCT wallet) AS count FROM analytics_events WHERE wallet IS NOT NULL AND created_at > NOW() - INTERVAL '1 hour' * $1::int`,
           [hours]
         ),
+        // All-time, unlike the other counts above: anyone who's ever shown up in telemetry,
+        // held Pro credits, or spent a credit - not just the selected range.
+        this.pool.query(
+          `SELECT COUNT(DISTINCT wallet) AS count FROM (
+             SELECT wallet FROM analytics_events WHERE wallet IS NOT NULL
+             UNION SELECT address AS wallet FROM pro_credits
+             UNION SELECT address AS wallet FROM credit_ledger
+           ) AS all_wallets`
+        ),
         this.pool.query(
           `SELECT COUNT(*) AS wallets_with_credits, COALESCE(SUM(credits), 0) AS total_credits, COALESCE(AVG(credits), 0) AS avg_credits
            FROM pro_credits WHERE credits > 0`
@@ -148,6 +158,7 @@ export class AnalyticsService {
       errorCount: Number(errors.rows[0]?.count ?? 0),
       stuckCount: Number(stuck.rows[0]?.count ?? 0),
       uniqueWallets: Number(uniqueWallets.rows[0]?.count ?? 0),
+      totalUsers: Number(totalUsers.rows[0]?.count ?? 0),
       pro: {
         walletsWithCredits: Number(proStats.rows[0]?.wallets_with_credits ?? 0),
         totalCredits: Number(proStats.rows[0]?.total_credits ?? 0),

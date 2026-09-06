@@ -53,6 +53,7 @@ describe("AnalyticsService", () => {
       if (sql.includes("'analyze'") && sql.includes("GROUP BY verdict")) return { rows: [{ verdict: "allow", count: "6" }] };
       if (sql.includes("'error'")) return { rows: [{ count: "2" }] };
       if (sql.includes("'stuck'")) return { rows: [{ count: "1" }] };
+      if (sql.includes("all_wallets")) return { rows: [{ count: "6" }] };
       if (sql.includes("COUNT(DISTINCT wallet)")) return { rows: [{ count: "4" }] };
       if (sql.includes("pro_credits")) return { rows: [{ wallets_with_credits: "3", total_credits: "30", avg_credits: "10" }] };
       if (sql.includes("pro_payments")) return { rows: [{ purchases: "2", total_usdc: "5.5" }] };
@@ -66,6 +67,7 @@ describe("AnalyticsService", () => {
     expect(summary.errorCount).toBe(2);
     expect(summary.stuckCount).toBe(1);
     expect(summary.uniqueWallets).toBe(4);
+    expect(summary.totalUsers).toBe(6);
     expect(summary.pro).toEqual({ walletsWithCredits: 3, totalCredits: 30, avgCredits: 10 });
     expect(summary.creditsBought).toEqual({ purchases: 2, totalUsdc: 5.5 });
     expect(summary.recentEvents.length).toBe(1);

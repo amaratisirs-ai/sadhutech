@@ -19,6 +19,7 @@ interface Summary {
   errorCount: number;
   stuckCount: number;
   uniqueWallets: number;
+  totalUsers: number;
   pro: { walletsWithCredits: number; totalCredits: number; avgCredits: number };
   creditsBought: { purchases: number; totalUsdc: number };
   recentEvents: {
@@ -181,7 +182,8 @@ export default function AdminPage() {
 
       {summary && (
         <>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+            <Stat label="Total users" value={summary.totalUsers} hint="all-time" />
             <Stat label="Unique wallets" value={summary.uniqueWallets} hint={`active in last ${rangeLabel}`} />
             <Stat label="Transactions checked" value={summary.transactionsByHour.reduce((s, r) => s + Number(r.count), 0)} hint={`last ${rangeLabel}`} />
             <Stat label="Errors" value={summary.errorCount} hint={`last ${rangeLabel}`} />
