@@ -24,6 +24,9 @@ let nextId = 0;
 // call (below) must bypass its own interception, or personal_sign would recurse through
 // the analyze pipeline as if it were a third-party dapp request.
 let unwrappedRequest: ((args: { method: string; params?: unknown[] }) => Promise<any>) | null = null;
+// Most recently wrapped provider (window.ethereum or an EIP-6963 announcement) - used as a
+// fallback for the auth flow below in case a wallet only announces via EIP-6963.
+let lastWrappedProvider: any = null;
 
 function askGenesis(method: InterceptedMethod, params: unknown[]): Promise<AnalyzeResponseMessage> {
   const id = `genesis-${Date.now()}-${nextId++}`;
@@ -51,6 +54,7 @@ function wrapProvider(provider: any): void {
   const originalRequest = provider.request?.bind(provider);
   if (typeof originalRequest !== "function") return;
   unwrappedRequest = originalRequest;
+  lastWrappedProvider = provider;
 
   provider.request = async (args: { method: string; params?: unknown[] }) => {
     if (!INTERCEPTED.has(args.method)) {
@@ -86,12 +90,24 @@ function watchForProvider(): void {
 
 watchForProvider();
 
+// EIP-6963 (Multi Injected Provider Discovery): modern dapps (Uniswap included) increasingly
+// fetch a wallet's provider directly via this event instead of the legacy window.ethereum
+// singleton, especially when multiple wallets are installed. Missing this meant real
+// transactions from EIP-6963-aware dapps went completely unscreened. Wrap every provider a
+// wallet announces, and proactively ask wallets to (re-)announce in case they already fired
+// before this listener attached.
+window.addEventListener("eip6963:announceProvider", (event) => {
+  const provider = (event as CustomEvent<{ provider?: any }>).detail?.provider;
+  if (provider) wrapProvider(provider);
+});
+window.dispatchEvent(new Event("eip6963:requestProvider"));
+
 // Deep Check authorization: content-script.ts (relaying a request from the popup) asks
 // whatever wallet is on this page to sign a one-time proof-of-ownership message.
 window.addEventListener(GENESIS_AUTH_REQUEST_EVENT, async (event) => {
   const request = (event as CustomEvent<{ id: string }>).detail;
   if (!request) return;
-  const provider = (window as any).ethereum;
+  const provider = (window as any).ethereum ?? lastWrappedProvider;
   const respond = (detail: AuthResponseMessage) =>
     window.dispatchEvent(new CustomEvent(GENESIS_AUTH_RESPONSE_EVENT, { detail }));
 

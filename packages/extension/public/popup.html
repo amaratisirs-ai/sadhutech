@@ -15,6 +15,7 @@
       .status-text { font-size: 11px; color: #94a3b8; margin: -8px 0 10px 2px; }
       button.connect-btn { width: 100%; padding: 8px; border-radius: 8px; border: none; background: #2dd4bf; color: #0f172a; font-weight: 700; font-size: 12px; cursor: pointer; margin-bottom: 8px; }
       button.connect-btn:disabled { opacity: 0.6; cursor: default; }
+      a.disconnect-link { color: #f87171; }
     </style>
   </head>
   <body>
@@ -32,6 +33,7 @@
     <div class="status-text" id="deep-check-status">Off - checks the community threat feed only.</div>
     <button class="connect-btn" id="connect-btn" style="display:none">Connect wallet &amp; enable</button>
     <a id="buy-credits-link" href="https://sadhutech.com/pro" target="_blank" rel="noopener" style="display:none">Buy more credits &rarr;</a>
+    <a id="disconnect-link" class="disconnect-link" href="#" style="display:none">Disconnect / switch wallet</a>
     <a href="https://sadhutech.com/check" target="_blank" rel="noopener">Open GENESIS Check &rarr;</a>
     <script src="popup.js"></script>
   </body>

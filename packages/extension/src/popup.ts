@@ -18,6 +18,7 @@ const deepToggle = document.querySelector<HTMLInputElement>("#deep-check-toggle"
 const statusEl = document.querySelector<HTMLDivElement>("#deep-check-status");
 const connectBtn = document.querySelector<HTMLButtonElement>("#connect-btn");
 const buyLink = document.querySelector<HTMLAnchorElement>("#buy-credits-link");
+const disconnectLink = document.querySelector<HTMLAnchorElement>("#disconnect-link");
 
 function short(addr: string): string {
   return `${addr.slice(0, 6)}\u2026${addr.slice(-4)}`;
@@ -49,6 +50,7 @@ async function loadDeepCheckState(): Promise<void> {
   const auth = stored.genesisProAuth as ProAuth | undefined;
   const fresh = !!auth && Date.now() - auth.ts < PRO_AUTH_TTL_MS;
   if (deepToggle) deepToggle.checked = !!stored.deepCheckEnabled && fresh;
+  if (disconnectLink) disconnectLink.style.display = auth ? "block" : "none";
   if (!auth) {
     setStatus("Off \u2014 checks the community threat feed only.");
     return;
@@ -75,6 +77,7 @@ async function authorizeAndEnable(): Promise<void> {
     const auth: ProAuth = { address: response.address, message: response.message, signature: response.signature, ts: Date.now() };
     await chrome.storage.local.set({ deepCheckEnabled: true, genesisProAuth: auth });
     connectBtn.style.display = "none";
+    if (disconnectLink) disconnectLink.style.display = "block";
     await refreshCredits(auth.address);
   } catch (err) {
     deepToggle.checked = false;
@@ -115,3 +118,14 @@ if (deepToggle && connectBtn) {
   connectBtn.addEventListener("click", authorizeAndEnable);
   loadDeepCheckState();
 }
+
+disconnectLink?.addEventListener("click", async (e) => {
+  e.preventDefault();
+  await chrome.storage.local.set({ deepCheckEnabled: false });
+  await chrome.storage.local.remove("genesisProAuth");
+  if (deepToggle) deepToggle.checked = false;
+  if (connectBtn) connectBtn.style.display = "none";
+  if (buyLink) buyLink.style.display = "none";
+  disconnectLink.style.display = "none";
+  setStatus("Off \u2014 checks the community threat feed only.");
+});

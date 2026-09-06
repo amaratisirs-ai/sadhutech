@@ -12,7 +12,11 @@ one wallet's plugin API.
 
 1. **`inject.ts`** runs in the page's own JS context (declared as a `"world":
    "MAIN"` content script) and wraps `window.ethereum.request`, so it sees the
-   exact same provider the dapp and wallet use.
+   exact same provider the dapp and wallet use. It also listens for
+   **EIP-6963** `eip6963:announceProvider` events and wraps every provider a
+   wallet announces that way too - some dapps (Uniswap included) fetch a
+   wallet's provider directly via EIP-6963 instead of `window.ethereum`, and
+   missing that meant real transactions went completely unscreened.
 2. When a dapp calls `eth_sendTransaction`, `personal_sign`, or
    `eth_signTypedData_v4`, `inject.ts` pauses the call and asks
    **`content-script.ts`** (an isolated-world script bridging via
@@ -52,7 +56,9 @@ Off by default - the popup's "Deep Check protection" toggle enables it:
 
 Turning the toggle off just stops attaching `pro` on future requests - the
 cached signature stays put so re-enabling doesn't require signing again
-(until it expires).
+(until it expires). "Disconnect / switch wallet" (shown whenever a
+credential is cached) clears it immediately, so a different wallet can
+authorize next time instead of the cached one being reused.
 
 ## Coverage: what it can and can't see
 
@@ -87,9 +93,6 @@ select `packages/extension/dist`.
 
 ## Known limitations (MVP, not yet production-hardened)
 
-- Only wraps a single `window.ethereum` - doesn't yet listen for EIP-6963
-  `eip6963:announceProvider` events, so pages with multiple simultaneously
-  announced providers may only get the first one wrapped.
 - No real icon assets yet (manifest omits `icons` - Chrome shows a default
   placeholder). Needs real PNG icons before a Chrome Web Store submission.
 - `personal_sign`/`eth_signTypedData_v4` params are read positionally per the
