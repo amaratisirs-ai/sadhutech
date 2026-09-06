@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useWallet } from "@/src/wallet/useWallet";
 import { useProAuth, WalletTimeoutError, withTimeout } from "@/src/wallet/useProAuth";
 import { friendlyWalletError } from "@/src/wallet/errors";
@@ -25,53 +25,45 @@ export default function ExtensionConnectPage() {
   const [state, setState] = useState<State>("connect");
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (!isConnected || !address || state !== "connect") return;
-    let cancelled = false;
+  // Signing is triggered from a direct button click (not an effect) - some wallet extensions
+  // silently drop a signature request that isn't tied to a recent user gesture, which left this
+  // page spinning forever with no visible prompt when the wallet was already connected on load.
+  const signAndConnect = async () => {
+    if (!address) return;
+    setState("signing");
+    try {
+      const auth = await getProAuth(address);
 
-    (async () => {
-      setState("signing");
-      try {
-        const auth = await getProAuth(address);
-        if (cancelled) return;
-
-        const runtime = window.chrome?.runtime;
-        if (!runtime?.sendMessage) {
-          throw new Error("This only works in Chrome with the GENESIS extension installed.");
-        }
-        // A mismatched extension ID or an origin missing from manifest.json's
-        // "externally_connectable" can leave the callback never firing at all rather than
-        // erroring - a timeout guarantees this never spins forever.
-        await withTimeout(
-          new Promise<void>((resolve, reject) => {
-            runtime.sendMessage(
-              EXTENSION_ID,
-              { type: "genesis-connect-result", address: auth.address, authMessage: auth.message, signature: auth.signature },
-              (response) => {
-                const err = (globalThis as any).chrome?.runtime?.lastError;
-                if (err) reject(new Error("Couldn't reach the GENESIS extension. Is it installed and enabled?"));
-                else if (!(response as { ok?: boolean } | undefined)?.ok) reject(new Error("The extension rejected the connection. Try again."));
-                else resolve();
-              }
-            );
-          }),
-          10_000,
-          "Couldn't reach the GENESIS extension. Make sure it's installed and enabled, then try again."
-        );
-        if (cancelled) return;
-        setState("done");
-        setTimeout(() => window.close(), 1500);
-      } catch (err) {
-        if (cancelled) return;
-        setErrorMsg(err instanceof WalletTimeoutError ? err.message : friendlyWalletError(err));
-        setState("error");
+      const runtime = window.chrome?.runtime;
+      if (!runtime?.sendMessage) {
+        throw new Error("This only works in Chrome with the GENESIS extension installed.");
       }
-    })();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [isConnected, address, state, getProAuth]);
+      // A mismatched extension ID or an origin missing from manifest.json's
+      // "externally_connectable" can leave the callback never firing at all rather than
+      // erroring - a timeout guarantees this never spins forever.
+      await withTimeout(
+        new Promise<void>((resolve, reject) => {
+          runtime.sendMessage(
+            EXTENSION_ID,
+            { type: "genesis-connect-result", address: auth.address, authMessage: auth.message, signature: auth.signature },
+            (response) => {
+              const err = (globalThis as any).chrome?.runtime?.lastError;
+              if (err) reject(new Error("Couldn't reach the GENESIS extension. Is it installed and enabled?"));
+              else if (!(response as { ok?: boolean } | undefined)?.ok) reject(new Error("The extension rejected the connection. Try again."));
+              else resolve();
+            }
+          );
+        }),
+        10_000,
+        "Couldn't reach the GENESIS extension. Make sure it's installed and enabled, then try again."
+      );
+      setState("done");
+      setTimeout(() => window.close(), 1500);
+    } catch (err) {
+      setErrorMsg(err instanceof WalletTimeoutError ? err.message : friendlyWalletError(err));
+      setState("error");
+    }
+  };
 
   return (
     <div className="max-w-lg mx-auto text-center space-y-6 py-16">
@@ -80,7 +72,7 @@ export default function ExtensionConnectPage() {
         Enable Deep Check for the <Genesis /> Extension
       </h1>
 
-      {state === "connect" && (
+      {state === "connect" && !isConnected && (
         <>
           <p className="text-slate-300">
             Connect the wallet you want Deep Check credits spent from. This opens in its own
@@ -92,6 +84,21 @@ export default function ExtensionConnectPage() {
             className="px-6 py-3 rounded-xl bg-teal-500 text-slate-950 font-bold hover:bg-teal-400 transition"
           >
             Connect Wallet
+          </button>
+        </>
+      )}
+
+      {state === "connect" && isConnected && (
+        <>
+          <p className="text-slate-300">
+            Wallet connected — click below to sign a message proving ownership. Your wallet may
+            need a moment to show the signature request.
+          </p>
+          <button
+            onClick={signAndConnect}
+            className="px-6 py-3 rounded-xl bg-teal-500 text-slate-950 font-bold hover:bg-teal-400 transition"
+          >
+            Sign &amp; Enable Deep Check
           </button>
         </>
       )}
