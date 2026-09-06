@@ -88,7 +88,7 @@ export default function ProductsPage() {
             name="GENESIS Extension"
             status="Live · Any wallet"
             statusColor="bg-emerald-500/15 text-emerald-300"
-            desc="A wallet-agnostic browser extension - works with MetaMask, Trust Wallet, Coinbase Wallet, or any wallet that injects window.ethereum. Functional today; not yet published to any browser's extension store, so install is manual (load unpacked) for now."
+            desc="Install it once and any site that asks your wallet to sign something gets screened first - works with MetaMask, Trust Wallet, Coinbase Wallet, and other popular wallets. Available today as a manual install while it goes through browser store review."
             href="/extension"
             cta="Get the Extension"
           />
