@@ -17,9 +17,11 @@ function toHex(value: number): string {
 }
 
 export const FONT_OPTIONS = [
-  { id: "default", label: "Default", stack: "var(--font-inter), Arial, sans-serif" },
-  { id: "rounded", label: "Rounded", stack: "var(--font-nunito), Arial, sans-serif" },
+  { id: "sans-serif", label: "Sans Serif", stack: "var(--font-inter), Arial, sans-serif" },
   { id: "serif", label: "Serif", stack: "var(--font-merriweather), Georgia, serif" },
+  { id: "display", label: "Display", stack: "var(--font-playfair), Georgia, serif" },
+  { id: "handwriting", label: "Handwriting", stack: "var(--font-dancing-script), cursive" },
+  { id: "monospace", label: "Monospace", stack: "var(--font-roboto-mono), monospace" },
   { id: "easy-read", label: "Easy Read", stack: "var(--font-atkinson), Arial, sans-serif" },
 ] as const;
 
@@ -38,7 +40,7 @@ function applyFont(id: FontId): void {
  * both user-adjustable instead of one fixed value guessed to suit everyone's eyes. */
 export function useDisplaySettings() {
   const [brightness, setBrightnessState] = useState(DEFAULT_BRIGHTNESS);
-  const [font, setFontState] = useState<FontId>("default");
+  const [font, setFontState] = useState<FontId>("sans-serif");
 
   useEffect(() => {
     const savedBrightness = Number(localStorage.getItem(BRIGHTNESS_KEY));
@@ -48,7 +50,7 @@ export function useDisplaySettings() {
     applyBrightness(initialBrightness);
 
     const savedFont = localStorage.getItem(FONT_KEY) as FontId | null;
-    const initialFont = FONT_OPTIONS.some((f) => f.id === savedFont) ? (savedFont as FontId) : "default";
+    const initialFont = FONT_OPTIONS.some((f) => f.id === savedFont) ? (savedFont as FontId) : "sans-serif";
     setFontState(initialFont);
     applyFont(initialFont);
   }, []);

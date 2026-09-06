@@ -43,7 +43,7 @@ export default function SettingsPage() {
 
       <section className="bg-slate-900 border border-slate-700 rounded-2xl p-6 space-y-4">
         <h2 className="text-lg font-bold">Font</h2>
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
           {FONT_OPTIONS.map((opt) => (
             <button
               key={opt.id}
@@ -55,7 +55,7 @@ export default function SettingsPage() {
                   : "border-slate-700 text-slate-300 hover:border-slate-500"
               }`}
             >
-              <div className="text-base mb-1">Aa</div>
+              <div className="text-xl mb-1">Aa</div>
               {opt.label}
             </button>
           ))}
