@@ -183,7 +183,8 @@ const ROADMAP: { theme: string; items: string[] }[] = [
     items: [
       "External security audit",
       "Expanded real-time threat feed integrations (beyond GoPlus/ChainAbuse)",
-      "Cross-chain coverage beyond the 5 EVM chains supported today",
+      "Solana/Sui support via GoPlus's dedicated non-EVM endpoints (new lookup module + a non-ABI transaction parser)",
+      "Cross-chain coverage beyond the 5 EVM chains supported today - Bitcoin/Dogecoin remain unblocked by no vendor: GoPlus has no security API for either",
       "SLA documentation, monitoring & alerting for the gate API",
     ],
   },
@@ -385,9 +386,11 @@ export default function AdminArchitecturePage() {
           </div>
         </div>
         <p className="text-xs text-slate-500 border-t border-slate-800 pt-3">
-          Note: a paid GoPlus tier only raises the request quota (CU) for chains/APIs we already call by chain_id (EVM) - it
-          doesn't add non-EVM support. Bitcoin/Dogecoin aren't UTXO-decodable by decode.ts today because they have no ABI
-          calldata to parse at all; adding them is a separate decoder, not a billing upgrade.
+          Note: a paid GoPlus tier raises request quota (CU) for chains/APIs we already call, and would also unlock GoPlus's
+          separate dedicated endpoints for Solana and Sui (Token Security API for Solana/Sui) - a real but scoped addition
+          (new lookup module + a Solana/Sui transaction parser, since their format isn't EVM ABI calldata). It does not cover
+          Bitcoin or Dogecoin: GoPlus has no security API for either chain at any tier as of their current API catalog
+          (docs.gopluslabs.io/reference/api-overview) - that gap isn't a billing question, there's simply nothing to call.
         </p>
       </Section>
 
