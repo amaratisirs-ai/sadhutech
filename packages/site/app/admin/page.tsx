@@ -75,7 +75,7 @@ function BarRow({ label, count, max }: { label: string; count: number; max: numb
 
 export default function AdminPage() {
   const { address, isConnected, connect } = useWallet();
-  const { getAdminAuth } = useAdminAuth();
+  const { getAdminAuth, persistAdminAuth } = useAdminAuth();
   const [hours, setHours] = useState(24 * 7);
   const [summary, setSummary] = useState<Summary | null>(null);
   const [loading, setLoading] = useState(false);
@@ -94,6 +94,10 @@ export default function AdminPage() {
         headers: { "content-type": "application/json" },
         body: JSON.stringify({ wallet: address, message, signature, hours: rangeHours }),
       });
+      if (res.status === 401) {
+        persistAdminAuth(null);
+        throw new Error("Your admin session expired - please try again.");
+      }
       if (!res.ok) {
         const body = await res.json().catch(() => ({}));
         throw new Error(body?.error || `Request failed (HTTP ${res.status})`);
