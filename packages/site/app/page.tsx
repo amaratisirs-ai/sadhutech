@@ -524,7 +524,7 @@ export default function Home() {
               </div>
             </div>
             <p className="text-slate-300">
-              Add <Genesis /> to your browser. Every time you're about to sign a transaction, we'll pop up with a verdict.
+              Add <Genesis /> to your browser once. From then on, before you approve anything risky, we'll warn you in plain English  -  works with any wallet, on any site.
             </p>
             <a
               href="/extension"

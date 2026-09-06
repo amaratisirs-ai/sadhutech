@@ -74,8 +74,6 @@ export function LayoutClient({ children }: { children: ReactNode }) {
               <div className="hidden md:flex items-center gap-1">
                 <NavLink href="/products">Products</NavLink>
                 <NavLink href="/check">Check</NavLink>
-                <NavLink href="/threats">Threats Hub</NavLink>
-                <NavLink href="/pricing">Pricing</NavLink>
                 <NavDropdown
                   label="Community"
                   items={[
@@ -88,6 +86,8 @@ export function LayoutClient({ children }: { children: ReactNode }) {
                 <NavDropdown
                   label="Resources"
                   items={[
+                    { href: "/threats", label: "Threats Hub" },
+                    { href: "/pricing", label: "Pricing" },
                     { href: "/demo", label: "Demo" },
                     { href: "/developers", label: "Developers" },
                     { href: "/partners", label: "Integrations & Partners" },
@@ -129,8 +129,6 @@ export function LayoutClient({ children }: { children: ReactNode }) {
               <div className="space-y-1">
                 <MobileNavLink href="/" onClick={() => setMobileMenuOpen(false)}>Home</MobileNavLink>
                 <MobileNavLink href="/products" onClick={() => setMobileMenuOpen(false)}>Products</MobileNavLink>
-                <MobileNavLink href="/threats" onClick={() => setMobileMenuOpen(false)}>Threats Hub</MobileNavLink>
-                <MobileNavLink href="/pricing" onClick={() => setMobileMenuOpen(false)}>Pricing</MobileNavLink>
 
                 <MobileSectionLabel>Community</MobileSectionLabel>
                 <MobileNavLink href="/report" onClick={() => setMobileMenuOpen(false)}>Report a Threat</MobileNavLink>
@@ -139,6 +137,8 @@ export function LayoutClient({ children }: { children: ReactNode }) {
                 <MobileNavLink href="https://github.com/amaratisirs-ai/sadhutech" onClick={() => setMobileMenuOpen(false)}>GitHub</MobileNavLink>
 
                 <MobileSectionLabel>Resources</MobileSectionLabel>
+                <MobileNavLink href="/threats" onClick={() => setMobileMenuOpen(false)}>Threats Hub</MobileNavLink>
+                <MobileNavLink href="/pricing" onClick={() => setMobileMenuOpen(false)}>Pricing</MobileNavLink>
                 <MobileNavLink href="/demo" onClick={() => setMobileMenuOpen(false)}>Demo</MobileNavLink>
                 <MobileNavLink href="/developers" onClick={() => setMobileMenuOpen(false)}>Developers</MobileNavLink>
                 <MobileNavLink href="/partners" onClick={() => setMobileMenuOpen(false)}>Integrations & Partners</MobileNavLink>
