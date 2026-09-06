@@ -40,6 +40,17 @@ function applyFont(id: FontId): void {
   document.body.style.fontFamily = opt.stack;
 }
 
+/** Reads and re-applies saved brightness/font preferences. Called from LayoutClient (every
+ * page, via the root layout) so a preference set once on /settings still applies no matter
+ * which page loads first - the /settings page itself is just one place that can change it. */
+export function applySavedDisplaySettings(): void {
+  const savedBrightness = Number(localStorage.getItem(BRIGHTNESS_KEY));
+  applyBrightness(Number.isFinite(savedBrightness) && savedBrightness >= 0 && savedBrightness <= 100 ? savedBrightness : DEFAULT_BRIGHTNESS);
+
+  const savedFont = localStorage.getItem(FONT_KEY) as FontId | null;
+  applyFont(FONT_OPTIONS.some((f) => f.id === savedFont) ? (savedFont as FontId) : "sans-serif");
+}
+
 /** Shared state + persistence for the /settings page - text brightness and font choice,
  * both user-adjustable instead of one fixed value guessed to suit everyone's eyes. */
 export function useDisplaySettings() {
@@ -51,12 +62,12 @@ export function useDisplaySettings() {
     const initialBrightness =
       Number.isFinite(savedBrightness) && savedBrightness >= 0 && savedBrightness <= 100 ? savedBrightness : DEFAULT_BRIGHTNESS;
     setBrightnessState(initialBrightness);
-    applyBrightness(initialBrightness);
 
     const savedFont = localStorage.getItem(FONT_KEY) as FontId | null;
     const initialFont = FONT_OPTIONS.some((f) => f.id === savedFont) ? (savedFont as FontId) : "sans-serif";
     setFontState(initialFont);
-    applyFont(initialFont);
+    // Applying is handled globally by applySavedDisplaySettings() (see LayoutClient) - this
+    // effect only needs to sync this page's own slider/button UI to the saved values.
   }, []);
 
   const setBrightness = (next: number) => {

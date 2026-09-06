@@ -5,6 +5,7 @@ import { ThemeProvider } from "./theme-provider";
 import { Web3Provider } from "./web3-provider";
 import { Icon, type IconName } from "@/components/Icon";
 import { AccountWidget } from "@/components/AccountWidget";
+import { applySavedDisplaySettings } from "@/src/useDisplaySettings";
 import { GateStatusProvider, useGateStatus } from "@/src/gate-status";
 
 const GATE_URL = process.env.NEXT_PUBLIC_GATE_URL || "https://genesis-gate.onrender.com";
@@ -14,6 +15,10 @@ export function LayoutClient({ children }: { children: ReactNode }) {
   const [showScrollTop, setShowScrollTop] = useState(false);
   const [subscribeEmail, setSubscribeEmail] = useState("");
   const [subscribeStatus, setSubscribeStatus] = useState<"idle" | "loading" | "ok" | "error">("idle");
+
+  useEffect(() => {
+    applySavedDisplaySettings();
+  }, []);
 
   useEffect(() => {
     const handleScroll = () => setShowScrollTop(window.scrollY > 400);
