@@ -75,9 +75,7 @@ export default function ExtensionConnectPage() {
       {state === "connect" && !isConnected && (
         <>
           <p className="text-slate-300">
-            Connect the wallet you want Deep Check credits spent from. This opens in its own
-            tab so your wallet can show the real GENESIS origin, and so it isn't interrupted if
-            the wallet's own approval popup takes focus.
+            Connect your wallet to turn on Deep Check.
           </p>
           <button
             onClick={connect}
@@ -91,8 +89,7 @@ export default function ExtensionConnectPage() {
       {state === "connect" && isConnected && (
         <>
           <p className="text-slate-300">
-            Wallet connected — click below to sign a message proving ownership. Your wallet may
-            need a moment to show the signature request.
+            Wallet connected. Click below and sign in your wallet to finish.
           </p>
           <button
             onClick={signAndConnect}
