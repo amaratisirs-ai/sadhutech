@@ -196,6 +196,12 @@ export default function ProPage() {
                   ? "Adding checks…"
                   : `Pay ${Math.max(MIN_USDC, amount)} USDC`}
           </button>
+          {busy === "paying" && (
+            <p className="text-xs text-slate-400 text-center">
+              Some wallets show the raw amount instead of USDC — {Math.max(MIN_USDC, amount) * 1_000_000} is
+              correct for {Math.max(MIN_USDC, amount)} USDC (USDC uses 6 decimal places).
+            </p>
+          )}
           <button
             onClick={verifyNow}
             disabled={busy !== "idle"}
