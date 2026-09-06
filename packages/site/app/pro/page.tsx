@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { encodeFunctionData, erc20Abi } from "viem";
 import { base } from "@reown/appkit/networks";
-import { useSendTransaction, useSwitchChain } from "wagmi";
+import { useSendTransaction, useSwitchChain, useWalletClient } from "wagmi";
 import { useWallet } from "@/src/wallet/useWallet";
 import { friendlyWalletError } from "@/src/wallet/errors";
 import { DEEP_CHECK_ENABLED } from "@/src/pro-status";
@@ -25,6 +25,7 @@ export default function ProPage() {
   const gateStatus = useGateStatus();
   const { switchChainAsync } = useSwitchChain();
   const { sendTransactionAsync } = useSendTransaction();
+  const { data: walletClient } = useWalletClient();
 
   const [credits, setCredits] = useState<number>(0);
   const [amount, setAmount] = useState<number>(MIN_USDC);
@@ -82,6 +83,14 @@ export default function ProPage() {
     try {
       if (chainId !== base.id) {
         await switchChainAsync({ chainId: base.id });
+      }
+      // Best-effort: registers USDC's symbol/decimals with the wallet so its confirm screen
+      // shows "10 USDC" instead of a raw base-units number. Silently ignored by wallets that
+      // don't support wallet_watchAsset or already know this token - never blocks payment.
+      try {
+        await walletClient?.watchAsset({ type: "ERC20", options: { address: USDC_BASE, symbol: "USDC", decimals: 6 } });
+      } catch {
+        // not supported / dismissed - fine, the transfer still works
       }
       const units = BigInt(Math.round(amt * 1_000_000)); // USDC has 6 decimals
       const data = encodeFunctionData({
