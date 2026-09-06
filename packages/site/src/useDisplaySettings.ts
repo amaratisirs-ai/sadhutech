@@ -34,6 +34,10 @@ function applyBrightness(value: number): void {
 function applyFont(id: FontId): void {
   const opt = FONT_OPTIONS.find((f) => f.id === id) ?? FONT_OPTIONS[0];
   document.documentElement.style.setProperty("--font-choice", opt.stack);
+  // Belt-and-suspenders: a plain inline style directly on body always wins over any
+  // stylesheet rule (Tailwind's own base/preflight styles included), regardless of how
+  // CSS cascade layers order things - the CSS variable alone wasn't reliably taking effect.
+  document.body.style.fontFamily = opt.stack;
 }
 
 /** Shared state + persistence for the /settings page - text brightness and font choice,
