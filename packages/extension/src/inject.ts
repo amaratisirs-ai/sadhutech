@@ -20,6 +20,10 @@ const INTERCEPTED: ReadonlySet<string> = new Set<InterceptedMethod>([
 ]);
 
 let nextId = 0;
+// The unwrapped provider.request, captured by wrapProvider() - GENESIS's own auth-signing
+// call (below) must bypass its own interception, or personal_sign would recurse through
+// the analyze pipeline as if it were a third-party dapp request.
+let unwrappedRequest: ((args: { method: string; params?: unknown[] }) => Promise<any>) | null = null;
 
 function askGenesis(method: InterceptedMethod, params: unknown[]): Promise<AnalyzeResponseMessage> {
   const id = `genesis-${Date.now()}-${nextId++}`;
@@ -46,6 +50,7 @@ function wrapProvider(provider: any): void {
   if (!provider || provider.__genesisWrapped) return;
   const originalRequest = provider.request?.bind(provider);
   if (typeof originalRequest !== "function") return;
+  unwrappedRequest = originalRequest;
 
   provider.request = async (args: { method: string; params?: unknown[] }) => {
     if (!INTERCEPTED.has(args.method)) {
@@ -95,11 +100,12 @@ window.addEventListener(GENESIS_AUTH_REQUEST_EVENT, async (event) => {
     return;
   }
   try {
-    const accounts = (await provider.request({ method: "eth_requestAccounts" })) as string[];
+    const rawRequest = unwrappedRequest ?? provider.request.bind(provider);
+    const accounts = (await rawRequest({ method: "eth_requestAccounts" })) as string[];
     const address = accounts?.[0];
     if (!address) throw new Error("No account returned by wallet.");
     const message = `GENESIS Deep Check\nwallet: ${address}\nts: ${new Date().toISOString()}`;
-    const signature = (await provider.request({ method: "personal_sign", params: [message, address] })) as string;
+    const signature = (await rawRequest({ method: "personal_sign", params: [message, address] })) as string;
     respond({ type: GENESIS_AUTH_RESPONSE_EVENT, id: request.id, address, message, signature });
   } catch (err) {
     respond({

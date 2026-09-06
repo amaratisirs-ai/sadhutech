@@ -63,6 +63,10 @@ function respond(message: AnalyzeResponseMessage): void {
 
 // Relays the popup's "authorize wallet" request into inject.ts's MAIN world (where
 // window.ethereum lives) and reports the signed credential (or error) back to the popup.
+// Persists the result here (not just in popup.ts) because the wallet's own approval dialog
+// stealing focus commonly closes the extension's popup mid-flow, in Chrome's default popup
+// lifecycle - content-script.ts keeps running regardless, so the credential still saves even
+// if the popup is long gone by the time the user approves the signature.
 chrome.runtime.onMessage.addListener((message: { type: string }, _sender, sendResponse) => {
   if (message?.type !== "genesis-authorize") return;
 
@@ -71,7 +75,17 @@ chrome.runtime.onMessage.addListener((message: { type: string }, _sender, sendRe
     const detail = (event as CustomEvent<AuthResponseMessage>).detail;
     if (detail?.id !== id) return;
     window.removeEventListener(GENESIS_AUTH_RESPONSE_EVENT, onResponse);
-    sendResponse(detail);
+    if (detail.address && detail.signature && detail.message) {
+      void chrome.storage.local.set({
+        deepCheckEnabled: true,
+        genesisProAuth: { address: detail.address, message: detail.message, signature: detail.signature, ts: Date.now() },
+      });
+    }
+    try {
+      sendResponse(detail);
+    } catch {
+      // popup already closed - the storage write above already happened, nothing more to do
+    }
   };
   window.addEventListener(GENESIS_AUTH_RESPONSE_EVENT, onResponse);
   window.dispatchEvent(new CustomEvent(GENESIS_AUTH_REQUEST_EVENT, { detail: { id } }));
