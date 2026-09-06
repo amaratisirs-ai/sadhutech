@@ -78,10 +78,13 @@ async function authorizeAndEnable(): Promise<void> {
     await refreshCredits(auth.address);
   } catch (err) {
     deepToggle.checked = false;
+    const raw = err instanceof Error ? err.message : "";
     setStatus(
-      err instanceof Error
-        ? `Couldn't enable: ${err.message}`
-        : "Couldn't enable Deep Check. Open a regular webpage (not a new tab) and try again."
+      /receiving end does not exist/i.test(raw)
+        ? "This tab was open before GENESIS loaded here \u2014 refresh the page and try again."
+        : raw
+          ? `Couldn't enable: ${raw}`
+          : "Couldn't enable Deep Check. Open a regular webpage (not a new tab) and try again."
     );
   } finally {
     connectBtn.disabled = false;
