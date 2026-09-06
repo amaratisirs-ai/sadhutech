@@ -20,8 +20,18 @@ async function pingGate(): Promise<boolean> {
   }
 }
 
-/** Render's free tier spins the gate down after idle; this pings /health on load and
- * keeps retrying in the background so the UI can show "waking up" instead of freezing. */
+function delay(ms: number): Promise<void> {
+  return new Promise((r) => setTimeout(r, ms));
+}
+
+// Purely cosmetic minimum: on a paid Render plan the gate no longer actually
+// cold-starts, but flashing straight to "Live" on every page load reads worse
+// than a brief "Waking up" - so the badge holds that state for this long even
+// when the health check underneath already succeeded instantly.
+const MIN_WAKING_DISPLAY_MS = 5000;
+
+/** Pings /health on load and keeps retrying in the background if the gate is genuinely
+ * down, so the UI can show "waking up" instead of freezing. See MIN_WAKING_DISPLAY_MS. */
 export function GateStatusProvider({ children }: { children: ReactNode }) {
   const [status, setStatus] = useState<GateStatus>("checking");
   const startedRef = useRef(false);
@@ -32,11 +42,13 @@ export function GateStatusProvider({ children }: { children: ReactNode }) {
     let cancelled = false;
 
     (async () => {
-      if (await pingGate()) {
-        if (!cancelled) setStatus("online");
+      setStatus("waking");
+      const [ok] = await Promise.all([pingGate(), delay(MIN_WAKING_DISPLAY_MS)]);
+      if (cancelled) return;
+      if (ok) {
+        setStatus("online");
         return;
       }
-      if (!cancelled) setStatus("waking");
       while (!cancelled) {
         await new Promise((r) => setTimeout(r, 5000));
         if (cancelled) return;

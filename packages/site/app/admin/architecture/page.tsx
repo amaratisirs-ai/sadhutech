@@ -384,6 +384,11 @@ export default function AdminArchitecturePage() {
             </ul>
           </div>
         </div>
+        <p className="text-xs text-slate-500 border-t border-slate-800 pt-3">
+          Note: a paid GoPlus tier only raises the request quota (CU) for chains/APIs we already call by chain_id (EVM) - it
+          doesn't add non-EVM support. Bitcoin/Dogecoin aren't UTXO-decodable by decode.ts today because they have no ABI
+          calldata to parse at all; adding them is a separate decoder, not a billing upgrade.
+        </p>
       </Section>
 
       <Section title="Why this design">
