@@ -179,12 +179,20 @@ const ROADMAP: { theme: string; items: string[] }[] = [
     ],
   },
   {
+    theme: "Multi-chain decoder plugin architecture",
+    items: [
+      "Chain-family router + common SimulationResult contract, so rules.ts/analyze.ts scoring stays generic per plugin",
+      "Solana plugin (@solana/web3.js) + GoPlus's dedicated Solana Token Security / Transaction Simulation APIs",
+      "Sui plugin (@mysten/sui, official SDK) + GoPlus's dedicated Sui Token Security API",
+      "Bitcoin/Dogecoin plugin (bitcoinjs-lib, Dogecoin via custom network params or bitcore-lib-doge) - no threat-intel vendor covers these chains yet, so community intel would carry more weight here",
+      "Alternative: @trustwallet/wallet-core (Trust Wallet's own WASM engine) as a single cross-chain decoder covering 100+ chains, instead of one plugin per chain family",
+    ],
+  },
+  {
     theme: "Near-term production hardening",
     items: [
       "External security audit",
       "Expanded real-time threat feed integrations (beyond GoPlus/ChainAbuse)",
-      "Solana/Sui support via GoPlus's dedicated non-EVM endpoints (new lookup module + a non-ABI transaction parser)",
-      "Cross-chain coverage beyond the 5 EVM chains supported today - Bitcoin/Dogecoin remain unblocked by no vendor: GoPlus has no security API for either",
       "SLA documentation, monitoring & alerting for the gate API",
     ],
   },
