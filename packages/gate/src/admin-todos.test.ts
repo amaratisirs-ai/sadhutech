@@ -8,7 +8,8 @@ function fakePool(queryImpl?: (...args: unknown[]) => unknown) {
 describe("AdminTodosService", () => {
   it("initialize() creates the table and seeds it when empty", async () => {
     const queries: string[] = [];
-    const pool = fakePool((sql: string) => {
+    const pool = fakePool((...args: unknown[]) => {
+      const sql = args[0] as string;
       queries.push(sql);
       if (sql.includes("SELECT COUNT(*)")) return { rows: [{ count: "0" }] };
       if (sql.includes("INSERT INTO admin_todos")) return { rows: [{ id: 1, title: "x", description: null, category: null, status: "not-started", effort: null, estimate_hours: null, sort_order: 0, created_at: "now", updated_at: "now" }] };
@@ -22,7 +23,8 @@ describe("AdminTodosService", () => {
 
   it("initialize() does not reseed when the table already has rows", async () => {
     const queries: string[] = [];
-    const pool = fakePool((sql: string) => {
+    const pool = fakePool((...args: unknown[]) => {
+      const sql = args[0] as string;
       queries.push(sql);
       if (sql.includes("SELECT COUNT(*)")) return { rows: [{ count: "3" }] };
       return { rows: [] };

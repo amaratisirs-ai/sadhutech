@@ -104,8 +104,8 @@ export class AdminTodosService {
     `);
     const { rows } = await this.pool.query("SELECT COUNT(*) AS count FROM admin_todos");
     if (Number(rows[0]?.count ?? 0) === 0) {
-      for (let i = 0; i < SEED_TODOS.length; i++) {
-        await this.create(SEED_TODOS[i], i);
+      for (const [i, seed] of SEED_TODOS.entries()) {
+        await this.create(seed, i);
       }
     }
   }
