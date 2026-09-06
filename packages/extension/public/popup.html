@@ -12,6 +12,9 @@
       a { color: #5eead4; font-size: 12px; text-decoration: none; }
       .toggle-row { display: flex; align-items: center; justify-content: space-between; margin: 14px 0; padding: 10px 12px; background: #1e293b; border-radius: 8px; }
       .toggle-row span { font-size: 13px; }
+      .status-text { font-size: 11px; color: #94a3b8; margin: -8px 0 10px 2px; }
+      button.connect-btn { width: 100%; padding: 8px; border-radius: 8px; border: none; background: #2dd4bf; color: #0f172a; font-weight: 700; font-size: 12px; cursor: pointer; margin-bottom: 8px; }
+      button.connect-btn:disabled { opacity: 0.6; cursor: default; }
     </style>
   </head>
   <body>
@@ -22,6 +25,13 @@
       <span>Protection enabled</span>
       <input type="checkbox" id="enabled-toggle" checked />
     </div>
+    <div class="toggle-row">
+      <span>Deep Check protection</span>
+      <input type="checkbox" id="deep-check-toggle" />
+    </div>
+    <div class="status-text" id="deep-check-status">Off - checks the community threat feed only.</div>
+    <button class="connect-btn" id="connect-btn" style="display:none">Connect wallet &amp; enable</button>
+    <a id="buy-credits-link" href="https://sadhutech.com/pro" target="_blank" rel="noopener" style="display:none">Buy more credits &rarr;</a>
     <a href="https://sadhutech.com/check" target="_blank" rel="noopener">Open GENESIS Check &rarr;</a>
     <script src="popup.js"></script>
   </body>

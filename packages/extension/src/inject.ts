@@ -5,8 +5,11 @@
 import {
   GENESIS_REQUEST_EVENT,
   GENESIS_RESPONSE_EVENT,
+  GENESIS_AUTH_REQUEST_EVENT,
+  GENESIS_AUTH_RESPONSE_EVENT,
   type AnalyzeRequestMessage,
   type AnalyzeResponseMessage,
+  type AuthResponseMessage,
   type InterceptedMethod,
 } from "./messages.js";
 
@@ -77,3 +80,32 @@ function watchForProvider(): void {
 }
 
 watchForProvider();
+
+// Deep Check authorization: content-script.ts (relaying a request from the popup) asks
+// whatever wallet is on this page to sign a one-time proof-of-ownership message.
+window.addEventListener(GENESIS_AUTH_REQUEST_EVENT, async (event) => {
+  const request = (event as CustomEvent<{ id: string }>).detail;
+  if (!request) return;
+  const provider = (window as any).ethereum;
+  const respond = (detail: AuthResponseMessage) =>
+    window.dispatchEvent(new CustomEvent(GENESIS_AUTH_RESPONSE_EVENT, { detail }));
+
+  if (!provider?.request) {
+    respond({ type: GENESIS_AUTH_RESPONSE_EVENT, id: request.id, error: "No wallet found on this page." });
+    return;
+  }
+  try {
+    const accounts = (await provider.request({ method: "eth_requestAccounts" })) as string[];
+    const address = accounts?.[0];
+    if (!address) throw new Error("No account returned by wallet.");
+    const message = `GENESIS Deep Check\nwallet: ${address}\nts: ${new Date().toISOString()}`;
+    const signature = (await provider.request({ method: "personal_sign", params: [message, address] })) as string;
+    respond({ type: GENESIS_AUTH_RESPONSE_EVENT, id: request.id, address, message, signature });
+  } catch (err) {
+    respond({
+      type: GENESIS_AUTH_RESPONSE_EVENT,
+      id: request.id,
+      error: err instanceof Error ? err.message : "Wallet authorization failed.",
+    });
+  }
+});

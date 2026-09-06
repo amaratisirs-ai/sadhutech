@@ -27,6 +27,33 @@ one wallet's plugin API.
 Fails open throughout: any network/gate error results in `allow`, never a
 false block.
 
+## Deep Check (Pro credits)
+
+Off by default - the popup's "Deep Check protection" toggle enables it:
+
+1. Enabling it (with no cached authorization yet) messages the active tab's
+   `content-script.ts`, which relays a `personal_sign` request into
+   `inject.ts`'s MAIN world - signing a one-time message
+   (`GENESIS Deep Check\nwallet: <addr>\nts: <ISO time>`) with whatever wallet
+   is on that page. This proves wallet ownership without ever needing a
+   dedicated "connect" UI in the popup itself.
+2. The signed credential is cached in `chrome.storage.local` (key
+   `genesisProAuth`) and reused for ~23h (matches the gate's 24h signature-
+   freshness window in `server.ts`, same margin the site's `/check` page
+   uses) - not re-signed on every transaction.
+3. `background.ts` attaches `pro: {wallet, message, signature, source:
+   "extension"}` to `/v1/analyze` calls (transaction checks only - signature
+   checks have no server-side deep-check logic yet, see snap-registry-issue
+   notes) whenever the toggle is on and the cached signature is still fresh.
+   The gate spends 1 credit and adds ChainAbuse intel to the verdict.
+4. `creditsLeft` comes back on the response either way: a small "N credits
+   left" pill on `allow` (`overlay.ts`'s `showCreditNotice`), or appended to
+   the warn/block overlay text.
+
+Turning the toggle off just stops attaching `pro` on future requests - the
+cached signature stays put so re-enabling doesn't require signing again
+(until it expires).
+
 ## Coverage: what it can and can't see
 
 Any browser extension (this one included) can only intercept transactions

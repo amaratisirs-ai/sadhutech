@@ -25,6 +25,6 @@
       "run_at": "document_start"
     }
   ],
-  "permissions": ["storage"],
+  "permissions": ["storage", "activeTab"],
   "host_permissions": ["https://genesis-gate.onrender.com/*"]
 }

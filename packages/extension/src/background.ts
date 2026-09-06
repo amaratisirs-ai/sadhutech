@@ -1,8 +1,11 @@
 // Service worker - the only context allowed to make cross-origin fetch() calls to the gate.
 // Receives intercepted wallet requests from content-script.ts and returns a verdict.
-import type { AnalyzeRequestMessage, AnalyzeResponseMessage } from "./messages.js";
+import type { AnalyzeRequestMessage, AnalyzeResponseMessage, ProAuth } from "./messages.js";
 
 const GATE_URL = "https://genesis-gate.onrender.com";
+// Matches the site's own safety margin under the gate's 24h signature-freshness window
+// (server.ts) - reused well before expiry so a cached signature is never rejected as stale.
+const PRO_AUTH_TTL_MS = 23 * 60 * 60 * 1000;
 
 function parseChainId(hex: unknown): number {
   if (typeof hex !== "string") return 1;
@@ -10,11 +13,21 @@ function parseChainId(hex: unknown): number {
   return Number.isFinite(n) && n > 0 ? n : 1;
 }
 
+/** Reads the cached Deep Check credential, if the feature is on and the signature is still fresh. */
+async function getActiveProAuth(): Promise<ProAuth | null> {
+  const stored = await chrome.storage.local.get(["deepCheckEnabled", "genesisProAuth"]);
+  if (!stored.deepCheckEnabled) return null;
+  const auth = stored.genesisProAuth as ProAuth | undefined;
+  if (!auth || Date.now() - auth.ts >= PRO_AUTH_TTL_MS) return null;
+  return auth;
+}
+
 async function analyze(request: AnalyzeRequestMessage): Promise<Omit<AnalyzeResponseMessage, "id" | "type" | "proceed">> {
   try {
     if (request.method === "eth_sendTransaction") {
       const tx = request.params[0] as Record<string, unknown> | undefined;
       if (!tx?.to || !tx?.from) throw new Error("Malformed transaction request");
+      const proAuth = await getActiveProAuth();
       const res = await fetch(`${GATE_URL}/v1/analyze`, {
         method: "POST",
         headers: { "content-type": "application/json" },
@@ -26,11 +39,18 @@ async function analyze(request: AnalyzeRequestMessage): Promise<Omit<AnalyzeResp
             value: typeof tx.value === "string" ? tx.value : "0",
             data: tx.data ?? "0x",
           },
+          ...(proAuth && {
+            pro: { wallet: proAuth.address, message: proAuth.message, signature: proAuth.signature, source: "extension" },
+          }),
         }),
       });
       if (!res.ok) throw new Error(`Gate returned ${res.status}`);
       const data = await res.json();
-      return { verdict: data.verdict, plainEnglish: data.plainEnglish ?? data.summary ?? "" };
+      return {
+        verdict: data.verdict,
+        plainEnglish: data.plainEnglish ?? data.summary ?? "",
+        creditsLeft: typeof data.creditsLeft === "number" ? data.creditsLeft : undefined,
+      };
     }
 
     // personal_sign: params = [message, address]. eth_signTypedData_v4: params = [address, typedData].

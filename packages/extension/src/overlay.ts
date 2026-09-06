@@ -26,6 +26,20 @@ export function showChecking(): () => void {
   return () => pill.remove();
 }
 
+// Brief, auto-dismissing notice shown when a request silently passes (verdict "allow") but
+// still spent a Deep Check credit, so the user isn't surprised by their balance dropping.
+export function showCreditNotice(creditsLeft: number): void {
+  const pill = document.createElement("div");
+  pill.style.cssText = `
+    position: fixed; top: 16px; right: 16px; z-index: 2147483647; padding: 10px 14px;
+    border-radius: 999px; background: #0f172a; border: 1px solid #2dd4bf; color: #5eead4;
+    font: 600 12px system-ui, sans-serif; box-shadow: 0 8px 24px rgba(0,0,0,0.35);
+  `;
+  pill.textContent = `\u{1F6E1} Deep Check used \u2014 ${creditsLeft} credit${creditsLeft === 1 ? "" : "s"} left`;
+  document.documentElement.appendChild(pill);
+  setTimeout(() => pill.remove(), 3000);
+}
+
 export function showOverlay(verdict: Exclude<Verdict, "allow">, plainEnglish: string): Promise<boolean> {
   return new Promise((resolve) => {
     const theme = THEME[verdict];
