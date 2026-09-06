@@ -40,49 +40,49 @@ export default function Home() {
       icon: "dollar",
       title: "DeFi Traders",
       desc: "Swap, stake, and farm with confidence. GENESIS checks approvals before you risk your funds.",
-      badge: "bg-teal-100 dark:bg-teal-500/20 text-teal-600 dark:text-teal-400",
-      blob: "bg-teal-400/25 dark:bg-teal-400/10",
-      hoverBorder: "hover:border-teal-300 dark:hover:border-teal-500",
+      badge: "bg-teal-500/20 text-teal-400",
+      blob: "bg-teal-400/10",
+      hoverBorder: "hover:border-teal-500",
     },
     {
       icon: "photo",
       title: "NFT Collectors",
       desc: "Protect your valuable collections. GENESIS blocks approvals to known NFT thieves.",
-      badge: "bg-purple-100 dark:bg-purple-500/20 text-purple-600 dark:text-purple-400",
-      blob: "bg-purple-400/25 dark:bg-purple-400/10",
-      hoverBorder: "hover:border-purple-300 dark:hover:border-purple-500",
+      badge: "bg-purple-500/20 text-purple-400",
+      blob: "bg-purple-400/10",
+      hoverBorder: "hover:border-purple-500",
     },
     {
       icon: "shield",
       title: "Crypto Beginners",
       desc: "New to crypto? GENESIS explains transactions in plain English, not jargon.",
-      badge: "bg-blue-100 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400",
-      blob: "bg-blue-400/25 dark:bg-blue-400/10",
-      hoverBorder: "hover:border-blue-300 dark:hover:border-blue-500",
+      badge: "bg-blue-500/20 text-blue-400",
+      blob: "bg-blue-400/10",
+      hoverBorder: "hover:border-blue-500",
     },
     {
       icon: "rocket",
       title: "Power Users",
       desc: "Complex transactions? GENESIS decodes bundled actions and shows what each one really does.",
-      badge: "bg-orange-100 dark:bg-orange-500/20 text-orange-600 dark:text-orange-400",
-      blob: "bg-orange-400/25 dark:bg-orange-400/10",
-      hoverBorder: "hover:border-orange-300 dark:hover:border-orange-500",
+      badge: "bg-orange-500/20 text-orange-400",
+      blob: "bg-orange-400/10",
+      hoverBorder: "hover:border-orange-500",
     },
     {
       icon: "wrench",
       title: "Developers",
       desc: "Build safer wallets and apps. Our API returns a clear verdict for any transaction.",
-      badge: "bg-indigo-100 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400",
-      blob: "bg-indigo-400/25 dark:bg-indigo-400/10",
-      hoverBorder: "hover:border-indigo-300 dark:hover:border-indigo-500",
+      badge: "bg-indigo-500/20 text-indigo-400",
+      blob: "bg-indigo-400/10",
+      hoverBorder: "hover:border-indigo-500",
     },
     {
       icon: "search",
       title: "Security Teams",
       desc: "Community-verified threat intelligence  -  confirmed by multiple independent reporters before it counts.",
-      badge: "bg-rose-100 dark:bg-rose-500/20 text-rose-600 dark:text-rose-400",
-      blob: "bg-rose-400/25 dark:bg-rose-400/10",
-      hoverBorder: "hover:border-rose-300 dark:hover:border-rose-500",
+      badge: "bg-rose-500/20 text-rose-400",
+      blob: "bg-rose-400/10",
+      hoverBorder: "hover:border-rose-500",
     },
   ] as const;
 
@@ -509,47 +509,47 @@ export default function Home() {
       {/* ===== INTEGRATION OPTIONS ===== */}
       <section className="space-y-8">
         <div>
-          <h2 className="text-3xl font-bold text-slate-900 dark:text-white mb-2">How to use <Genesis /></h2>
-          <p className="text-slate-700 dark:text-slate-400">Choose what works best for you</p>
+          <h2 className="text-3xl font-bold text-white mb-2">How to use <Genesis /></h2>
+          <p className="text-slate-400">Choose what works best for you</p>
         </div>
 
         <div className="grid md:grid-cols-2 gap-8">
           {/* Browser Extension */}
-          <div className="bg-gradient-to-br from-orange-50 to-red-50 dark:from-orange-900/20 dark:to-red-900/20 rounded-xl border-2 border-orange-200 dark:border-orange-600 p-8 space-y-4">
+          <div className="bg-gradient-to-br from-orange-900/20 to-red-900/20 rounded-xl border-2 border-orange-600 p-8 space-y-4">
             <div className="flex items-center gap-3">
               <span className="text-orange-500"><Icon name="wallet" className="w-9 h-9" /></span>
               <div>
-                <h3 className="font-bold text-lg text-slate-900 dark:text-white"><Genesis /> Extension</h3>
-                <p className="text-sm text-slate-700 dark:text-slate-400">Any wallet, one-click install</p>
+                <h3 className="font-bold text-lg text-white"><Genesis /> Extension</h3>
+                <p className="text-sm text-slate-400">Any wallet, one-click install</p>
               </div>
             </div>
-            <p className="text-slate-900 dark:text-slate-300">
+            <p className="text-slate-300">
               Add <Genesis /> to your browser. Every time you're about to sign a transaction, we'll pop up with a verdict.
             </p>
             <a
               href="/extension"
-              className="inline-block bg-orange-600 hover:bg-orange-700 dark:bg-orange-700 dark:hover:bg-orange-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition"
+              className="inline-block bg-orange-700 hover:bg-orange-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition"
             >
               Get the Extension →
             </a>
           </div>
 
           {/* HTTP API */}
-          <div className="bg-gradient-to-br from-indigo-50 to-indigo-50 dark:from-indigo-900/20 dark:to-indigo-900/20 rounded-xl border-2 border-indigo-200 dark:border-indigo-600 p-8 space-y-4">
+          <div className="bg-gradient-to-br from-indigo-900/20 to-indigo-900/20 rounded-xl border-2 border-indigo-600 p-8 space-y-4">
             <div className="flex items-center gap-3">
               <span className="text-indigo-500"><Icon name="code" className="w-9 h-9" /></span>
               <div>
-                <h3 className="font-bold text-lg text-slate-900 dark:text-white"><Genesis /> API</h3>
-                <p className="text-sm text-slate-700 dark:text-slate-400">For developers</p>
+                <h3 className="font-bold text-lg text-white"><Genesis /> API</h3>
+                <p className="text-sm text-slate-400">For developers</p>
               </div>
             </div>
-            <p className="text-slate-900 dark:text-slate-300">
+            <p className="text-slate-300">
               Send us a transaction (any format) and we return a risk verdict. Integrate into your wallet, dashboard, or
               bot.
             </p>
             <a
               href="/developers"
-              className="inline-block bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-700 dark:hover:bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition"
+              className="inline-block bg-indigo-700 hover:bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition"
             >
               Open developer docs →
             </a>
@@ -560,23 +560,23 @@ export default function Home() {
       {/* ===== WHO IS THIS FOR ===== */}
       <section className="space-y-8">
         <div>
-          <h2 className="text-3xl font-bold text-slate-900 dark:text-white mb-2">Who is <Genesis /> for?</h2>
-          <p className="text-slate-700 dark:text-slate-400">If you use crypto, <Genesis /> is built for you.</p>
+          <h2 className="text-3xl font-bold text-white mb-2">Who is <Genesis /> for?</h2>
+          <p className="text-slate-400">If you use crypto, <Genesis /> is built for you.</p>
         </div>
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {personas.map((p, i) => (
             <div
               key={i}
-              className={`relative overflow-hidden bg-white dark:bg-slate-800 rounded-xl border-2 border-slate-200 dark:border-slate-700 p-6 space-y-3 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl ${p.hoverBorder}`}
+              className={`relative overflow-hidden bg-slate-800 rounded-xl border-2 border-slate-700 p-6 space-y-3 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl ${p.hoverBorder}`}
             >
               <div className={`absolute -top-10 -right-10 w-28 h-28 rounded-full blur-2xl pointer-events-none ${p.blob}`} />
               <div className="relative space-y-3">
                 <div className={`inline-flex w-12 h-12 rounded-xl items-center justify-center ${p.badge}`}>
                   <Icon name={p.icon} className="w-6 h-6" />
                 </div>
-                <h3 className="font-bold text-slate-900 dark:text-white text-lg">{p.title}</h3>
-                <p className="text-sm text-slate-700 dark:text-slate-300">{withGenesisStyle(p.desc)}</p>
+                <h3 className="font-bold text-white text-lg">{p.title}</h3>
+                <p className="text-sm text-slate-300">{withGenesisStyle(p.desc)}</p>
               </div>
             </div>
           ))}
@@ -586,40 +586,40 @@ export default function Home() {
       {/* ===== VISUAL ROADMAP ===== */}
       <section className="space-y-8">
         <div>
-          <h2 className="text-3xl font-bold text-slate-900 dark:text-white mb-2">Our Journey</h2>
-          <p className="text-slate-700 dark:text-slate-400">From today to a safer crypto future, one step at a time.</p>
+          <h2 className="text-3xl font-bold text-white mb-2">Our Journey</h2>
+          <p className="text-slate-400">From today to a safer crypto future, one step at a time.</p>
         </div>
 
         <div className="space-y-6">
           {/* Phase 1: MVP */}
-          <div className="relative overflow-hidden bg-white dark:bg-slate-800 rounded-lg border-2 border-slate-200 dark:border-slate-700 p-8 space-y-4 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:border-emerald-300 dark:hover:border-emerald-500">
-            <div className="absolute -bottom-12 -right-12 w-48 h-48 rounded-full blur-3xl pointer-events-none bg-emerald-400/20 dark:bg-emerald-400/10" />
+          <div className="relative overflow-hidden bg-slate-800 rounded-lg border-2 border-slate-700 p-8 space-y-4 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:border-emerald-500">
+            <div className="absolute -bottom-12 -right-12 w-48 h-48 rounded-full blur-3xl pointer-events-none bg-emerald-400/10" />
             <div className="relative flex items-start justify-between">
               <div>
-                <div className="inline-flex items-center gap-2 px-3 py-1 bg-emerald-100 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 rounded-full text-xs font-bold mb-3">
+                <div className="inline-flex items-center gap-2 px-3 py-1 bg-emerald-500/20 text-emerald-300 rounded-full text-xs font-bold mb-3">
                   <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" /></svg>
                   LIVE NOW
                 </div>
-                <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">Phase 1: Foundation (Sept 2026)</h3>
-                <p className="text-slate-700 dark:text-slate-300 mb-4 font-medium">Wallet protection you can trust, starting today</p>
+                <h3 className="text-2xl font-bold text-white mb-2">Phase 1: Foundation (Sept 2026)</h3>
+                <p className="text-slate-300 mb-4 font-medium">Wallet protection you can trust, starting today</p>
               </div>
-              <div className="w-12 h-12 rounded-lg bg-emerald-100 dark:bg-emerald-500/20 flex items-center justify-center flex-shrink-0">
-                <svg className="w-6 h-6 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+              <div className="w-12 h-12 rounded-lg bg-emerald-500/20 flex items-center justify-center flex-shrink-0">
+                <svg className="w-6 h-6 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
               </div>
             </div>
 
             <div className="relative space-y-3">
-              <p className="text-slate-700 dark:text-slate-300">
+              <p className="text-slate-300">
                 We've built a working gate that checks crypto transactions before you sign. It blocks known scams, warns you about risky moves, and explains everything in plain English - no crypto jargon.
               </p>
-              <p className="text-slate-700 dark:text-slate-300">
+              <p className="text-slate-300">
                 Try it on the web, or install the <Genesis /> browser extension for real-time protection with any wallet.
               </p>
               <div className="flex flex-wrap gap-x-6 gap-y-2">
-                <a href="/check" className="inline-flex items-center gap-2 text-emerald-600 dark:text-emerald-400 font-semibold hover:underline">
+                <a href="/check" className="inline-flex items-center gap-2 text-emerald-400 font-semibold hover:underline">
                   → Try the free checker
                 </a>
-                <a href="/extension" className="inline-flex items-center gap-2 text-emerald-600 dark:text-emerald-400 font-semibold hover:underline">
+                <a href="/extension" className="inline-flex items-center gap-2 text-emerald-400 font-semibold hover:underline">
                   → Get the browser extension
                 </a>
               </div>
@@ -627,51 +627,51 @@ export default function Home() {
           </div>
 
           {/* Phase 2: Adoption */}
-          <div className="relative overflow-hidden bg-white dark:bg-slate-800 rounded-lg border-2 border-slate-200 dark:border-slate-700 p-8 space-y-4 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:border-indigo-300 dark:hover:border-indigo-500">
-            <div className="absolute -bottom-12 -right-12 w-48 h-48 rounded-full blur-3xl pointer-events-none bg-indigo-400/20 dark:bg-indigo-400/10" />
+          <div className="relative overflow-hidden bg-slate-800 rounded-lg border-2 border-slate-700 p-8 space-y-4 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:border-indigo-500">
+            <div className="absolute -bottom-12 -right-12 w-48 h-48 rounded-full blur-3xl pointer-events-none bg-indigo-400/10" />
             <div className="relative flex items-start justify-between">
               <div>
-                <div className="inline-flex items-center gap-2 px-3 py-1 bg-indigo-100 dark:bg-indigo-500/20 text-indigo-700 dark:text-indigo-300 rounded-full text-xs font-bold mb-3">
+                <div className="inline-flex items-center gap-2 px-3 py-1 bg-indigo-500/20 text-indigo-300 rounded-full text-xs font-bold mb-3">
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
                   Q4 2026
                 </div>
-                <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">Phase 2: Wider Adoption (Q4 2026)</h3>
-                <p className="text-slate-700 dark:text-slate-300 mb-4 font-medium">Published to browser extension stores, more chains covered</p>
+                <h3 className="text-2xl font-bold text-white mb-2">Phase 2: Wider Adoption (Q4 2026)</h3>
+                <p className="text-slate-300 mb-4 font-medium">Published to browser extension stores, more chains covered</p>
               </div>
-              <div className="w-12 h-12 rounded-lg bg-indigo-100 dark:bg-indigo-500/20 flex items-center justify-center flex-shrink-0">
-                <svg className="w-6 h-6 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3v-6" /></svg>
+              <div className="w-12 h-12 rounded-lg bg-indigo-500/20 flex items-center justify-center flex-shrink-0">
+                <svg className="w-6 h-6 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3v-6" /></svg>
               </div>
             </div>
 
             <div className="relative space-y-3">
-              <p className="text-slate-700 dark:text-slate-300">
+              <p className="text-slate-300">
                 Get <Genesis /> onto the Chrome Web Store and other browser stores so anyone can install it in one click, no manual setup.
               </p>
-              <p className="text-slate-700 dark:text-slate-300">
+              <p className="text-slate-300">
                 Works across Ethereum, Polygon, Base, and more. Whether you're trading, collecting NFTs, or doing DeFi, <Genesis /> watches your back.
               </p>
             </div>
           </div>
 
           {/* Phase 3: Scale */}
-          <div className="relative overflow-hidden bg-white dark:bg-slate-800 rounded-lg border-2 border-slate-200 dark:border-slate-700 p-8 space-y-4 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:border-orange-300 dark:hover:border-orange-500">
-            <div className="absolute -bottom-12 -right-12 w-48 h-48 rounded-full blur-3xl pointer-events-none bg-orange-400/20 dark:bg-orange-400/10" />
+          <div className="relative overflow-hidden bg-slate-800 rounded-lg border-2 border-slate-700 p-8 space-y-4 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:border-orange-500">
+            <div className="absolute -bottom-12 -right-12 w-48 h-48 rounded-full blur-3xl pointer-events-none bg-orange-400/10" />
             <div className="relative flex items-start justify-between">
               <div>
-                <div className="inline-flex items-center gap-2 px-3 py-1 bg-orange-100 dark:bg-orange-500/20 text-orange-700 dark:text-orange-300 rounded-full text-xs font-bold mb-3">
+                <div className="inline-flex items-center gap-2 px-3 py-1 bg-orange-500/20 text-orange-300 rounded-full text-xs font-bold mb-3">
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                   2027
                 </div>
-                <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">Phase 3: Community-Powered (2027)</h3>
-                <p className="text-slate-700 dark:text-slate-300 mb-4 font-medium">Your network, your rules</p>
+                <h3 className="text-2xl font-bold text-white mb-2">Phase 3: Community-Powered (2027)</h3>
+                <p className="text-slate-300 mb-4 font-medium">Your network, your rules</p>
               </div>
-              <div className="w-12 h-12 rounded-lg bg-orange-100 dark:bg-orange-500/20 flex items-center justify-center flex-shrink-0">
-                <svg className="w-6 h-6 text-orange-600 dark:text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 0H3m9 9c-1.657 0-3-4.03-3-9s1.343-9 3-9m0 0h6" /></svg>
+              <div className="w-12 h-12 rounded-lg bg-orange-500/20 flex items-center justify-center flex-shrink-0">
+                <svg className="w-6 h-6 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 0H3m9 9c-1.657 0-3-4.03-3-9s1.343-9 3-9m0 0h6" /></svg>
               </div>
             </div>
 
             <div className="relative space-y-3">
-              <p className="text-slate-700 dark:text-slate-300">
+              <p className="text-slate-300">
                 Community reporting and the leaderboard are already live. Next: a formal vote on disputed reports,
                 plus real rewards for top contributors - a threat intelligence network owned by the community.
               </p>
@@ -680,9 +680,9 @@ export default function Home() {
         </div>
 
         {/* Not roadmap: What we won't do */}
-        <div className="bg-slate-50 dark:bg-slate-800 border-2 border-slate-300 dark:border-slate-700 rounded-lg p-6">
-          <p className="font-semibold text-slate-900 dark:text-white mb-3 flex items-center gap-2"><Icon name="badge" className="w-5 h-5 text-teal-500" /> Our Promise</p>
-          <div className="grid md:grid-cols-3 gap-4 text-sm text-slate-900 dark:text-slate-300">
+        <div className="bg-slate-800 border-2 border-slate-700 rounded-lg p-6">
+          <p className="font-semibold text-white mb-3 flex items-center gap-2"><Icon name="badge" className="w-5 h-5 text-teal-500" /> Our Promise</p>
+          <div className="grid md:grid-cols-3 gap-4 text-sm text-slate-300">
             <div>
               <p className="font-medium text-red-600">We won't</p>
               <ul className="mt-2 space-y-1">
@@ -713,8 +713,8 @@ export default function Home() {
 
       {/* ===== CTA ===== */}
       <section className="text-center space-y-6">
-        <h2 className="text-3xl font-bold text-slate-900 dark:text-white">Ready to protect your wallet?</h2>
-        <p className="text-slate-600 dark:text-slate-400 text-lg">Join thousands of crypto users already using <Genesis /></p>
+        <h2 className="text-3xl font-bold text-white">Ready to protect your wallet?</h2>
+        <p className="text-slate-400 text-lg">Join thousands of crypto users already using <Genesis /></p>
         <div className="flex gap-4 justify-center flex-wrap">
           <a
             href="/check"
@@ -726,7 +726,7 @@ export default function Home() {
             href="https://github.com/amaratisirs-ai/sadhutech"
             target="_blank"
             rel="noopener noreferrer"
-            className="px-8 py-4 bg-white dark:bg-slate-800 text-slate-900 dark:text-white rounded-lg font-semibold border-2 border-slate-200 dark:border-slate-700 hover:border-slate-400 dark:hover:border-slate-600 transition"
+            className="px-8 py-4 bg-slate-800 text-white rounded-lg font-semibold border-2 border-slate-700 hover:border-slate-600 transition"
           >
             Star on GitHub
           </a>

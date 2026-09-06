@@ -103,15 +103,15 @@ export default function CommunityPage() {
           <svg className="w-8 h-8 text-emerald-500" fill="currentColor" viewBox="0 0 24 24">
             <path d="M18 18.5a6 6 0 00-12 0v.5H6v2h12v-2h-.5v-.5zM9 9a3 3 0 106 0 3 3 0 00-6 0z" />
           </svg>
-          <h1 className="text-4xl font-bold text-slate-900 dark:text-white">Security Community</h1>
+          <h1 className="text-4xl font-bold text-white">Security Community</h1>
         </div>
-        <p className="text-slate-600 dark:text-slate-400 mt-2">
+        <p className="text-slate-400 mt-2">
           Report and verify scam addresses so <Genesis /> can protect everyone. The more reports, the stronger the shield.
         </p>
       </div>
 
       {/* Tab Navigation */}
-      <div className="flex flex-wrap gap-2 p-3 bg-slate-50 dark:bg-slate-900/30 rounded-lg border border-slate-200 dark:border-slate-700 sticky top-16 z-40">
+      <div className="flex flex-wrap gap-2 p-3 bg-slate-900/30 rounded-lg border border-slate-700 sticky top-16 z-40">
         {[
           { id: "leaderboard" as const, label: "Leaderboard" },
           { id: "contribute" as const, label: "How to Contribute" },
@@ -123,7 +123,7 @@ export default function CommunityPage() {
             className={`px-4 py-2 rounded-lg font-semibold transition-all text-sm ${
               activeTab === tab.id
                 ? "bg-emerald-600 text-white shadow-lg"
-                : "bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700"
+                : "bg-slate-800 text-slate-300 hover:bg-slate-700"
             }`}
           >
             {tab.label}
@@ -136,26 +136,26 @@ export default function CommunityPage() {
         <div className="space-y-4">
           {/* Stats */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="bg-slate-50 dark:bg-slate-900/30 rounded-lg border border-slate-200 dark:border-slate-700 p-4">
-              <div className="text-sm text-slate-600 dark:text-slate-400 mb-1">Threats tracked</div>
-              <div className="text-3xl font-bold text-slate-900 dark:text-white">{threatCount !== null ? threatCount.toLocaleString() : " - "}</div>
-              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Malicious addresses in the community threat feed.</p>
+            <div className="bg-slate-900/30 rounded-lg border border-slate-700 p-4">
+              <div className="text-sm text-slate-400 mb-1">Threats tracked</div>
+              <div className="text-3xl font-bold text-white">{threatCount !== null ? threatCount.toLocaleString() : " - "}</div>
+              <p className="text-xs text-slate-400 mt-1">Malicious addresses in the community threat feed.</p>
             </div>
-            <div className="bg-slate-50 dark:bg-slate-900/30 rounded-lg border border-slate-200 dark:border-slate-700 p-4">
-              <div className="text-sm text-slate-600 dark:text-slate-400 mb-1">Community contributors</div>
-              <div className="text-3xl font-bold text-slate-900 dark:text-white">{totalCount ? totalCount.toLocaleString() : " - "}</div>
-              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Grows as verified reports come in. Rewards program coming soon.</p>
+            <div className="bg-slate-900/30 rounded-lg border border-slate-700 p-4">
+              <div className="text-sm text-slate-400 mb-1">Community contributors</div>
+              <div className="text-3xl font-bold text-white">{totalCount ? totalCount.toLocaleString() : " - "}</div>
+              <p className="text-xs text-slate-400 mt-1">Grows as verified reports come in. Rewards program coming soon.</p>
             </div>
           </div>
 
           {/* Leaderboard Table */}
-          <div className="bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-lg overflow-hidden">
-            <div className="p-6 border-b border-slate-200 dark:border-slate-700 space-y-4">
-              <h2 className="font-semibold text-slate-900 dark:text-white">Top Contributors This Month</h2>
+          <div className="bg-slate-900/50 border border-slate-700 rounded-lg overflow-hidden">
+            <div className="p-6 border-b border-slate-700 space-y-4">
+              <h2 className="font-semibold text-white">Top Contributors This Month</h2>
               
               {/* Sort Controls */}
               <div className="flex flex-wrap gap-2">
-                <span className="text-sm font-medium text-slate-600 dark:text-slate-400 py-2">Sort by:</span>
+                <span className="text-sm font-medium text-slate-400 py-2">Sort by:</span>
                 {[
                   { id: "score", label: "Top Score" },
                   { id: "reports", label: "Most Reports" },
@@ -168,7 +168,7 @@ export default function CommunityPage() {
                     className={`px-3 py-1.5 rounded text-sm font-medium transition-colors ${
                       sortBy === sort.id
                         ? "bg-emerald-600 text-white"
-                        : "bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700"
+                        : "bg-slate-800 text-slate-300 hover:bg-slate-700"
                     }`}
                   >
                     {sort.label}
@@ -180,15 +180,15 @@ export default function CommunityPage() {
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
-                  <tr className="border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50">
-                    <th className="px-6 py-3 text-left text-xs font-semibold text-slate-600 dark:text-slate-400">#</th>
-                    <th className="px-6 py-3 text-left text-xs font-semibold text-slate-600 dark:text-slate-400">Contributor</th>
-                    <th className="px-6 py-3 text-left text-xs font-semibold text-slate-600 dark:text-slate-400">Reports</th>
-                    <th className="px-6 py-3 text-left text-xs font-semibold text-slate-600 dark:text-slate-400">Verified</th>
-                    <th className="px-6 py-3 text-left text-xs font-semibold text-slate-600 dark:text-slate-400">Score</th>
+                  <tr className="border-b border-slate-700 bg-slate-800/50">
+                    <th className="px-6 py-3 text-left text-xs font-semibold text-slate-400">#</th>
+                    <th className="px-6 py-3 text-left text-xs font-semibold text-slate-400">Contributor</th>
+                    <th className="px-6 py-3 text-left text-xs font-semibold text-slate-400">Reports</th>
+                    <th className="px-6 py-3 text-left text-xs font-semibold text-slate-400">Verified</th>
+                    <th className="px-6 py-3 text-left text-xs font-semibold text-slate-400">Score</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-200 dark:divide-slate-700">
+                <tbody className="divide-y divide-slate-700">
                   {contributors
                     .slice()
                     .sort((a, b) => {
@@ -199,7 +199,7 @@ export default function CommunityPage() {
                       return 0;
                     })
                     .map((c, i) => (
-                    <tr key={c.reporterId} className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+                    <tr key={c.reporterId} className="hover:bg-slate-800/50 transition-colors">
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-2">
                           <div className="font-bold text-lg">{i === 0 ? "🥇" : i === 1 ? "🥈" : i === 2 ? "🥉" : `${i + 1}`}</div>
@@ -208,17 +208,17 @@ export default function CommunityPage() {
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-2">
                           <span>{c.avatar || "🛡️"}</span>
-                          <div className="font-semibold text-slate-900 dark:text-white">{c.displayName || "Anonymous"}</div>
+                          <div className="font-semibold text-white">{c.displayName || "Anonymous"}</div>
                         </div>
                       </td>
-                      <td className="px-6 py-4 text-slate-900 dark:text-white font-semibold">{c.totalReports}</td>
+                      <td className="px-6 py-4 text-white font-semibold">{c.totalReports}</td>
                       <td className="px-6 py-4">
-                        <span className="inline-flex items-center gap-1 px-2 py-1 bg-green-500/20 text-green-700 dark:text-green-300 rounded text-sm font-medium">
+                        <span className="inline-flex items-center gap-1 px-2 py-1 bg-green-500/20 text-green-300 rounded text-sm font-medium">
                           {c.badges.includes("verified") ? "✓ Verified" : "—"}
                         </span>
                       </td>
                       <td className="px-6 py-4">
-                        <div className="font-bold text-emerald-600 dark:text-emerald-400 text-lg">{c.reputationScore.toLocaleString()}</div>
+                        <div className="font-bold text-emerald-400 text-lg">{c.reputationScore.toLocaleString()}</div>
                       </td>
                     </tr>
                   ))}
@@ -227,15 +227,15 @@ export default function CommunityPage() {
             </div>
 
             {!loading && contributors.length === 0 && (
-              <div className="p-10 text-center text-slate-500 dark:text-slate-400">
-                <p className="font-semibold text-slate-700 dark:text-slate-300">Contributor rankings will appear here.</p>
+              <div className="p-10 text-center text-slate-400">
+                <p className="font-semibold text-slate-300">Contributor rankings will appear here.</p>
                 <p className="text-sm mt-1">Scores reflect the quality and impact of community threat reports.</p>
               </div>
             )}
 
             {/* Load More Button */}
             {hasMore && contributors.length > 0 && (
-              <div className="p-4 border-t border-slate-200 dark:border-slate-700 flex justify-center">
+              <div className="p-4 border-t border-slate-700 flex justify-center">
                 <button
                   onClick={handleLoadMore}
                   disabled={loadingMore}
@@ -256,7 +256,7 @@ export default function CommunityPage() {
             )}
 
             {!hasMore && contributors.length > 0 && (
-              <div className="p-4 border-t border-slate-200 dark:border-slate-700 text-center text-slate-600 dark:text-slate-400">
+              <div className="p-4 border-t border-slate-700 text-center text-slate-400">
                 ✓ All {contributors.length} contributors loaded
               </div>
             )}
@@ -267,8 +267,8 @@ export default function CommunityPage() {
       {/* Tab: How to Contribute */}
       {activeTab === "contribute" && (
         <div className="space-y-4">
-          <div className="bg-indigo-50 dark:bg-indigo-950/20 border border-indigo-200 dark:border-indigo-800 rounded-lg p-6">
-            <h2 className="text-2xl font-bold text-indigo-900 dark:text-indigo-100 mb-6">How to Report Threats</h2>
+          <div className="bg-indigo-950/20 border border-indigo-800 rounded-lg p-6">
+            <h2 className="text-2xl font-bold text-indigo-100 mb-6">How to Report Threats</h2>
 
             <div className="space-y-6">
               {[
@@ -304,26 +304,26 @@ export default function CommunityPage() {
                 },
               ].map((item) => (
                 <div key={item.step} className="flex gap-4">
-                  <div className="text-indigo-500 dark:text-indigo-400 flex-shrink-0">{item.icon}</div>
+                  <div className="text-indigo-400 flex-shrink-0">{item.icon}</div>
                   <div>
                     <div className="flex items-baseline gap-2 mb-1">
                       <span className="inline-flex items-center justify-center w-6 h-6 bg-indigo-600 text-white rounded-full text-sm font-bold">
                         {item.step}
                       </span>
-                      <h3 className="font-semibold text-slate-900 dark:text-white">{item.title}</h3>
+                      <h3 className="font-semibold text-white">{item.title}</h3>
                     </div>
-                    <p className="text-slate-600 dark:text-slate-400 ml-8">{withGenesisStyle(item.desc)}</p>
+                    <p className="text-slate-400 ml-8">{withGenesisStyle(item.desc)}</p>
                   </div>
                 </div>
               ))}
             </div>
 
-            <div className="mt-8 p-4 bg-white dark:bg-slate-800 border border-indigo-200 dark:border-indigo-800 rounded-lg">
-              <h3 className="font-semibold text-slate-900 dark:text-white mb-2 flex items-center gap-2"><Icon name="document" className="w-5 h-5 text-indigo-500" /> API Documentation</h3>
-              <p className="text-sm text-slate-600 dark:text-slate-400 mb-4">
+            <div className="mt-8 p-4 bg-slate-800 border border-indigo-800 rounded-lg">
+              <h3 className="font-semibold text-white mb-2 flex items-center gap-2"><Icon name="document" className="w-5 h-5 text-indigo-500" /> API Documentation</h3>
+              <p className="text-sm text-slate-400 mb-4">
                 Submit threat reports programmatically using the <Genesis /> API:
               </p>
-              <pre className="bg-slate-50 dark:bg-slate-900 p-3 rounded text-xs overflow-x-auto text-slate-900 dark:text-slate-100">
+              <pre className="bg-slate-900 p-3 rounded text-xs overflow-x-auto text-slate-100">
 {`POST /v1/report
 Content-Type: application/json
 
@@ -343,55 +343,55 @@ Content-Type: application/json
       {/* Tab: Rewards Program */}
       {activeTab === "rewards" && (
         <div className="space-y-4">
-          <div className="bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800 rounded-lg p-6">
-            <h2 className="text-2xl font-bold text-amber-900 dark:text-amber-100 mb-6">Community Rewards Program</h2>
+          <div className="bg-amber-950/20 border border-amber-800 rounded-lg p-6">
+            <h2 className="text-2xl font-bold text-amber-100 mb-6">Community Rewards Program</h2>
 
             {/* Tier Breakdown */}
             <div className="space-y-4 mb-8">
-              <h3 className="font-semibold text-slate-900 dark:text-white">Verification Tier Rewards</h3>
+              <h3 className="font-semibold text-white">Verification Tier Rewards</h3>
               <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                 {[
-                  { tier: "Bronze", points: "100-499", percentage: "84%", color: "bg-yellow-100 dark:bg-yellow-950" },
-                  { tier: "Silver", points: "500-999", percentage: "90%", color: "bg-gray-100 dark:bg-gray-800" },
-                  { tier: "Gold", points: "1000-4999", percentage: "95%", color: "bg-yellow-200 dark:bg-yellow-900" },
-                  { tier: "Platinum", points: "5000+", percentage: "98%", color: "bg-blue-100 dark:bg-blue-950" },
+                  { tier: "Bronze", points: "100-499", percentage: "84%", color: "bg-yellow-950" },
+                  { tier: "Silver", points: "500-999", percentage: "90%", color: "bg-gray-800" },
+                  { tier: "Gold", points: "1000-4999", percentage: "95%", color: "bg-yellow-900" },
+                  { tier: "Platinum", points: "5000+", percentage: "98%", color: "bg-blue-950" },
                 ].map((tier) => (
-                  <div key={tier.tier} className={`${tier.color} border border-slate-300 dark:border-slate-600 rounded-lg p-4`}>
-                    <div className="font-bold text-slate-900 dark:text-white mb-1">{tier.tier}</div>
-                    <div className="text-sm text-slate-700 dark:text-slate-400 mb-2">Score: {tier.points}</div>
-                    <div className="text-lg font-bold text-slate-900 dark:text-white">{tier.percentage} verified</div>
+                  <div key={tier.tier} className={`${tier.color} border border-slate-600 rounded-lg p-4`}>
+                    <div className="font-bold text-white mb-1">{tier.tier}</div>
+                    <div className="text-sm text-slate-400 mb-2">Score: {tier.points}</div>
+                    <div className="text-lg font-bold text-white">{tier.percentage} verified</div>
                   </div>
                 ))}
               </div>
             </div>
 
             {/* Reward Formulas */}
-            <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg p-6 mb-8">
-              <h3 className="font-semibold text-slate-900 dark:text-white mb-4">Point & Payment System</h3>
+            <div className="bg-slate-800 border border-slate-700 rounded-lg p-6 mb-8">
+              <h3 className="font-semibold text-white mb-4">Point & Payment System</h3>
               <div className="space-y-4 text-sm">
                 <div>
-                  <div className="font-semibold text-slate-900 dark:text-white mb-1">Base Report Points</div>
-                  <p className="text-slate-600 dark:text-slate-400">Each successful report: 10-50 points depending on threat type</p>
+                  <div className="font-semibold text-white mb-1">Base Report Points</div>
+                  <p className="text-slate-400">Each successful report: 10-50 points depending on threat type</p>
                 </div>
                 <div>
-                  <div className="font-semibold text-slate-900 dark:text-white mb-1">Verification Bonus</div>
-                  <p className="text-slate-600 dark:text-slate-400">Report confirmed by the community: +25 points, Monthly bonus pool: $1,000 distributed</p>
+                  <div className="font-semibold text-white mb-1">Verification Bonus</div>
+                  <p className="text-slate-400">Report confirmed by the community: +25 points, Monthly bonus pool: $1,000 distributed</p>
                 </div>
                 <div>
-                  <div className="font-semibold text-slate-900 dark:text-white mb-1">Leaderboard Rewards</div>
-                  <p className="text-slate-600 dark:text-slate-400">Top 10 monthly: 🥇 $500 | 🥈 $250 | 🥉 $100 | 4-10: $25-50</p>
+                  <div className="font-semibold text-white mb-1">Leaderboard Rewards</div>
+                  <p className="text-slate-400">Top 10 monthly: 🥇 $500 | 🥈 $250 | 🥉 $100 | 4-10: $25-50</p>
                 </div>
                 <div>
-                  <div className="font-semibold text-slate-900 dark:text-white mb-1">Annual Bonuses</div>
-                  <p className="text-slate-600 dark:text-slate-400">Platinum+ contributors: Additional 20% bonus on annual rewards</p>
+                  <div className="font-semibold text-white mb-1">Annual Bonuses</div>
+                  <p className="text-slate-400">Platinum+ contributors: Additional 20% bonus on annual rewards</p>
                 </div>
               </div>
             </div>
 
             {/* Redemption */}
-            <div className="bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-800 rounded-lg p-6">
-              <h3 className="font-semibold text-emerald-900 dark:text-emerald-100 mb-4 flex items-center gap-2"><Icon name="gift" className="w-5 h-5" /> How to Redeem</h3>
-              <ul className="space-y-2 text-sm text-emerald-900 dark:text-emerald-100">
+            <div className="bg-emerald-950/20 border border-emerald-800 rounded-lg p-6">
+              <h3 className="font-semibold text-emerald-100 mb-4 flex items-center gap-2"><Icon name="gift" className="w-5 h-5" /> How to Redeem</h3>
+              <ul className="space-y-2 text-sm text-emerald-100">
                 <li>• Points automatically added to your contributor dashboard</li>
                 <li>• Redeem 1,000 points = $50 USDC or ETH</li>
                 <li>• Monthly payout runs on the 5th (minimum 500 points)</li>
