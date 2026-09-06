@@ -44,10 +44,10 @@ export default function WhitepaperPage() {
         {/* sadhutech product roadmap */}
         <section className="space-y-6">
           <div className="border-l-4 border-teal-500 pl-6 py-4">
-            <h2 className="text-3xl font-black text-teal-400 mb-2"><Genesis /> is sadhutech's first product</h2>
+            <h2 className="text-3xl font-black text-teal-400 mb-2">The roadmap</h2>
             <p className="text-slate-300">
-              sadhutech is building a family of pre-action security products. <Genesis />  -  for crypto  -  is live today
-              across three surfaces; everything else is where the same philosophy goes next.
+              <Genesis />  -  for crypto  -  is live today across two surfaces; everything else is where the same
+              philosophy goes next.
             </p>
           </div>
           <div className="grid md:grid-cols-2 gap-4">
