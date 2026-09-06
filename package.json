@@ -21,9 +21,21 @@
     "@types/pg": "^8.23.1",
     "tsx": "^4.19.2",
     "typescript": "^5.7.2",
-    "vitest": "^2.1.8"
+    "vitest": "^3.2.6"
   },
   "dependencies": {
     "prettier": "^3.9.6"
+  },
+  "pnpm": {
+    "overrides": {
+      "elliptic": "^6.6.1",
+      "axios@1": "^1.18.0",
+      "uuid@9": "^11.1.1",
+      "vite": "^6.4.3",
+      "esbuild": "^0.25.0",
+      "bn.js": "^5.2.3",
+      "fast-xml-parser": "^5.7.0",
+      "decode-uri-component": "^0.5.0"
+    }
   }
 }
