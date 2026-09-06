@@ -51,11 +51,12 @@ function short(a: string | null) {
   return `${a.slice(0, 6)}…${a.slice(-4)}`;
 }
 
-function Stat({ label, value }: { label: string; value: string | number }) {
+function Stat({ label, value, hint }: { label: string; value: string | number; hint?: string }) {
   return (
     <div className="rounded-xl border border-teal-500/20 bg-slate-900/60 p-4">
       <p className="text-xs uppercase tracking-wide text-teal-300">{label}</p>
       <p className="mt-1 text-2xl font-black text-white">{value}</p>
+      {hint && <p className="mt-0.5 text-[11px] text-slate-500">{hint}</p>}
     </div>
   );
 }
@@ -139,6 +140,7 @@ export default function AdminPage() {
 
   const maxPageView = Math.max(1, ...(summary?.pageViews.map((p) => Number(p.count)) ?? [0]));
   const verdictMax = Math.max(1, ...(summary?.transactionsByVerdict.map((v) => Number(v.count)) ?? [0]));
+  const rangeLabel = RANGE_OPTIONS.find((o) => o.hours === hours)?.label ?? `${hours}h`;
 
   return (
     <div className="max-w-6xl mx-auto space-y-8">
@@ -180,15 +182,16 @@ export default function AdminPage() {
       {summary && (
         <>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <Stat label="Unique wallets" value={summary.uniqueWallets} />
-            <Stat label="Transactions checked" value={summary.transactionsByHour.reduce((s, r) => s + Number(r.count), 0)} />
-            <Stat label="Errors" value={summary.errorCount} />
-            <Stat label="Stuck flows" value={summary.stuckCount} />
+            <Stat label="Unique wallets" value={summary.uniqueWallets} hint={`active in last ${rangeLabel}`} />
+            <Stat label="Transactions checked" value={summary.transactionsByHour.reduce((s, r) => s + Number(r.count), 0)} hint={`last ${rangeLabel}`} />
+            <Stat label="Errors" value={summary.errorCount} hint={`last ${rangeLabel}`} />
+            <Stat label="Stuck flows" value={summary.stuckCount} hint={`last ${rangeLabel}`} />
           </div>
 
           <div className="grid md:grid-cols-2 gap-6">
             <section className="rounded-xl border border-teal-500/20 bg-slate-900/60 p-5">
-              <h2 className="text-sm font-bold text-white mb-4">Logins by hour</h2>
+              <h2 className="text-sm font-bold text-white">Logins by hour</h2>
+              <p className="text-[11px] text-slate-500 mb-4">Last {rangeLabel}.</p>
               <div className="space-y-2 max-h-64 overflow-y-auto pr-1">
                 {summary.loginsByHour.length === 0 && <p className="text-xs text-slate-500">No logins in this window.</p>}
                 {summary.loginsByHour.map((r) => (
@@ -198,7 +201,8 @@ export default function AdminPage() {
             </section>
 
             <section className="rounded-xl border border-teal-500/20 bg-slate-900/60 p-5">
-              <h2 className="text-sm font-bold text-white mb-4">Logins by day (30d)</h2>
+              <h2 className="text-sm font-bold text-white">Logins by day</h2>
+              <p className="text-[11px] text-slate-500 mb-4">Always last 30d, regardless of the range toggle.</p>
               <div className="space-y-2 max-h-64 overflow-y-auto pr-1">
                 {summary.loginsByDay.length === 0 && <p className="text-xs text-slate-500">No logins yet.</p>}
                 {summary.loginsByDay.map((r) => (
@@ -238,7 +242,8 @@ export default function AdminPage() {
             </section>
 
             <section className="rounded-xl border border-teal-500/20 bg-slate-900/60 p-5">
-              <h2 className="text-sm font-bold text-white mb-4">Pro credits</h2>
+              <h2 className="text-sm font-bold text-white">Pro credits</h2>
+              <p className="text-[11px] text-slate-500 mb-4">All-time balances - not affected by the range toggle above.</p>
               <ul className="space-y-2 text-sm text-slate-200">
                 <li>Wallets with credits: <span className="font-bold text-white">{summary.pro.walletsWithCredits}</span></li>
                 <li>Total credits held: <span className="font-bold text-white">{summary.pro.totalCredits}</span></li>
@@ -247,7 +252,8 @@ export default function AdminPage() {
             </section>
 
             <section className="rounded-xl border border-teal-500/20 bg-slate-900/60 p-5">
-              <h2 className="text-sm font-bold text-white mb-4">Credits bought (this window)</h2>
+              <h2 className="text-sm font-bold text-white">Credits bought</h2>
+              <p className="text-[11px] text-slate-500 mb-4">Purchases in the last {rangeLabel}.</p>
               <ul className="space-y-2 text-sm text-slate-200">
                 <li>Purchases: <span className="font-bold text-white">{summary.creditsBought.purchases}</span></li>
                 <li>Total USDC: <span className="font-bold text-white">${summary.creditsBought.totalUsdc.toFixed(2)}</span></li>
