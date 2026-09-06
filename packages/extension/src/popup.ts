@@ -2,6 +2,7 @@
 import type { ProAuth } from "./messages.js";
 
 const GATE_URL = "https://genesis-gate.onrender.com";
+const CONNECT_URL = "https://sadhutech.com/extension-connect";
 const PRO_AUTH_TTL_MS = 23 * 60 * 60 * 1000;
 
 const toggle = document.querySelector<HTMLInputElement>("#enabled-toggle");
@@ -63,32 +64,12 @@ async function loadDeepCheckState(): Promise<void> {
 }
 
 async function authorizeAndEnable(): Promise<void> {
-  if (!deepToggle || !connectBtn) return;
+  if (!connectBtn) return;
   connectBtn.disabled = true;
-  connectBtn.textContent = "Connecting\u2026";
-  setStatus("Check your wallet for a signature request\u2026");
+  connectBtn.textContent = "Opening connect tab\u2026";
+  setStatus("Complete the connection in the new tab, then reopen this popup.");
   try {
-    const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-    if (!tab?.id) throw new Error("No active tab found.");
-    const response = await chrome.tabs.sendMessage(tab.id, { type: "genesis-authorize" });
-    if (response?.error || !response?.address || !response?.signature) {
-      throw new Error(response?.error || "Wallet did not return a signature.");
-    }
-    const auth: ProAuth = { address: response.address, message: response.message, signature: response.signature, ts: Date.now() };
-    await chrome.storage.local.set({ deepCheckEnabled: true, genesisProAuth: auth });
-    connectBtn.style.display = "none";
-    if (disconnectLink) disconnectLink.style.display = "block";
-    await refreshCredits(auth.address);
-  } catch (err) {
-    deepToggle.checked = false;
-    const raw = err instanceof Error ? err.message : "";
-    setStatus(
-      /receiving end does not exist/i.test(raw)
-        ? "This tab was open before GENESIS loaded here \u2014 refresh the page and try again."
-        : raw
-          ? `Couldn't enable: ${raw}`
-          : "Couldn't enable Deep Check. Open a regular webpage (not a new tab) and try again."
-    );
+    await chrome.tabs.create({ url: CONNECT_URL });
   } finally {
     connectBtn.disabled = false;
     connectBtn.textContent = "Connect wallet & enable";
@@ -118,6 +99,13 @@ if (deepToggle && connectBtn) {
   connectBtn.addEventListener("click", authorizeAndEnable);
   loadDeepCheckState();
 }
+
+// If the connect tab (still open, or already closed) hands off a credential while this
+// popup happens to be open, reflect it immediately instead of requiring a reopen.
+chrome.storage.onChanged.addListener((changes, area) => {
+  if (area !== "local" || !changes.genesisProAuth?.newValue) return;
+  loadDeepCheckState();
+});
 
 disconnectLink?.addEventListener("click", async (e) => {
   e.preventDefault();

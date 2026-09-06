@@ -1,10 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useSignMessage } from "wagmi";
 import { resolveDecisionOutcome, type DecisionOutcome } from "../../src/decision";
 import { Icon } from "@/components/Icon";
 import { useWallet } from "@/src/wallet/useWallet";
+import { useProAuth, WalletTimeoutError } from "@/src/wallet/useProAuth";
 import { friendlyWalletError } from "@/src/wallet/errors";
 import { DEEP_CHECK_ENABLED } from "@/src/pro-status";
 import { useGateStatus } from "@/src/gate-status";
@@ -32,21 +32,6 @@ type Result = {
 
 function short(a: string) {
   return a ? `${a.slice(0, 6)}…${a.slice(-4)}` : "";
-}
-
-const WALLET_SIGN_TIMEOUT_MS = 60_000;
-
-class WalletTimeoutError extends Error {}
-
-// Guards against wallets that never resolve/reject a signature prompt (e.g. dismissed silently).
-function withTimeout<T>(promise: Promise<T>, ms: number, message: string): Promise<T> {
-  return new Promise((resolve, reject) => {
-    const timer = setTimeout(() => reject(new WalletTimeoutError(message)), ms);
-    promise.then(
-      (v) => { clearTimeout(timer); resolve(v); },
-      (e) => { clearTimeout(timer); reject(e); }
-    );
-  });
 }
 
 // Timeouts already carry a friendly message - only route real wallet/RPC errors through friendlyWalletError.
@@ -135,7 +120,7 @@ function VerdictCard({ result }: { result: Result }) {
 export default function CheckPage() {
   const { address, isConnected, connect } = useWallet();
   const gateStatus = useGateStatus();
-  const { signMessageAsync } = useSignMessage();
+  const { proAuth, getProAuth, persistProAuth } = useProAuth();
   const [mode, setMode] = useState<Mode>("address");
   const [addressInput, setAddressInput] = useState("");
   const [dataInput, setDataInput] = useState("");
@@ -152,30 +137,6 @@ export default function CheckPage() {
   const [bulkBusy, setBulkBusy] = useState(false);
   const [bulkMsg, setBulkMsg] = useState<string | null>(null);
   const [pendingBulkCheck, setPendingBulkCheck] = useState(false);
-  // Cached wallet signature proving ownership - reused across checks instead of re-prompting every click.
-  const [proAuth, setProAuth] = useState<{ address: string; message: string; signature: string; ts: number } | null>(null);
-
-  const PRO_AUTH_STORAGE_KEY = "genesis_pro_auth";
-
-  // Persists alongside state so the cached signature survives a page reload within its freshness window.
-  const persistProAuth = (auth: { address: string; message: string; signature: string; ts: number } | null) => {
-    setProAuth(auth);
-    try {
-      if (auth) localStorage.setItem(PRO_AUTH_STORAGE_KEY, JSON.stringify(auth));
-      else localStorage.removeItem(PRO_AUTH_STORAGE_KEY);
-    } catch {
-      // ignore storage failures (private browsing, quota, etc.) - falls back to in-memory only
-    }
-  };
-
-  useEffect(() => {
-    try {
-      const raw = localStorage.getItem(PRO_AUTH_STORAGE_KEY);
-      if (raw) setProAuth(JSON.parse(raw));
-    } catch {
-      // ignore malformed/missing cached auth
-    }
-  }, []);
 
   useEffect(() => {
     const raw = sessionStorage.getItem("genesis_check_pending");
@@ -286,23 +247,6 @@ export default function CheckPage() {
 
   // Stays under the gate's 24-hour signature-freshness window (server.ts) so a cached
   // signature is never rejected as stale, while avoiding a fresh wallet prompt on every click.
-  const PRO_AUTH_TTL_MS = 23 * 60 * 60 * 1000;
-
-  const getProAuth = async (addr: string): Promise<{ message: string; signature: string }> => {
-    if (proAuth && proAuth.address === addr && Date.now() - proAuth.ts < PRO_AUTH_TTL_MS) {
-      return proAuth;
-    }
-    const message = `SadhuTech pro check\nwallet: ${addr}\nts: ${new Date().toISOString()}`;
-    const signature = await withTimeout(
-      signMessageAsync({ message }),
-      WALLET_SIGN_TIMEOUT_MS,
-      "No response from your wallet. Check for a pending signature request, or try again."
-    );
-    const auth = { address: addr, message, signature, ts: Date.now() };
-    persistProAuth(auth);
-    return auth;
-  };
-
   const runDeepCheck = async () => {
     setDeepMsg(null);
     if (!lastTx || !address) return;

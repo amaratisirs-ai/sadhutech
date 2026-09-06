@@ -79,3 +79,21 @@ chrome.runtime.onMessage.addListener((request: AnalyzeRequestMessage, _sender, s
   analyze(request).then(sendResponse);
   return true; // keep the message channel open for the async sendResponse
 });
+
+// Deep Check enrollment: sadhutech.com's /extension-connect page (real tab, proper wallet
+// picker, correct signing origin - see manifest.json's "externally_connectable" and
+// packages/extension/README.md) hands the signed credential to the extension this way,
+// rather than trying to sign from within the transient toolbar popup.
+const ALLOWED_CONNECT_ORIGINS = ["https://sadhutech.com", "http://localhost:3000"];
+chrome.runtime.onMessageExternal.addListener((message: Record<string, unknown>, sender, sendResponse) => {
+  if (message?.type !== "genesis-connect-result" || !ALLOWED_CONNECT_ORIGINS.includes(sender.origin ?? "")) return;
+  const { address, authMessage, signature } = message as { address?: string; authMessage?: string; signature?: string };
+  if (!address || !authMessage || !signature) {
+    sendResponse({ ok: false, error: "Missing address, message, or signature." });
+    return;
+  }
+  chrome.storage.local
+    .set({ deepCheckEnabled: true, genesisProAuth: { address, message: authMessage, signature, ts: Date.now() } })
+    .then(() => sendResponse({ ok: true }));
+  return true; // keep the message channel open for the async sendResponse
+});

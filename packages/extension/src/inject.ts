@@ -5,11 +5,8 @@
 import {
   GENESIS_REQUEST_EVENT,
   GENESIS_RESPONSE_EVENT,
-  GENESIS_AUTH_REQUEST_EVENT,
-  GENESIS_AUTH_RESPONSE_EVENT,
   type AnalyzeRequestMessage,
   type AnalyzeResponseMessage,
-  type AuthResponseMessage,
   type InterceptedMethod,
 } from "./messages.js";
 
@@ -20,13 +17,6 @@ const INTERCEPTED: ReadonlySet<string> = new Set<InterceptedMethod>([
 ]);
 
 let nextId = 0;
-// The unwrapped provider.request, captured by wrapProvider() - GENESIS's own auth-signing
-// call (below) must bypass its own interception, or personal_sign would recurse through
-// the analyze pipeline as if it were a third-party dapp request.
-let unwrappedRequest: ((args: { method: string; params?: unknown[] }) => Promise<any>) | null = null;
-// Most recently wrapped provider (window.ethereum or an EIP-6963 announcement) - used as a
-// fallback for the auth flow below in case a wallet only announces via EIP-6963.
-let lastWrappedProvider: any = null;
 
 function askGenesis(method: InterceptedMethod, params: unknown[]): Promise<AnalyzeResponseMessage> {
   const id = `genesis-${Date.now()}-${nextId++}`;
@@ -53,8 +43,6 @@ function wrapProvider(provider: any): void {
   if (!provider || provider.__genesisWrapped) return;
   const originalRequest = provider.request?.bind(provider);
   if (typeof originalRequest !== "function") return;
-  unwrappedRequest = originalRequest;
-  lastWrappedProvider = provider;
 
   provider.request = async (args: { method: string; params?: unknown[] }) => {
     if (!INTERCEPTED.has(args.method)) {
@@ -101,33 +89,3 @@ window.addEventListener("eip6963:announceProvider", (event) => {
   if (provider) wrapProvider(provider);
 });
 window.dispatchEvent(new Event("eip6963:requestProvider"));
-
-// Deep Check authorization: content-script.ts (relaying a request from the popup) asks
-// whatever wallet is on this page to sign a one-time proof-of-ownership message.
-window.addEventListener(GENESIS_AUTH_REQUEST_EVENT, async (event) => {
-  const request = (event as CustomEvent<{ id: string }>).detail;
-  if (!request) return;
-  const provider = (window as any).ethereum ?? lastWrappedProvider;
-  const respond = (detail: AuthResponseMessage) =>
-    window.dispatchEvent(new CustomEvent(GENESIS_AUTH_RESPONSE_EVENT, { detail }));
-
-  if (!provider?.request) {
-    respond({ type: GENESIS_AUTH_RESPONSE_EVENT, id: request.id, error: "No wallet found on this page." });
-    return;
-  }
-  try {
-    const rawRequest = unwrappedRequest ?? provider.request.bind(provider);
-    const accounts = (await rawRequest({ method: "eth_requestAccounts" })) as string[];
-    const address = accounts?.[0];
-    if (!address) throw new Error("No account returned by wallet.");
-    const message = `GENESIS Deep Check\nwallet: ${address}\nts: ${new Date().toISOString()}`;
-    const signature = (await rawRequest({ method: "personal_sign", params: [message, address] })) as string;
-    respond({ type: GENESIS_AUTH_RESPONSE_EVENT, id: request.id, address, message, signature });
-  } catch (err) {
-    respond({
-      type: GENESIS_AUTH_RESPONSE_EVENT,
-      id: request.id,
-      error: err instanceof Error ? err.message : "Wallet authorization failed.",
-    });
-  }
-});

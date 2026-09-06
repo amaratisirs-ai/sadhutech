@@ -27,27 +27,14 @@ export interface AnalyzeResponseMessage {
   creditsLeft?: number;
 }
 
-// Deep Check authorization: popup.ts asks the active tab's page (via content-script.ts,
-// which relays into inject.ts's MAIN-world window.ethereum) to sign a one-time proof-of-
-// wallet-ownership message, cached in chrome.storage.local and reused across checks.
-export const GENESIS_AUTH_REQUEST_EVENT = "genesis:auth-request";
-export const GENESIS_AUTH_RESPONSE_EVENT = "genesis:auth-response";
-
-export interface AuthRequestMessage {
-  type: typeof GENESIS_AUTH_REQUEST_EVENT;
-  id: string;
-}
-
-export interface AuthResponseMessage {
-  type: typeof GENESIS_AUTH_RESPONSE_EVENT;
-  id: string;
-  address?: string;
-  message?: string;
-  signature?: string;
-  error?: string;
-}
-
-/** Cached Deep Check credential, persisted in chrome.storage.local under "genesisProAuth". */
+// Deep Check authorization: connecting happens on a real sadhutech.com tab (reusing the
+// site's own wallet-connect + signing flow), which hands the signed credential to the
+// extension via chrome.runtime.onMessageExternal (see background.ts + manifest.json's
+// "externally_connectable"). Not done from the toolbar popup - Chrome closes popups when a
+// wallet's own approval dialog steals focus, and the popup has no access to whatever wallet
+// is on the active tab, so a relay-through-the-page approach was unreliable and offered no
+// way to pick between multiple installed wallets. Cached in chrome.storage.local under
+// "genesisProAuth" and reused across checks.
 export interface ProAuth {
   address: string;
   message: string;
