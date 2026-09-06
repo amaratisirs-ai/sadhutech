@@ -5,6 +5,7 @@
   /* Softer than pure white - big bold headings in pure #fff on a dark background
      create a harsh glare/halation effect over long reading sessions. */
   --foreground: #e7ecf3;
+  --font-choice: var(--font-inter), Arial, Helvetica, sans-serif;
 }
 
 @theme inline {
@@ -23,7 +24,7 @@
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-choice);
   /* More breathing room between lines - the previous default (browser's ~1.2)
      reads as cramped for paragraph-length copy. */
   line-height: 1.65;

@@ -5,7 +5,7 @@ import { ThemeProvider } from "./theme-provider";
 import { Web3Provider } from "./web3-provider";
 import { Icon } from "@/components/Icon";
 import { AccountWidget } from "@/components/AccountWidget";
-import { ContrastControl } from "@/components/ContrastControl";
+import { DisplaySettings } from "@/components/DisplaySettings";
 import { GateStatusProvider, useGateStatus } from "@/src/gate-status";
 
 const GATE_URL = process.env.NEXT_PUBLIC_GATE_URL || "https://genesis-gate.onrender.com";
@@ -158,7 +158,7 @@ export function LayoutClient({ children }: { children: ReactNode }) {
         <Icon name="arrowUp" className="w-5 h-5" />
       </button>
 
-      <ContrastControl />
+      <DisplaySettings />
 
       {/* Bottom Navigation (Mobile App-like) */}
       <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-slate-950 border-t-2 border-teal-500 backdrop-blur-xl z-40 safe-bottom">
