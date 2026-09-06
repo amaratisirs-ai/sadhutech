@@ -3,9 +3,8 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { ThemeProvider } from "./theme-provider";
 import { Web3Provider } from "./web3-provider";
-import { Icon } from "@/components/Icon";
+import { Icon, type IconName } from "@/components/Icon";
 import { AccountWidget } from "@/components/AccountWidget";
-import { DisplaySettings } from "@/components/DisplaySettings";
 import { GateStatusProvider, useGateStatus } from "@/src/gate-status";
 
 const GATE_URL = process.env.NEXT_PUBLIC_GATE_URL || "https://genesis-gate.onrender.com";
@@ -87,6 +86,7 @@ export function LayoutClient({ children }: { children: ReactNode }) {
                     { href: "/partners", label: "Integrations & Partners" },
                     { href: "/whitepaper", label: "Vision & Roadmap" },
                     { href: "/help", label: "Help Center" },
+                    { href: "/settings", label: "Display Settings", icon: "settings" },
                   ]}
                 />
               </div>
@@ -137,6 +137,7 @@ export function LayoutClient({ children }: { children: ReactNode }) {
                 <MobileNavLink href="/partners" onClick={() => setMobileMenuOpen(false)}>Integrations & Partners</MobileNavLink>
                 <MobileNavLink href="/whitepaper" onClick={() => setMobileMenuOpen(false)}>Vision & Roadmap</MobileNavLink>
                 <MobileNavLink href="/help" onClick={() => setMobileMenuOpen(false)}>Help Center</MobileNavLink>
+                <MobileNavLink href="/settings" onClick={() => setMobileMenuOpen(false)}>Display Settings</MobileNavLink>
               </div>
             </div>
           )}
@@ -157,8 +158,6 @@ export function LayoutClient({ children }: { children: ReactNode }) {
       >
         <Icon name="arrowUp" className="w-5 h-5" />
       </button>
-
-      <DisplaySettings />
 
       {/* Bottom Navigation (Mobile App-like) */}
       <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-slate-950 border-t-2 border-teal-500 backdrop-blur-xl z-40 safe-bottom">
@@ -286,7 +285,7 @@ function NavDropdown({
   items,
 }: {
   label: string;
-  items: { href: string; label: string; external?: boolean }[];
+  items: { href: string; label: string; external?: boolean; icon?: IconName }[];
 }) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -323,8 +322,9 @@ function NavDropdown({
                 target={item.external ? "_blank" : undefined}
                 rel={item.external ? "noopener noreferrer" : undefined}
                 onClick={() => setOpen(false)}
-                className="block px-4 py-2.5 text-sm font-semibold text-teal-200 hover:text-white hover:bg-teal-500/10 transition-all"
+                className="flex items-center gap-2 px-4 py-2.5 text-sm font-semibold text-teal-200 hover:text-white hover:bg-teal-500/10 transition-all"
               >
+                {item.icon && <Icon name={item.icon} className="w-4 h-4 shrink-0" />}
                 {item.label}
               </a>
             ))}
