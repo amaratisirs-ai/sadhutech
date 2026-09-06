@@ -613,10 +613,7 @@ export default function Home() {
                 We've built a working gate that checks crypto transactions before you sign. It blocks known scams, warns you about risky moves, and explains everything in plain English - no crypto jargon.
               </p>
               <p className="text-slate-700 dark:text-slate-300">
-                Try it on the web, or install the <Genesis /> browser extension for real-time protection with any wallet - no copy-pasting addresses, no leaving your wallet.
-              </p>
-              <p className="text-slate-700 dark:text-slate-300">
-                Anyone can report a scam address and build reputation on the community leaderboard today.
+                Try it on the web, or install the <Genesis /> browser extension for real-time protection with any wallet.
               </p>
               <div className="flex flex-wrap gap-x-6 gap-y-2">
                 <a href="/check" className="inline-flex items-center gap-2 text-emerald-600 dark:text-emerald-400 font-semibold hover:underline">
@@ -624,9 +621,6 @@ export default function Home() {
                 </a>
                 <a href="/extension" className="inline-flex items-center gap-2 text-emerald-600 dark:text-emerald-400 font-semibold hover:underline">
                   → Get the browser extension
-                </a>
-                <a href="/community" className="inline-flex items-center gap-2 text-emerald-600 dark:text-emerald-400 font-semibold hover:underline">
-                  → See the leaderboard
                 </a>
               </div>
             </div>
@@ -678,11 +672,8 @@ export default function Home() {
 
             <div className="relative space-y-3">
               <p className="text-slate-700 dark:text-slate-300">
-                Reporting and the leaderboard are already live at <a href="/community" className="underline hover:no-underline">/community</a>. Next: a formal vote on
-                disputed reports, so no single person can flag  -  or clear  -  an address alone.
-              </p>
-              <p className="text-slate-700 dark:text-slate-300">
-                Then a real rewards payout, so top contributors earn for helping protect others  -  a threat intelligence network owned by the community, not by any corporation.
+                Community reporting and the leaderboard are already live. Next: a formal vote on disputed reports,
+                plus real rewards for top contributors - a threat intelligence network owned by the community.
               </p>
             </div>
           </div>
