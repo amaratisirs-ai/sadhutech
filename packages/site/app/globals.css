@@ -14,8 +14,10 @@
   --font-mono: var(--font-geist-mono);
   /* Same softening applied to the "white" utility itself (text-white/bg-white/
      border-white), since that's what nearly every heading across the site uses
-     directly rather than the CSS variable above. */
-  --color-white: #e7ecf3;
+     directly rather than the CSS variable above. References the same variable
+     so the readability slider (components/ContrastControl.tsx) can adjust both
+     at once by only ever touching --foreground. */
+  --color-white: var(--foreground);
 }
 
 body {
