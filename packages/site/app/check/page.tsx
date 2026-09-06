@@ -9,6 +9,7 @@ import { friendlyWalletError } from "@/src/wallet/errors";
 import { DEEP_CHECK_ENABLED } from "@/src/pro-status";
 import { useGateStatus } from "@/src/gate-status";
 import { Genesis, withGenesisStyle } from "@/components/Genesis";
+import { trackEvent } from "@/src/analytics";
 
 const GATE_URL = process.env.NEXT_PUBLIC_GATE_URL || "https://genesis-gate.onrender.com";
 const ADDRESS_RE = /^0x[0-9a-fA-F]{40}$/;
@@ -279,6 +280,7 @@ export default function CheckPage() {
       if (typeof data.creditsLeft === "number") setCredits(data.creditsLeft);
     } catch (e: unknown) {
       setDeepMsg(describeError(e));
+      trackEvent(e instanceof WalletTimeoutError ? "stuck" : "error", { page: "/check", wallet: address, meta: { flow: "deep-check", message: describeError(e) } });
     } finally {
       setDeepBusy(false);
     }
@@ -335,6 +337,7 @@ export default function CheckPage() {
       if (typeof data.creditsLeft === "number") setCredits(data.creditsLeft);
     } catch (e: unknown) {
       setBulkMsg(describeError(e));
+      trackEvent(e instanceof WalletTimeoutError ? "stuck" : "error", { page: "/check", wallet: address, meta: { flow: "bulk-check", message: describeError(e) } });
     } finally {
       setBulkBusy(false);
     }

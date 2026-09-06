@@ -6,6 +6,7 @@ try {
 }
 import { isAddress, recoverMessageAddress } from "viem";
 import type { Address, AnalyzeRequest, AnalyzeSignatureRequest, ReportRequest } from "@genesis/shared";
+import { ADMIN_WALLETS } from "@genesis/shared";
 import { analyze, analyzeSignature } from "./analyze.js";
 import { createIntelAsync } from "./index.js";
 import { TESTER_HTML } from "./ui.js";
@@ -14,6 +15,7 @@ import type { ThreatIntelPostgres } from "./intel-postgres.js";
 import { ContributorsService } from "./contributors.js";
 import { ProAccessService } from "./pro-access.js";
 import { AuditLogService, getClientIp, lookupGeoIp } from "./audit-log.js";
+import { AnalyticsService, type AnalyticsEventType } from "./analytics.js";
 import { premiumAvailable, lookupChainAbuse } from "./chainabuse-lookup.js";
 import { NewsletterService, initNewsletterService } from "./newsletter.js";
 import {
@@ -43,6 +45,8 @@ let contributorsService: ContributorsService | null = null;
 let proAccessService: ProAccessService | null = null;
 // Audit log service (credit consumption + security-event trail; initialized during startup)
 let auditLogService: AuditLogService | null = null;
+// Analytics service (logins, page views, transaction checks, errors; initialized during startup)
+let analyticsService: AnalyticsService | null = null;
 // Newsletter/journey service (email subscribers + templated sends; initialized during startup)
 let newsletterService: NewsletterService | null = null;
 
@@ -170,9 +174,20 @@ app.post<{ Body: AnalyzeRequest }>("/v1/analyze",
           proReq!.source
         );
       }
+      void analyticsService?.logEvent("analyze", {
+        wallet: proReq?.wallet,
+        chainId: tx.chainId,
+        verdict: (result as any).verdict,
+        meta: { endpoint: "analyze", pro: !!proMeta, findings: result.findings.length, source: proReq?.source },
+      });
       return result;
     } catch (err) {
       request.log.error(err);
+      void analyticsService?.logEvent("error", {
+        wallet: proReq?.wallet,
+        chainId: tx.chainId,
+        meta: { endpoint: "analyze", message: err instanceof Error ? err.message : String(err) },
+      });
       return reply.status(400).send({
         error: "Could not analyze transaction",
         message: err instanceof Error ? err.message : "Unknown error",
@@ -263,9 +278,18 @@ app.post<{ Body: { addresses?: string[]; pro?: { wallet?: string; message?: stri
         results.some((r) => (r as any).findings?.some((f: any) => f.id === "intel.chainabuse")),
         source
       );
+      void analyticsService?.logEvent("analyze", {
+        wallet,
+        verdict: results.some((r) => r.verdict === "block") ? "block" : results.some((r) => r.verdict === "warn") ? "warn" : "allow",
+        meta: { endpoint: "analyze/bulk", count: addresses.length, source },
+      });
       return { creditsLeft: remaining, results };
     } catch (err) {
       request.log.error(err);
+      void analyticsService?.logEvent("error", {
+        wallet,
+        meta: { endpoint: "analyze/bulk", message: err instanceof Error ? err.message : String(err) },
+      });
       return reply.status(400).send({
         error: "Could not complete the bulk check",
         message: err instanceof Error ? err.message : "Unknown error",
@@ -292,9 +316,19 @@ app.post<{ Body: AnalyzeSignatureRequest }>("/v1/analyze-signature",
 
     const intel = await createIntelAsync();
     try {
-      return await analyzeSignature(request.body, intel, auditLogService ?? undefined);
+      const result = await analyzeSignature(request.body, intel, auditLogService ?? undefined);
+      void analyticsService?.logEvent("analyze", {
+        chainId: request.body.sig?.chainId,
+        verdict: (result as any).verdict,
+        meta: { endpoint: "analyze-signature", method: request.body.sig?.method },
+      });
+      return result;
     } catch (err) {
       request.log.error(err);
+      void analyticsService?.logEvent("error", {
+        chainId: request.body.sig?.chainId,
+        meta: { endpoint: "analyze-signature", message: err instanceof Error ? err.message : String(err) },
+      });
       return reply.status(400).send({
         error: "Could not analyze signature request",
         message: err instanceof Error ? err.message : "Unknown error",
@@ -398,6 +432,83 @@ app.get<{ Params: { address: string } }>("/v1/pro/status/:address", async (reque
   const s = await proAccessService.getStatus(address);
   return { ...s, premium: premiumAvailable() };
 });
+
+// ============================================================================
+// Analytics: client-reported events (page views, logins, errors, "stuck" flows)
+// + the admin 360° summary, gated to ADMIN_WALLETS via signed wallet auth.
+// ============================================================================
+const CLIENT_EVENT_TYPES: ReadonlySet<AnalyticsEventType> = new Set(["page_view", "login", "error", "stuck"]);
+
+// POST /v1/analytics/event - fire-and-forget telemetry from the site/extension.
+// "analyze" events are never accepted from clients - they're logged server-side
+// only (in /v1/analyze, /v1/analyze/bulk, /v1/analyze-signature) so transaction
+// counts can't be spoofed.
+app.post<{ Body: { type?: string; wallet?: string; page?: string; chainId?: number; meta?: unknown } }>(
+  "/v1/analytics/event",
+  { onRequest: createRateLimitMiddleware(rateLimiter) },
+  async (request, reply) => {
+    const { type, wallet, page, chainId, meta } = request.body ?? {};
+    if (!type || !CLIENT_EVENT_TYPES.has(type as AnalyticsEventType)) {
+      return reply.status(400).send({ error: "Invalid event type." });
+    }
+    if (wallet && !isAddress(wallet)) {
+      return reply.status(400).send({ error: "Invalid wallet." });
+    }
+    void analyticsService?.logEvent(type as AnalyticsEventType, {
+      wallet,
+      page: typeof page === "string" ? page.slice(0, 200) : null,
+      chainId: typeof chainId === "number" ? chainId : null,
+      meta: meta && typeof meta === "object" ? meta : {},
+    });
+    return reply.status(202).send({ ok: true });
+  }
+);
+
+// POST /v1/admin/analytics - the 360° dashboard summary. Auth is a signed wallet
+// message (same pattern as Pro deep-check), not an API key, so the admin can log
+// in with the same wallet used everywhere else on the site.
+app.post<{ Body: { wallet?: string; message?: string; signature?: string; hours?: number } }>(
+  "/v1/admin/analytics",
+  { onRequest: createRateLimitMiddleware(rateLimiter) },
+  async (request, reply) => {
+    const { wallet, message, signature, hours } = request.body ?? {};
+    if (!wallet || !isAddress(wallet) || !message || !signature) {
+      return reply.status(400).send({ error: "Signed admin request required." });
+    }
+    if (!ADMIN_WALLETS.has(wallet.toLowerCase())) {
+      return reply.status(403).send({ error: "Not an admin wallet." });
+    }
+    let signer: string;
+    try {
+      signer = await recoverMessageAddress({ message, signature: signature as `0x${string}` });
+    } catch {
+      return reply.status(401).send({ error: "Bad signature." });
+    }
+    const tsMatch = /ts:\s*(\S+)/.exec(message);
+    const timestamp = tsMatch?.[1];
+    // Tighter than Pro's 24h window - this endpoint exposes aggregate usage data.
+    const freshnessWindowMs = 60 * 60 * 1000;
+    const fresh = timestamp ? Math.abs(Date.now() - Date.parse(timestamp)) < freshnessWindowMs : false;
+    if (
+      signer.toLowerCase() !== wallet.toLowerCase() ||
+      !fresh ||
+      !message.toLowerCase().includes(wallet.toLowerCase()) ||
+      !message.toLowerCase().includes("admin")
+    ) {
+      return reply.status(401).send({ error: "Invalid or expired signature." });
+    }
+    if (!analyticsService) {
+      return reply.status(503).send({ error: "Analytics unavailable (requires PostgreSQL)." });
+    }
+    try {
+      const capped = Math.min(Number(hours) || 24 * 7, 24 * 90);
+      return await analyticsService.getSummary(capped);
+    } catch (err) {
+      request.log.error(err);
+      return reply.status(500).send({ error: "Failed to load analytics." });
+    }
+  }
+);
 
 // ============================================================================
 // POST /v1/consent - Record acceptance of Terms/Privacy at a key touchpoint
@@ -822,6 +933,8 @@ async function start(): Promise<void> {
         await proAccessService.initialize();
         auditLogService = new AuditLogService(postgresIntel.pool);
         await auditLogService.initialize();
+        analyticsService = new AnalyticsService(postgresIntel.pool);
+        await analyticsService.initialize();
         newsletterService = new NewsletterService(postgresIntel.pool);
         await newsletterService.initialize();
         initNewsletterService(newsletterService, { runOnStartup: true, intervalHours: 1 });

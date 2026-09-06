@@ -7,6 +7,7 @@ import { Icon, type IconName } from "@/components/Icon";
 import { AccountWidget } from "@/components/AccountWidget";
 import { applySavedDisplaySettings } from "@/src/useDisplaySettings";
 import { GateStatusProvider, useGateStatus } from "@/src/gate-status";
+import { AnalyticsTracker } from "@/src/AnalyticsTracker";
 
 const GATE_URL = process.env.NEXT_PUBLIC_GATE_URL || "https://genesis-gate.onrender.com";
 
@@ -50,6 +51,7 @@ export function LayoutClient({ children }: { children: ReactNode }) {
 
   return (
     <Web3Provider>
+    <AnalyticsTracker />
     <GateStatusProvider>
     <ThemeProvider>
       {/* Modern Sticky Nav  -  Dark with Teal Border */}

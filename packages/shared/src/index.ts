@@ -192,6 +192,11 @@ export const KNOWN_INFRASTRUCTURE_SPENDERS: ReadonlySet<string> = new Set([
   "0x000000000022d473030f116ddee9f6b43ac78ba3", // Uniswap Permit2 (same address on all EVM chains)
 ]);
 
+/** Wallets granted access to the /admin analytics dashboard (lowercased). Shared so site + gate agree. */
+export const ADMIN_WALLETS: ReadonlySet<string> = new Set([
+  "0xd38721f0a0515c9aa1c291ea24512b66992fedaf",
+]);
+
 // Re-export API configuration and security policies
 export * from "./api-config.js";
 
