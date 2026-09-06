@@ -85,28 +85,19 @@ export default function ProductsPage() {
           />
           <ProductCard
             icon={<Icon name="shieldAlert" className="w-6 h-6" />}
-            name="GENESIS Snap"
-            status="Live · MetaMask"
-            statusColor="bg-emerald-500/15 text-emerald-300"
-            desc="Install GENESIS inside MetaMask so a verdict pops up right before you sign. Installable today via direct link, pending official MetaMask directory listing."
-            href="/snap-install"
-            cta="Install the Snap"
-          />
-          <ProductCard
-            icon={<Icon name="shieldAlert" className="w-6 h-6" />}
             name="GENESIS Extension"
-            status="Dev preview"
-            statusColor="bg-amber-500/15 text-amber-300"
+            status="Live · Any wallet"
+            statusColor="bg-emerald-500/15 text-emerald-300"
             desc="A wallet-agnostic browser extension - works with MetaMask, Trust Wallet, Coinbase Wallet, or any wallet that injects window.ethereum. Functional today; not yet published to any browser's extension store, so install is manual (load unpacked) for now."
-            href="https://github.com/amaratisirs-ai/sadhutech/tree/main/packages/extension"
-            cta="View source on GitHub"
+            href="/extension"
+            cta="Get the Extension"
           />
           <ProductCard
             icon={<Icon name="wallet" className="w-6 h-6" />}
             name="GENESIS Wallet Guard"
             status="Roadmap"
             statusColor="bg-amber-500/15 text-amber-300"
-            desc="The broader vision: automatic, real-time protection built into any wallet or browser, not just MetaMask. GENESIS Snap and GENESIS Extension are the first concrete steps toward it."
+            desc="The broader vision: automatic, real-time protection built into any wallet or browser. GENESIS Extension is the first concrete step toward it."
             href="/whitepaper"
             cta="See the vision"
           />
@@ -127,15 +118,10 @@ export default function ProductsPage() {
               </tr>
             </thead>
             <tbody className="text-slate-300">
-              <tr className="border-b border-slate-800">
+              <tr>
                 <td className="py-2 pr-4 font-semibold text-white">GENESIS Extension (any wallet)</td>
                 <td className="py-2 pr-4 text-emerald-400">Protected</td>
                 <td className="py-2 text-slate-500">Not visible - can't intercept</td>
-              </tr>
-              <tr>
-                <td className="py-2 pr-4 font-semibold text-white">GENESIS Snap (MetaMask only)</td>
-                <td className="py-2 pr-4 text-emerald-400">Protected</td>
-                <td className="py-2 text-emerald-400">Protected (MetaMask only)</td>
               </tr>
             </tbody>
           </table>

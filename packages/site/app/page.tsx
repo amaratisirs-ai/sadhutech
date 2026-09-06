@@ -124,7 +124,7 @@ export default function Home() {
     {
       icon: <Icon name="globe" className="w-6 h-6" />,
       title: "Works Everywhere",
-      desc: "Use it as a MetaMask Snap, HTTP API, or direct integration.",
+      desc: "Use it as a browser extension, HTTP API, or direct integration.",
     },
     {
       icon: <Icon name="eye" className="w-6 h-6" />,
@@ -343,19 +343,19 @@ export default function Home() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
               </svg>
             </div>
-            <p className="text-xs font-bold uppercase tracking-wide text-teal-400"><Genesis /> Snap</p>
+            <p className="text-xs font-bold uppercase tracking-wide text-teal-400"><Genesis /> Extension</p>
             <h3 className="text-2xl font-bold text-white -mt-3">In-Wallet Protection</h3>
-            <p className="text-sm text-slate-300 font-medium">Install <Genesis /> as a MetaMask Snap and get a verdict inside your wallet, right before you sign  -  no copy-pasting.</p>
+            <p className="text-sm text-slate-300 font-medium">Install <Genesis /> as a browser extension and get a verdict before you sign  -  works with any wallet, on any site.</p>
             <div className="pt-2 space-y-2">
-              <p className="text-sm font-semibold text-slate-200">✓ Live now  -  install via direct link</p>
-              <p className="text-sm font-semibold text-slate-200">✓ Real-time verdicts inside MetaMask</p>
-              <p className="text-sm font-semibold text-slate-200">✓ Official MetaMask directory listing pending</p>
+              <p className="text-sm font-semibold text-slate-200">✓ Works with MetaMask, Trust Wallet, Coinbase Wallet, Rabby...</p>
+              <p className="text-sm font-semibold text-slate-200">✓ Real-time verdicts before every signature</p>
+              <p className="text-sm font-semibold text-slate-200">✓ Non-custodial - never touches your keys</p>
             </div>
             <a
-              href="/snap-install"
+              href="/extension"
               className="inline-block mt-2 px-6 py-3 bg-slate-800 border border-slate-600 hover:border-teal-400 text-white rounded-lg font-bold transition"
             >
-              Install in MetaMask →
+              Get the Extension →
             </a>
           </div>
 
@@ -514,23 +514,23 @@ export default function Home() {
         </div>
 
         <div className="grid md:grid-cols-2 gap-8">
-          {/* MetaMask Snap */}
+          {/* Browser Extension */}
           <div className="bg-gradient-to-br from-orange-50 to-red-50 dark:from-orange-900/20 dark:to-red-900/20 rounded-xl border-2 border-orange-200 dark:border-orange-600 p-8 space-y-4">
             <div className="flex items-center gap-3">
               <span className="text-orange-500"><Icon name="wallet" className="w-9 h-9" /></span>
               <div>
-                <h3 className="font-bold text-lg text-slate-900 dark:text-white"><Genesis /> Snap</h3>
-                <p className="text-sm text-slate-700 dark:text-slate-400">MetaMask, one-click install</p>
+                <h3 className="font-bold text-lg text-slate-900 dark:text-white"><Genesis /> Extension</h3>
+                <p className="text-sm text-slate-700 dark:text-slate-400">Any wallet, one-click install</p>
               </div>
             </div>
             <p className="text-slate-900 dark:text-slate-300">
-              Add <Genesis /> to MetaMask. Every time you're about to sign a transaction, we'll pop up with a verdict.
+              Add <Genesis /> to your browser. Every time you're about to sign a transaction, we'll pop up with a verdict.
             </p>
             <a
-              href="/snap-install"
+              href="/extension"
               className="inline-block bg-orange-600 hover:bg-orange-700 dark:bg-orange-700 dark:hover:bg-orange-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition"
             >
-              Install the Snap →
+              Get the Extension →
             </a>
           </div>
 
@@ -640,7 +640,7 @@ export default function Home() {
 
             <div className="relative space-y-3">
               <p className="text-slate-700 dark:text-slate-300">
-                Install <Genesis /> as a MetaMask Snap and get real-time protection every time you sign. No copy-pasting addresses or leaving your wallet - just one-click safety.
+                Install <Genesis /> as a browser extension and get real-time protection every time you sign. No copy-pasting addresses or leaving your wallet - just one-click safety.
               </p>
               <p className="text-slate-700 dark:text-slate-300">
                 Works across Ethereum, Polygon, Base, and more. Whether you're trading, collecting NFTs, or doing DeFi, <Genesis /> watches your back.

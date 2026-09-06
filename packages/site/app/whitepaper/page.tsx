@@ -53,8 +53,8 @@ export default function WhitepaperPage() {
           <div className="grid md:grid-cols-2 gap-4">
             <div className="bg-slate-900/50 border border-teal-500/30 rounded-lg p-5 space-y-1">
               <p className="text-xs font-bold uppercase tracking-wide text-emerald-300">Live</p>
-              <h3 className="font-bold text-white"><Genesis /> Check &amp; <Genesis /> Snap</h3>
-              <p className="text-slate-400 text-sm">Web checker (free + Pro) and a MetaMask Snap for real-time, in-wallet verdicts.</p>
+              <h3 className="font-bold text-white"><Genesis /> Check &amp; <Genesis /> Extension</h3>
+              <p className="text-slate-400 text-sm">Web checker (free + Pro) and a browser extension for real-time verdicts with any wallet.</p>
             </div>
             <div className="bg-slate-900/50 border border-slate-700 rounded-lg p-5 space-y-1">
               <p className="text-xs font-bold uppercase tracking-wide text-amber-300">Next</p>

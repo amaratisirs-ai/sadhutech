@@ -9,16 +9,16 @@ export default function AddToWallet() {
 
   const wallets = [
     {
-      id: "metamask",
-      name: "MetaMask Snap",
-      description: "Install GENESIS inside MetaMask on desktop so verdicts appear before signing.",
+      id: "extension",
+      name: "Browser Extension",
+      description: "Install GENESIS as a browser extension so verdicts appear before you sign, with any wallet.",
       icon: "shield" as const,
-      badge: "MetaMask only",
+      badge: "Any wallet",
       status: "ready",
-      action: () => router.push("/snap-install"),
+      action: () => router.push("/extension"),
       details: [
-        "Best for desktop MetaMask users",
-        "Shows verdicts inside the wallet",
+        "Works with MetaMask, Trust Wallet, Coinbase Wallet, and more",
+        "Shows verdicts before you sign",
         "No wallet switching required",
         "Fastest way to get protected",
       ],
@@ -46,7 +46,7 @@ export default function AddToWallet() {
       <div className="text-center space-y-4">
         <h1 className="text-5xl md:text-6xl font-black text-white">� Connect Wallet</h1>
         <p className="text-xl text-teal-200 max-w-2xl mx-auto">
-          Choose how you want to connect. MetaMask for desktop or WalletConnect for supported mobile wallets.
+          Choose how you want to connect. Our browser extension works with any wallet, or use WalletConnect for supported mobile wallets.
         </p>
       </div>
 
@@ -54,8 +54,8 @@ export default function AddToWallet() {
         <h2 className="text-2xl font-bold text-white">Select your wallet path</h2>
         <div className="grid md:grid-cols-2 gap-4 text-sm text-slate-200">
           <div className="rounded-xl border border-slate-700 bg-slate-950/40 p-4 space-y-2">
-            <p className="font-bold text-white">MetaMask</p>
-            <p>Best for desktop MetaMask users who want <Genesis /> inside the wallet.</p>
+            <p className="font-bold text-white">Browser Extension</p>
+            <p>Best for anyone who wants <Genesis /> to check every transaction, no matter which wallet they use.</p>
           </div>
           <div className="rounded-xl border border-slate-700 bg-slate-950/40 p-4 space-y-2">
             <p className="font-bold text-white">WalletConnect</p>

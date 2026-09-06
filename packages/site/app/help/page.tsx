@@ -16,8 +16,8 @@ export default function HelpPage() {
           a: "Go to Check, choose 'Check an address' or 'Check a transaction', paste it in, and get a plain-English verdict in seconds. No install, no signup.",
         },
         {
-          q: "What's the difference between GENESIS Check, GENESIS Snap, and Wallet Guard?",
-          a: "GENESIS Check is the free web tool at /check  -  paste anything, no install. GENESIS Snap is a MetaMask extension that pops up the same verdict right before you sign (live today via direct install). GENESIS Wallet Guard is the broader roadmap vision: automatic protection built into any wallet or browser, not just MetaMask  -  Snap is the first concrete step toward it. See /products for the full picture.",
+          q: "What's the difference between GENESIS Check, the GENESIS Extension, and Wallet Guard?",
+          a: "GENESIS Check is the free web tool at /check  -  paste anything, no install. The GENESIS Extension is a browser extension that pops up the same verdict right before you sign, works with any wallet (live today, see /extension). GENESIS Wallet Guard is the broader roadmap vision: automatic protection built into any wallet or browser  -  the Extension is the first concrete step toward it. See /products for the full picture.",
         },
         {
           q: "Is GENESIS the only thing sadhutech makes?",

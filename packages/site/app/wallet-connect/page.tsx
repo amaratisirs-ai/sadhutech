@@ -403,8 +403,8 @@ export default function WalletConnect() {
         </div>
         <div className="flex flex-wrap gap-3">
 
-          <a href="/snap-install" className="px-4 py-2 rounded-lg bg-slate-800 text-slate-100 border border-slate-600 hover:border-teal-400 transition text-sm font-semibold">
-            MetaMask Snap →
+          <a href="/extension" className="px-4 py-2 rounded-lg bg-slate-800 text-slate-100 border border-slate-600 hover:border-teal-400 transition text-sm font-semibold">
+            Browser Extension →
           </a>
           <a href="/transaction-check" className="px-4 py-2 rounded-lg bg-slate-800 text-slate-100 border border-slate-600 hover:border-teal-400 transition text-sm font-semibold">
             Transaction Check →
