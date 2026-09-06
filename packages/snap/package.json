@@ -35,6 +35,6 @@
     "@metamask/snaps-sdk": "^6.17.1"
   },
   "devDependencies": {
-    "@metamask/snaps-cli": "^6.5.4"
+    "@metamask/snaps-cli": "^8.1.0"
   }
 }
