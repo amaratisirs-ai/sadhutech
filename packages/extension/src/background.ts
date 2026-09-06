@@ -13,6 +13,18 @@ function parseChainId(hex: unknown): number {
   return Number.isFinite(n) && n > 0 ? n : 1;
 }
 
+// Our wrapped provider.request() awaits this before ever forwarding to the real wallet - if the
+// gate is slow (e.g. a cold-started free-tier instance), the dapp's own UI can give up waiting
+// on the wallet and show a false "approval failed" even though nothing actually failed. Capping
+// the wait keeps GENESIS from ever being the reason a legitimate transaction looks broken.
+const GATE_TIMEOUT_MS = 5_000;
+
+function fetchWithTimeout(url: string, init: RequestInit): Promise<Response> {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), GATE_TIMEOUT_MS);
+  return fetch(url, { ...init, signal: controller.signal }).finally(() => clearTimeout(timer));
+}
+
 /** Reads the cached Deep Check credential, if the feature is on and the signature is still fresh. */
 async function getActiveProAuth(): Promise<ProAuth | null> {
   const stored = await chrome.storage.local.get(["deepCheckEnabled", "genesisProAuth"]);
@@ -28,7 +40,7 @@ async function analyze(request: AnalyzeRequestMessage): Promise<Omit<AnalyzeResp
       const tx = request.params[0] as Record<string, unknown> | undefined;
       if (!tx?.to || !tx?.from) throw new Error("Malformed transaction request");
       const proAuth = await getActiveProAuth();
-      const res = await fetch(`${GATE_URL}/v1/analyze`, {
+      const res = await fetchWithTimeout(`${GATE_URL}/v1/analyze`, {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({
@@ -59,7 +71,7 @@ async function analyze(request: AnalyzeRequestMessage): Promise<Omit<AnalyzeResp
     const data = (isTyped ? request.params[1] : request.params[0]) as string | undefined;
     if (!from || !data) throw new Error("Malformed signature request");
 
-    const res = await fetch(`${GATE_URL}/v1/analyze-signature`, {
+    const res = await fetchWithTimeout(`${GATE_URL}/v1/analyze-signature`, {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({
