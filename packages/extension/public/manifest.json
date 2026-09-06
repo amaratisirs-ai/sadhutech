@@ -27,7 +27,7 @@
     }
   ],
   "externally_connectable": {
-    "matches": ["https://sadhutech.com/*", "http://localhost:3000/*"]
+    "matches": ["https://sadhutech.com/*", "https://sadhutech-site.vercel.app/*", "http://localhost:3000/*"]
   },
   "permissions": ["storage", "activeTab"],
   "host_permissions": ["https://genesis-gate.onrender.com/*"]

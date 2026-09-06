@@ -84,7 +84,7 @@ chrome.runtime.onMessage.addListener((request: AnalyzeRequestMessage, _sender, s
 // picker, correct signing origin - see manifest.json's "externally_connectable" and
 // packages/extension/README.md) hands the signed credential to the extension this way,
 // rather than trying to sign from within the transient toolbar popup.
-const ALLOWED_CONNECT_ORIGINS = ["https://sadhutech.com", "http://localhost:3000"];
+const ALLOWED_CONNECT_ORIGINS = ["https://sadhutech.com", "https://sadhutech-site.vercel.app", "http://localhost:3000"];
 chrome.runtime.onMessageExternal.addListener((message: Record<string, unknown>, sender, sendResponse) => {
   if (message?.type !== "genesis-connect-result" || !ALLOWED_CONNECT_ORIGINS.includes(sender.origin ?? "")) return;
   const { address, authMessage, signature } = message as { address?: string; authMessage?: string; signature?: string };

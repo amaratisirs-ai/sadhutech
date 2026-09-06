@@ -19,7 +19,7 @@ const WALLET_SIGN_TIMEOUT_MS = 60_000;
 export class WalletTimeoutError extends Error {}
 
 // Guards against wallets that never resolve/reject a signature prompt (e.g. dismissed silently).
-function withTimeout<T>(promise: Promise<T>, ms: number, message: string): Promise<T> {
+export function withTimeout<T>(promise: Promise<T>, ms: number, message: string): Promise<T> {
   return new Promise((resolve, reject) => {
     const timer = setTimeout(() => reject(new WalletTimeoutError(message)), ms);
     promise.then(

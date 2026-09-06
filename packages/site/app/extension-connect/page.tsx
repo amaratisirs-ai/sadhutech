@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useWallet } from "@/src/wallet/useWallet";
-import { useProAuth, WalletTimeoutError } from "@/src/wallet/useProAuth";
+import { useProAuth, WalletTimeoutError, withTimeout } from "@/src/wallet/useProAuth";
 import { friendlyWalletError } from "@/src/wallet/errors";
 import { Icon } from "@/components/Icon";
 import { Genesis } from "@/components/Genesis";
@@ -39,18 +39,25 @@ export default function ExtensionConnectPage() {
         if (!runtime?.sendMessage) {
           throw new Error("This only works in Chrome with the GENESIS extension installed.");
         }
-        await new Promise<void>((resolve, reject) => {
-          runtime.sendMessage(
-            EXTENSION_ID,
-            { type: "genesis-connect-result", address: auth.address, authMessage: auth.message, signature: auth.signature },
-            (response) => {
-              const err = (globalThis as any).chrome?.runtime?.lastError;
-              if (err) reject(new Error("Couldn't reach the GENESIS extension. Is it installed and enabled?"));
-              else if (!(response as { ok?: boolean } | undefined)?.ok) reject(new Error("The extension rejected the connection. Try again."));
-              else resolve();
-            }
-          );
-        });
+        // A mismatched extension ID or an origin missing from manifest.json's
+        // "externally_connectable" can leave the callback never firing at all rather than
+        // erroring - a timeout guarantees this never spins forever.
+        await withTimeout(
+          new Promise<void>((resolve, reject) => {
+            runtime.sendMessage(
+              EXTENSION_ID,
+              { type: "genesis-connect-result", address: auth.address, authMessage: auth.message, signature: auth.signature },
+              (response) => {
+                const err = (globalThis as any).chrome?.runtime?.lastError;
+                if (err) reject(new Error("Couldn't reach the GENESIS extension. Is it installed and enabled?"));
+                else if (!(response as { ok?: boolean } | undefined)?.ok) reject(new Error("The extension rejected the connection. Try again."));
+                else resolve();
+              }
+            );
+          }),
+          10_000,
+          "Couldn't reach the GENESIS extension. Make sure it's installed and enabled, then try again."
+        );
         if (cancelled) return;
         setState("done");
         setTimeout(() => window.close(), 1500);
