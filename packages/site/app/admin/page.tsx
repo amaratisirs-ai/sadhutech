@@ -149,9 +149,14 @@ export default function AdminPage() {
         <div>
           <h1 className="text-3xl font-black text-white">Admin · 360° view</h1>
           <p className="text-sm text-slate-400 mt-1">Logins, traffic, transaction checks, errors, and Pro/credit activity.</p>
-          <a href="/admin/architecture" className="inline-block mt-2 text-xs font-bold text-teal-300 hover:text-teal-100">
-            View architecture &amp; design docs →
-          </a>
+          <div className="flex flex-wrap gap-x-4 gap-y-1 mt-2">
+            <a href="/admin/architecture" className="text-xs font-bold text-teal-300 hover:text-teal-100">
+              View architecture &amp; design docs →
+            </a>
+            <a href="/admin/todos" className="text-xs font-bold text-teal-300 hover:text-teal-100">
+              View build &amp; roadmap tracker →
+            </a>
+          </div>
         </div>
         <div className="flex items-center gap-2">
           {RANGE_OPTIONS.map((opt) => (

@@ -268,6 +268,9 @@ export default function AdminArchitecturePage() {
         <p className="text-sm text-slate-400 mt-1">
           How GENESIS is built today, how it maps to the nature-inspired vision, and what's left to build. Internal only - not for customer-facing use.
         </p>
+        <a href="/admin/todos" className="inline-block mt-2 text-xs font-bold text-teal-300 hover:text-teal-100">
+          Track this roadmap →
+        </a>
       </div>
 
       <Section title="System architecture (vision layers)">

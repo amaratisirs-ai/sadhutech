@@ -6,7 +6,6 @@ try {
 }
 import { isAddress, recoverMessageAddress } from "viem";
 import type { Address, AnalyzeRequest, AnalyzeSignatureRequest, ReportRequest } from "@genesis/shared";
-import { ADMIN_WALLETS } from "@genesis/shared";
 import { analyze, analyzeSignature } from "./analyze.js";
 import { createIntelAsync } from "./index.js";
 import { TESTER_HTML } from "./ui.js";
@@ -16,6 +15,8 @@ import { ContributorsService } from "./contributors.js";
 import { ProAccessService } from "./pro-access.js";
 import { AuditLogService, getClientIp, lookupGeoIp } from "./audit-log.js";
 import { AnalyticsService, type AnalyticsEventType } from "./analytics.js";
+import { AdminTodosService } from "./admin-todos.js";
+import { verifyAdminAuth } from "./admin-auth.js";
 import { premiumAvailable, lookupChainAbuse } from "./chainabuse-lookup.js";
 import { NewsletterService, initNewsletterService } from "./newsletter.js";
 import {
@@ -47,6 +48,8 @@ let proAccessService: ProAccessService | null = null;
 let auditLogService: AuditLogService | null = null;
 // Analytics service (logins, page views, transaction checks, errors; initialized during startup)
 let analyticsService: AnalyticsService | null = null;
+// Admin build/roadmap tracker (initialized during startup)
+let adminTodosService: AdminTodosService | null = null;
 // Newsletter/journey service (email subscribers + templated sends; initialized during startup)
 let newsletterService: NewsletterService | null = null;
 
@@ -471,41 +474,96 @@ app.post<{ Body: { wallet?: string; message?: string; signature?: string; hours?
   "/v1/admin/analytics",
   { onRequest: createRateLimitMiddleware(rateLimiter) },
   async (request, reply) => {
-    const { wallet, message, signature, hours } = request.body ?? {};
-    if (!wallet || !isAddress(wallet) || !message || !signature) {
-      return reply.status(400).send({ error: "Signed admin request required." });
-    }
-    if (!ADMIN_WALLETS.has(wallet.toLowerCase())) {
-      return reply.status(403).send({ error: "Not an admin wallet." });
-    }
-    let signer: string;
-    try {
-      signer = await recoverMessageAddress({ message, signature: signature as `0x${string}` });
-    } catch {
-      return reply.status(401).send({ error: "Bad signature." });
-    }
-    const tsMatch = /ts:\s*(\S+)/.exec(message);
-    const timestamp = tsMatch?.[1];
-    // Tighter than Pro's 24h window - this endpoint exposes aggregate usage data.
-    const freshnessWindowMs = 60 * 60 * 1000;
-    const fresh = timestamp ? Math.abs(Date.now() - Date.parse(timestamp)) < freshnessWindowMs : false;
-    if (
-      signer.toLowerCase() !== wallet.toLowerCase() ||
-      !fresh ||
-      !message.toLowerCase().includes(wallet.toLowerCase()) ||
-      !message.toLowerCase().includes("admin")
-    ) {
-      return reply.status(401).send({ error: "Invalid or expired signature." });
+    const auth = await verifyAdminAuth(request.body);
+    if (!auth.ok) {
+      return reply.status(auth.status).send({ error: auth.error });
     }
     if (!analyticsService) {
       return reply.status(503).send({ error: "Analytics unavailable (requires PostgreSQL)." });
     }
     try {
-      const capped = Math.min(Number(hours) || 24 * 7, 24 * 90);
+      const capped = Math.min(Number(request.body?.hours) || 24 * 7, 24 * 90);
       return await analyticsService.getSummary(capped);
     } catch (err) {
       request.log.error(err);
       return reply.status(500).send({ error: "Failed to load analytics." });
+    }
+  }
+);
+
+// ============================================================================
+// Admin build/roadmap tracker (todo list shown on /admin/todos)
+// ============================================================================
+app.post<{ Body: { wallet?: string; message?: string; signature?: string } }>(
+  "/v1/admin/todos/list",
+  { onRequest: createRateLimitMiddleware(rateLimiter) },
+  async (request, reply) => {
+    const auth = await verifyAdminAuth(request.body);
+    if (!auth.ok) return reply.status(auth.status).send({ error: auth.error });
+    if (!adminTodosService) return reply.status(503).send({ error: "Todos unavailable (requires PostgreSQL)." });
+    try {
+      return await adminTodosService.list();
+    } catch (err) {
+      request.log.error(err);
+      return reply.status(500).send({ error: "Failed to load todos." });
+    }
+  }
+);
+
+app.post<{
+  Body: { wallet?: string; message?: string; signature?: string; title?: string; description?: string; category?: string; effort?: string; estimateHours?: string };
+}>("/v1/admin/todos/create", { onRequest: createRateLimitMiddleware(rateLimiter) }, async (request, reply) => {
+  const auth = await verifyAdminAuth(request.body);
+  if (!auth.ok) return reply.status(auth.status).send({ error: auth.error });
+  if (!adminTodosService) return reply.status(503).send({ error: "Todos unavailable (requires PostgreSQL)." });
+  const { title, description, category, effort, estimateHours } = request.body ?? {};
+  if (!title || !title.trim()) return reply.status(400).send({ error: "A title is required." });
+  try {
+    return await adminTodosService.create({ title: title.trim(), description, category, effort, estimateHours });
+  } catch (err) {
+    request.log.error(err);
+    return reply.status(500).send({ error: "Failed to create todo." });
+  }
+});
+
+app.post<{ Body: { wallet?: string; message?: string; signature?: string; id?: number; status?: string } }>(
+  "/v1/admin/todos/status",
+  { onRequest: createRateLimitMiddleware(rateLimiter) },
+  async (request, reply) => {
+    const auth = await verifyAdminAuth(request.body);
+    if (!auth.ok) return reply.status(auth.status).send({ error: auth.error });
+    if (!adminTodosService) return reply.status(503).send({ error: "Todos unavailable (requires PostgreSQL)." });
+    const { id, status } = request.body ?? {};
+    const validStatuses = new Set(["not-started", "in-progress", "done", "blocked"]);
+    if (typeof id !== "number" || !status || !validStatuses.has(status)) {
+      return reply.status(400).send({ error: "A valid id and status are required." });
+    }
+    try {
+      const updated = await adminTodosService.updateStatus(id, status as "not-started" | "in-progress" | "done" | "blocked");
+      if (!updated) return reply.status(404).send({ error: "Todo not found." });
+      return updated;
+    } catch (err) {
+      request.log.error(err);
+      return reply.status(500).send({ error: "Failed to update todo." });
+    }
+  }
+);
+
+app.post<{ Body: { wallet?: string; message?: string; signature?: string; id?: number } }>(
+  "/v1/admin/todos/delete",
+  { onRequest: createRateLimitMiddleware(rateLimiter) },
+  async (request, reply) => {
+    const auth = await verifyAdminAuth(request.body);
+    if (!auth.ok) return reply.status(auth.status).send({ error: auth.error });
+    if (!adminTodosService) return reply.status(503).send({ error: "Todos unavailable (requires PostgreSQL)." });
+    const { id } = request.body ?? {};
+    if (typeof id !== "number") return reply.status(400).send({ error: "A valid id is required." });
+    try {
+      await adminTodosService.remove(id);
+      return { ok: true };
+    } catch (err) {
+      request.log.error(err);
+      return reply.status(500).send({ error: "Failed to delete todo." });
     }
   }
 );
@@ -935,6 +993,8 @@ async function start(): Promise<void> {
         await auditLogService.initialize();
         analyticsService = new AnalyticsService(postgresIntel.pool);
         await analyticsService.initialize();
+        adminTodosService = new AdminTodosService(postgresIntel.pool);
+        await adminTodosService.initialize();
         newsletterService = new NewsletterService(postgresIntel.pool);
         await newsletterService.initialize();
         initNewsletterService(newsletterService, { runOnStartup: true, intervalHours: 1 });
