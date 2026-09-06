@@ -1,5 +1,5 @@
 {
-  "buildCommand": "pnpm --filter @genesis/site build",
+  "buildCommand": "pnpm --filter @genesis/site... build",
   "outputDirectory": ".next",
   "installCommand": "pnpm install --frozen-lockfile"
 }
