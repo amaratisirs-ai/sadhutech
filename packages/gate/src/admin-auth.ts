@@ -30,7 +30,10 @@ export async function verifyAdminAuth(body: AdminAuthBody | undefined): Promise<
   }
   const tsMatch = /ts:\s*(\S+)/.exec(message);
   const timestamp = tsMatch?.[1];
-  const freshnessWindowMs = 60 * 60 * 1000;
+  // Matches the Pro deep-check window - the admin wallet is a single fixed, trusted wallet
+  // (not arbitrary users), so there's no real benefit to a tighter window here, and a short
+  // one just meant re-signing every ~50min while navigating between admin pages.
+  const freshnessWindowMs = 24 * 60 * 60 * 1000;
   const fresh = timestamp ? Math.abs(Date.now() - Date.parse(timestamp)) < freshnessWindowMs : false;
   if (
     signer.toLowerCase() !== wallet.toLowerCase() ||
