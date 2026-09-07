@@ -4,10 +4,23 @@
 import {
   GENESIS_REQUEST_EVENT,
   GENESIS_RESPONSE_EVENT,
+  GENESIS_HANDSHAKE_EVENT,
+  generateChannelSecret,
+  signResponse,
   type AnalyzeRequestMessage,
   type AnalyzeResponseMessage,
+  type HandshakeMessage,
 } from "./messages.js";
 import { showOverlay, showChecking, showCreditNotice } from "./overlay.js";
+
+// Generated and broadcast the instant this script loads - before any page script has had a
+// chance to run (Chrome guarantees "document_start" content scripts execute first) - so
+// inject.ts can verify every response really came from here, not a forged page script.
+// See messages.ts for why this is needed.
+const channelSecret = generateChannelSecret();
+window.dispatchEvent(
+  new CustomEvent<HandshakeMessage>(GENESIS_HANDSHAKE_EVENT, { detail: { type: GENESIS_HANDSHAKE_EVENT, secret: channelSecret } })
+);
 
 window.addEventListener(GENESIS_REQUEST_EVENT, async (event) => {
   const request = (event as CustomEvent<AnalyzeRequestMessage>).detail;
@@ -15,7 +28,7 @@ window.addEventListener(GENESIS_REQUEST_EVENT, async (event) => {
 
   const settings = await chrome.storage.local.get("genesisEnabled");
   if (settings.genesisEnabled === false) {
-    respond({ type: GENESIS_RESPONSE_EVENT, id: request.id, verdict: "allow", plainEnglish: "", proceed: true });
+    await respond({ type: GENESIS_RESPONSE_EVENT, id: request.id, verdict: "allow", plainEnglish: "", proceed: true });
     return;
   }
 
@@ -27,14 +40,14 @@ window.addEventListener(GENESIS_REQUEST_EVENT, async (event) => {
   } catch (err) {
     // Fail open: never block a signature because our own analysis pipeline had an error.
     dismissChecking();
-    respond({ type: GENESIS_RESPONSE_EVENT, id: request.id, verdict: "allow", plainEnglish: "", proceed: true });
+    await respond({ type: GENESIS_RESPONSE_EVENT, id: request.id, verdict: "allow", plainEnglish: "", proceed: true });
     return;
   }
 
   if (analysis.verdict === "allow") {
     dismissChecking();
     if (typeof analysis.creditsLeft === "number") showCreditNotice(analysis.creditsLeft);
-    respond({
+    await respond({
       type: GENESIS_RESPONSE_EVENT,
       id: request.id,
       verdict: "allow",
@@ -51,9 +64,11 @@ window.addEventListener(GENESIS_REQUEST_EVENT, async (event) => {
       ? `${analysis.plainEnglish}\n\n(1 Deep Check credit used, ${analysis.creditsLeft} remaining.)`
       : analysis.plainEnglish;
   const proceed = await showOverlay(analysis.verdict, plainEnglish);
-  respond({ type: GENESIS_RESPONSE_EVENT, id: request.id, verdict: analysis.verdict, plainEnglish, proceed, creditsLeft: analysis.creditsLeft });
+  await respond({ type: GENESIS_RESPONSE_EVENT, id: request.id, verdict: analysis.verdict, plainEnglish, proceed, creditsLeft: analysis.creditsLeft });
 });
 
-function respond(message: AnalyzeResponseMessage): void {
-  window.dispatchEvent(new CustomEvent(GENESIS_RESPONSE_EVENT, { detail: message }));
+async function respond(message: Omit<AnalyzeResponseMessage, "sig">): Promise<void> {
+  const sig = await signResponse(channelSecret, message);
+  window.dispatchEvent(new CustomEvent(GENESIS_RESPONSE_EVENT, { detail: { ...message, sig } }));
 }
+

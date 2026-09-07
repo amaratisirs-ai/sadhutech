@@ -5,8 +5,11 @@
 import {
   GENESIS_REQUEST_EVENT,
   GENESIS_RESPONSE_EVENT,
+  GENESIS_HANDSHAKE_EVENT,
+  verifyResponse,
   type AnalyzeRequestMessage,
   type AnalyzeResponseMessage,
+  type HandshakeMessage,
   type InterceptedMethod,
 } from "./messages.js";
 
@@ -18,14 +21,32 @@ const INTERCEPTED: ReadonlySet<string> = new Set<InterceptedMethod>([
 
 let nextId = 0;
 
+// Received once, the instant content-script.ts loads (before any page script can run) - see
+// messages.ts. Used to reject forged "allow" responses a malicious page dispatches itself.
+let channelSecret = "";
+window.addEventListener(
+  GENESIS_HANDSHAKE_EVENT,
+  (event) => {
+    channelSecret = (event as CustomEvent<HandshakeMessage>).detail?.secret ?? "";
+  },
+  { once: true }
+);
+
 function askGenesis(method: InterceptedMethod, params: unknown[]): Promise<AnalyzeResponseMessage> {
   const id = `genesis-${Date.now()}-${nextId++}`;
   return new Promise((resolve) => {
     const onResponse = (event: Event) => {
       const detail = (event as CustomEvent<AnalyzeResponseMessage>).detail;
       if (detail?.id !== id) return;
-      window.removeEventListener(GENESIS_RESPONSE_EVENT, onResponse);
-      resolve(detail);
+      void (async () => {
+        // Ignore anything that doesn't verify - a malicious page could dispatch a forged
+        // "proceed: true" event with a matching id to race past the real content-script
+        // response, which only arrives after a real gate round-trip. Keep waiting instead
+        // of resolving on the first (possibly fake) match.
+        if (!(await verifyResponse(channelSecret, detail))) return;
+        window.removeEventListener(GENESIS_RESPONSE_EVENT, onResponse);
+        resolve(detail);
+      })();
     };
     window.addEventListener(GENESIS_RESPONSE_EVENT, onResponse);
     const message: AnalyzeRequestMessage = {
@@ -38,6 +59,7 @@ function askGenesis(method: InterceptedMethod, params: unknown[]): Promise<Analy
     window.dispatchEvent(new CustomEvent(GENESIS_REQUEST_EVENT, { detail: message }));
   });
 }
+
 
 function wrapProvider(provider: any): void {
   if (!provider || provider.__genesisWrapped) return;
