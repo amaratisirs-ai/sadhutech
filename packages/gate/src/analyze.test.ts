@@ -117,4 +117,12 @@ describe("Chakravyuha pre-sign gate", () => {
     const result = await analyze({ tx: tx({ to: TOKEN, data }) }, createIntel());
     expect(result.findings.map((f) => f.id)).toContain("call.multicall");
   });
+
+  // GOPLUS_APP_KEY/SECRET aren't set in tests, so lookupPhishingSite() short-circuits to
+  // null - this just guards the origin-checking code path itself never throws/breaks a check.
+  it("accepts an optional tx.origin without breaking the check", async () => {
+    const data = encodeFunctionData({ abi: ABI, functionName: "transfer", args: [RECIPIENT, 1000n] });
+    const result = await analyze({ tx: tx({ to: TOKEN, data, origin: "https://example.com" }) }, createIntel());
+    expect(result.verdict).toBe("allow");
+  });
 });

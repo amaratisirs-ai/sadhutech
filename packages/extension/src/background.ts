@@ -50,6 +50,7 @@ async function analyze(request: AnalyzeRequestMessage): Promise<Omit<AnalyzeResp
             to: tx.to,
             value: typeof tx.value === "string" ? tx.value : "0",
             data: tx.data ?? "0x",
+            origin: request.origin,
           },
           ...(proAuth && {
             pro: { wallet: proAuth.address, message: proAuth.message, signature: proAuth.signature, source: "extension" },

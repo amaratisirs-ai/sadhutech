@@ -19,6 +19,8 @@ export interface TxRequest {
   value?: string;
   /** Calldata, 0x-prefixed. "0x" for a plain native transfer. */
   data?: `0x${string}`;
+  /** Origin of the site requesting the transaction, when the client exposes it (e.g. the browser extension's window.location.origin). Enables the same GoPlus phishing-site check already applied to signature requests. */
+  origin?: string;
 }
 
 export type Severity = "info" | "low" | "medium" | "high" | "critical";

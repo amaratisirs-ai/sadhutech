@@ -26,7 +26,26 @@ export async function analyze(
   auditLog?: AuditLogService
 ): Promise<RiskAssessment> {
   const simulation = await decodeTransaction(req.tx);
-  return finalize(simulation, intel, req.tx.chainId, [], auditLog);
+
+  // Same phishing-site check already applied to signature requests below - a drainer site
+  // shouldn't get a pass just because it asked for a plain transaction instead of a signature.
+  const extraFindings: RiskFinding[] = [];
+  if (req.tx.origin) {
+    const phishing = await lookupPhishingSite(req.tx.origin, (reason) =>
+      void auditLog?.logIntegrationFailure("goplus-phishing", reason)
+    );
+    if (phishing?.flagged) {
+      extraFindings.push({
+        id: "goplus.phishing-site",
+        severity: "critical",
+        title: "This site is a known phishing site",
+        description: `${req.tx.origin} is flagged by GoPlus Security as a phishing site. Do not sign anything here.`,
+      });
+      void auditLog?.logSecurityEvent("goplus.phishing-site", req.tx.origin, "critical", {});
+    }
+  }
+
+  return finalize(simulation, intel, req.tx.chainId, extraFindings, auditLog);
 }
 
 /**
