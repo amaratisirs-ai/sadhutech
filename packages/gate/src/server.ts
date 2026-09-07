@@ -18,7 +18,8 @@ import { AnalyticsService, type AnalyticsEventType } from "./analytics.js";
 import { AdminTodosService } from "./admin-todos.js";
 import { verifyAdminAuth } from "./admin-auth.js";
 import { premiumAvailable, lookupChainAbuse } from "./chainabuse-lookup.js";
-import { NewsletterService, initNewsletterService } from "./newsletter.js";
+import { goplusAvailable } from "./goplus-lookup.js";
+import { NewsletterService, initNewsletterService, resendConfigured } from "./newsletter.js";
 import {
   loadApiKeys,
   createApiKeyMiddleware,
@@ -91,7 +92,17 @@ app.get("/", async (_req, reply) => {
   return TESTER_HTML;
 });
 
-app.get("/health", async () => ({ status: "ok", service: "genesis-gate" }));
+app.get("/health", async () => ({
+  status: "ok",
+  service: "genesis-gate",
+  // Boolean-only (never the keys themselves) - lets us verify which optional integrations
+  // are actually configured on a given deployment without needing dashboard access.
+  integrations: {
+    goplus: goplusAvailable(),
+    chainabuse: premiumAvailable(),
+    resend: resendConfigured(),
+  },
+}));
 
 // ============================================================================
 // POST /v1/analyze - Analyze transaction before signing

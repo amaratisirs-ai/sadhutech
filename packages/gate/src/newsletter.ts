@@ -7,6 +7,11 @@ const RESEND_API_KEY = process.env.RESEND_API_KEY || process.env.RESENT_API_KEY 
 const FROM = process.env.NEWSLETTER_FROM_EMAIL || "GENESIS <noreply@sadhutech.com>";
 const SITE_URL = process.env.SITE_URL || "https://sadhutech.com";
 
+/** Boolean-only (never the key itself) so /health can report whether sending is configured. */
+export function resendConfigured(): boolean {
+  return !!RESEND_API_KEY;
+}
+
 export interface SubscribeResult {
   ok: boolean;
   alreadySubscribed?: boolean;
