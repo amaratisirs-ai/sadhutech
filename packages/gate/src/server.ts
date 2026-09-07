@@ -971,32 +971,44 @@ async function start(): Promise<void> {
     // Pre-warm threat feeds/intel before listening.
     const intel = await createIntelAsync();
 
+    // Listen first - every deploy restarts this process, and health checks (Render's own,
+    // plus the site's gate-status badge) shouldn't have to wait behind ~7 sequential DB
+    // initialize() calls below. Endpoints that need those services already fail soft with
+    // a 503 ("unavailable (requires PostgreSQL)") until they finish, same as the existing
+    // no-Postgres case - a much better failure mode than the whole server not responding.
+    const port = Number(process.env.PORT ?? 8787);
+    await app.listen({ port, host: "0.0.0.0" });
+    app.log.info(`GENESIS gate listening on :${port} with loaded threat intel`);
+
     // If using PostgreSQL, sync external threats in background + initialize contributors service
     if (intel instanceof (await import("./intel-postgres.js")).ThreatIntelPostgres) {
       const postgresIntel = intel as ThreatIntelPostgres;
-      
+
       // Start sync service: run now, then every 6 hours
       initSyncService(postgresIntel, { runOnStartup: true, intervalHours: 6 }).catch((err) => {
         console.error("[startup] Sync service failed:", err);
         // Don't crash, just log - firewall can still work with stale data
       });
-      
+
       // Initialize contributors service for leaderboard & gamification
       try {
-        // Ensure threat_intel exists first (ledger references it), then contributor tables.
+        // Ensure threat_intel exists first (ledger references it), then everything else -
+        // those are independent standalone tables, safe to create in parallel.
         await postgresIntel.initialize();
         contributorsService = new ContributorsService(postgresIntel.pool);
-        await contributorsService.initialize();
         proAccessService = new ProAccessService(postgresIntel.pool);
-        await proAccessService.initialize();
         auditLogService = new AuditLogService(postgresIntel.pool);
-        await auditLogService.initialize();
         analyticsService = new AnalyticsService(postgresIntel.pool);
-        await analyticsService.initialize();
         adminTodosService = new AdminTodosService(postgresIntel.pool);
-        await adminTodosService.initialize();
         newsletterService = new NewsletterService(postgresIntel.pool);
-        await newsletterService.initialize();
+        await Promise.all([
+          contributorsService.initialize(),
+          proAccessService.initialize(),
+          auditLogService.initialize(),
+          analyticsService.initialize(),
+          adminTodosService.initialize(),
+          newsletterService.initialize(),
+        ]);
         initNewsletterService(newsletterService, { runOnStartup: true, intervalHours: 1 });
         console.log("[startup] Contributors service initialized");
       } catch (err) {
@@ -1004,10 +1016,6 @@ async function start(): Promise<void> {
         // Don't crash, just warn - reporting still works without gamification
       }
     }
-
-    const port = Number(process.env.PORT ?? 8787);
-    await app.listen({ port, host: "0.0.0.0" });
-    app.log.info(`GENESIS gate listening on :${port} with loaded threat intel`);
   } catch (err) {
     app.log.error(err);
     process.exit(1);
