@@ -1,33 +1,32 @@
 import { describe, it, expect, vi } from "vitest";
-import { AdminTodosService } from "./admin-todos.js";
+import { AdminTodosService, SEED_TODOS } from "./admin-todos.js";
 
 function fakePool(queryImpl?: (...args: unknown[]) => unknown) {
   return { query: vi.fn(queryImpl ?? (async () => ({ rows: [] }))) } as any;
 }
 
 describe("AdminTodosService", () => {
-  it("initialize() creates the table and seeds it when empty", async () => {
+  it("initialize() creates the table and seeds every curated item when none exist yet", async () => {
     const queries: string[] = [];
     const pool = fakePool((...args: unknown[]) => {
       const sql = args[0] as string;
       queries.push(sql);
-      if (sql.includes("SELECT COUNT(*)")) return { rows: [{ count: "0" }] };
+      if (sql.includes("SELECT 1 FROM admin_todos WHERE title")) return { rows: [] }; // no existing row for any title
       if (sql.includes("INSERT INTO admin_todos")) return { rows: [{ id: 1, title: "x", description: null, category: null, status: "not-started", effort: null, estimate_hours: null, sort_order: 0, created_at: "now", updated_at: "now" }] };
       return { rows: [] };
     });
     const svc = new AdminTodosService(pool);
     await svc.initialize();
     const inserts = queries.filter((q) => q.includes("INSERT INTO admin_todos"));
-    expect(inserts.length).toBe(5); // one per seed todo
+    expect(inserts.length).toBe(SEED_TODOS.length); // one per seed todo
   });
 
-  it("initialize() does not reseed when the table already has rows", async () => {
+  it("initialize() skips seed items that already exist by title", async () => {
     const queries: string[] = [];
     const pool = fakePool((...args: unknown[]) => {
       const sql = args[0] as string;
       queries.push(sql);
-      if (sql.includes("SELECT COUNT(*)")) return { rows: [{ count: "3" }] };
-      return { rows: [] };
+      if (sql.includes("SELECT 1 FROM admin_todos WHERE title")) return { rows: [{ "?column?": 1 }] }; // every title already exists
     });
     const svc = new AdminTodosService(pool);
     await svc.initialize();

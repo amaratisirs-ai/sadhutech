@@ -28,9 +28,10 @@ export interface CreateTodoInput {
   estimateHours?: string;
 }
 
-// Seeded once (only if the table is empty) so the multi-chain decoder plugin plan
-// discussed on /admin/architecture shows up here immediately instead of an empty list.
-const SEED_TODOS: CreateTodoInput[] = [
+// Curated seed items - added incrementally (see initialize(): inserted if no existing row
+// has the same title, so re-running after adding new entries here doesn't touch rows the
+// admin has already updated/created through the UI). Exported for test use only.
+export const SEED_TODOS: CreateTodoInput[] = [
   {
     title: "Plugin scaffolding (chain-family router + common contract)",
     description: "Add chainFamily to shared types; wrap today's EVM decode.ts as the first plugin behind a router. No behavior change.",
@@ -65,6 +66,41 @@ const SEED_TODOS: CreateTodoInput[] = [
     category: "Multi-chain decoder plugins",
     effort: "High",
     estimateHours: "8-20+ hrs per vendor",
+  },
+  {
+    title: "GoPlus Approval Security API integration",
+    description: "GoPlus's own dedicated 'detect risks of token approvals' endpoint - we currently only detect approvals via our own calldata heuristics and never cross-check the spender against this API. Most directly relevant unused GoPlus endpoint given our exact use case.",
+    category: "GoPlus / threat-intel depth",
+    effort: "Medium",
+    estimateHours: "4-6 hrs",
+  },
+  {
+    title: "GoPlus Token Security API integration",
+    description: "Checks the TOKEN CONTRACT's own risk (honeypot, hidden owner, mint/tax functions) - today we only check the spender/counterparty address's reputation, not the token contract itself.",
+    category: "GoPlus / threat-intel depth",
+    effort: "Medium",
+    estimateHours: "3-5 hrs",
+  },
+  {
+    title: "GoPlus NFT Security API integration",
+    description: "Relevant for setApprovalForAll findings (ap.kind === 'erc721-all') - checks the actual NFT collection's own legitimacy, not just the operator address.",
+    category: "GoPlus / threat-intel depth",
+    effort: "Low-Medium",
+    estimateHours: "2-4 hrs",
+  },
+  {
+    title: "Pro Deep Check: layer in GoPlus depth beyond ChainAbuse",
+    description: "Deep Check currently only adds a ChainAbuse lookup on top of the same GoPlus Malicious Address check every free user already gets - no GoPlus-specific extra depth is reserved for paying users. Once Approval/Token Security API integrations above exist, wire them into the Pro path specifically so 'deep' actually means deeper.",
+    category: "GoPlus / threat-intel depth",
+    effort: "Low",
+    estimateHours: "1-2 hrs (after the above)",
+  },
+  {
+    title: "Extend phishing-site origin check to the MetaMask Snap's onTransaction",
+    description: "Same gap as the browser extension had (fixed in 9d1f39b): onTransaction destructures {transaction, chainId}, not transactionOrigin, so Snap users don't get the GoPlus phishing-site check on plain transactions. Intentionally parked - not in scope while focusing on the generic (extension/site) path.",
+    category: "GoPlus / threat-intel depth",
+    effort: "Low",
+    estimateHours: "< 1 hr",
   },
 ];
 
@@ -102,11 +138,12 @@ export class AdminTodosService {
       );
       CREATE INDEX IF NOT EXISTS admin_todos_status_idx ON admin_todos (status);
     `);
-    const { rows } = await this.pool.query("SELECT COUNT(*) AS count FROM admin_todos");
-    if (Number(rows[0]?.count ?? 0) === 0) {
-      for (const [i, seed] of SEED_TODOS.entries()) {
-        await this.create(seed, i);
-      }
+    // Incremental: add any curated seed item whose title doesn't already exist, rather than
+    // only seeding an empty table - lets new curated items show up after a deploy without
+    // touching rows the admin has already updated/created.
+    for (const seed of SEED_TODOS) {
+      const { rows } = await this.pool.query("SELECT 1 FROM admin_todos WHERE title = $1", [seed.title]);
+      if (rows.length === 0) await this.create(seed);
     }
   }
 
