@@ -2,6 +2,7 @@ import { Genesis } from "@/components/Genesis";
 
 export const metadata = {
   title: "Integrations & Partners — GENESIS",
+  description: "Wallets, dApps, and security partners integrating GENESIS's pre-sign transaction firewall.",
 };
 
 function Partner({ name, href }: { name: string; href?: string }) {

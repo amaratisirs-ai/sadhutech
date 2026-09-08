@@ -92,4 +92,32 @@ describe("NewsletterService", () => {
     expect(result).toEqual({ sent: 0, subscribers: 0 });
     expect(pool.query).not.toHaveBeenCalled();
   });
+
+  it("subscribe() sends the welcome email immediately (doesn't wait for the hourly sweep/cron) when Resend is configured", async () => {
+    const originalKey = process.env.RESEND_API_KEY;
+    const originalFetch = global.fetch;
+    process.env.RESEND_API_KEY = "test-key";
+    global.fetch = vi.fn(async () => ({ ok: true, text: async () => "" })) as any;
+    vi.resetModules();
+    try {
+      const { NewsletterService: FreshNewsletterService } = await import("./newsletter.js");
+      const pool = fakePool(async (sql: unknown) => {
+        if (String(sql).includes("SELECT unsubscribe_token")) return { rows: [] };
+        if (String(sql).includes("INSERT INTO email_subscribers")) return { rows: [{ id: 42 }] };
+        return { rows: [] };
+      });
+      const svc = new FreshNewsletterService(pool);
+      await svc.subscribe("new@example.com");
+      expect(global.fetch).toHaveBeenCalledWith(
+        "https://api.resend.com/emails",
+        expect.objectContaining({ method: "POST" })
+      );
+      const sendLogCall = pool.query.mock.calls.find((c: unknown[]) => String(c[0]).includes("INSERT INTO email_sends"));
+      expect(sendLogCall[1]).toEqual([42, "welcome"]);
+    } finally {
+      process.env.RESEND_API_KEY = originalKey;
+      global.fetch = originalFetch;
+      vi.resetModules();
+    }
+  });
 });

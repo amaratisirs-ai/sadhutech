@@ -1,6 +1,12 @@
 import { Icon } from "@/components/Icon";
 import { DeveloperTryIt } from "@/components/DeveloperTryIt";
 import { Genesis } from "@/components/Genesis";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Developers — GENESIS",
+  description: "Integrate GENESIS's /v1/analyze API to screen crypto transactions for drainer patterns and risky approvals before they're signed.",
+};
 
 const requestExample = `{
   "tx": {

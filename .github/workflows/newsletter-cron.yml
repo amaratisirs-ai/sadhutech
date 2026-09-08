@@ -1,0 +1,24 @@
+name: Newsletter cron
+
+# Render's free tier spins down when idle and the in-process hourly timer
+# (initNewsletterService) only runs while the instance happens to be awake -
+# this workflow pings /v1/newsletter/run on a schedule so day-3/14/30 journey
+# steps and the recurring monthly newsletter actually go out reliably.
+on:
+  schedule:
+    - cron: "*/30 * * * *"
+  workflow_dispatch: {}
+
+jobs:
+  run-due-emails:
+    runs-on: ubuntu-latest
+    steps:
+      - name: POST /v1/newsletter/run
+        run: |
+          curl --fail --silent --show-error \
+            -X POST "${GATE_URL}/v1/newsletter/run" \
+            -H "X-API-Key: ${GENESIS_API_KEY}" | tee /tmp/newsletter-run.json
+          echo "" # response is {sent, subscribers} - check here if a run looks unexpectedly large
+        env:
+          GATE_URL: ${{ vars.GENESIS_GATE_URL || 'https://genesis-gate.onrender.com' }}
+          GENESIS_API_KEY: ${{ secrets.GENESIS_API_KEY }}

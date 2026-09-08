@@ -156,6 +156,9 @@ export default function AdminPage() {
             <a href="/admin/todos" className="text-xs font-bold text-teal-300 hover:text-teal-100">
               View build &amp; roadmap tracker →
             </a>
+            <a href="https://vercel.com/dashboard" target="_blank" rel="noopener noreferrer" className="text-xs font-bold text-teal-300 hover:text-teal-100">
+              Open Vercel dashboard (traffic analytics) →
+            </a>
           </div>
         </div>
         <div className="flex items-center gap-2">

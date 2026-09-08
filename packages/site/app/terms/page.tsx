@@ -2,17 +2,12 @@ import { Genesis } from "@/components/Genesis";
 
 export const metadata = {
   title: "Terms of Service — GENESIS",
+  description: "The terms governing use of GENESIS's transaction firewall, browser extension, and MetaMask Snap.",
 };
 
 export default function TermsPage() {
   return (
     <div className="max-w-3xl mx-auto space-y-8 py-8 text-slate-200">
-      <div className="rounded-xl border-2 border-amber-500/40 bg-amber-500/10 p-4 text-sm text-amber-200">
-        <strong>Draft — pending attorney review.</strong> This page describes how <Genesis /> actually works today, in
-        plain language, but it has not yet been reviewed by a lawyer and is not a final, binding legal document.
-        Do not rely on it as legal advice; contact <a href="mailto:security@sadhutech.com" className="underline">security@sadhutech.com</a> with questions.
-      </div>
-
       <header className="space-y-2">
         <h1 className="text-3xl font-black text-white">Terms of Service</h1>
         <p className="text-sm text-slate-400">Last updated: September 2026</p>

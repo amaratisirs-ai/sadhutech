@@ -2,18 +2,12 @@ import { Genesis } from "@/components/Genesis";
 
 export const metadata = {
   title: "Privacy Policy — GENESIS",
+  description: "What GENESIS collects, why, and how to control it — including newsletter subscription and unsubscribe.",
 };
 
 export default function PrivacyPage() {
   return (
     <div className="max-w-3xl mx-auto space-y-8 py-8 text-slate-200">
-      <div className="rounded-xl border-2 border-amber-500/40 bg-amber-500/10 p-4 text-sm text-amber-200">
-        <strong>Draft — pending attorney review.</strong> This page describes what <Genesis /> actually collects and why,
-        in plain language, but it has not yet been reviewed by a lawyer and is not a final, binding legal document.
-        Do not rely on it for GDPR/CCPA compliance sign-off without legal review; contact{" "}
-        <a href="mailto:security@sadhutech.com" className="underline">security@sadhutech.com</a> with questions.
-      </div>
-
       <header className="space-y-2">
         <h1 className="text-3xl font-black text-white">Privacy Policy</h1>
         <p className="text-sm text-slate-400">Last updated: September 2026</p>

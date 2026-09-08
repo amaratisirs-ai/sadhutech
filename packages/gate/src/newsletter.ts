@@ -1,6 +1,6 @@
 import { Pool } from "pg";
 import crypto from "node:crypto";
-import { computeDueSteps } from "./journeys.js";
+import { ONBOARDING_JOURNEY, computeDueSteps } from "./journeys.js";
 import { EMAIL_TEMPLATES } from "./email-templates.js";
 
 const RESEND_API_KEY = process.env.RESEND_API_KEY || process.env.RESENT_API_KEY || "";
@@ -70,11 +70,22 @@ export class NewsletterService {
         return { ok: true, alreadySubscribed: true, unsubscribeToken: existing.rows[0].unsubscribe_token };
       }
       const token = crypto.randomBytes(24).toString("hex");
-      await this.pool.query(
+      const inserted = await this.pool.query(
         `INSERT INTO email_subscribers (email, wallet_address, consent_version, source, unsubscribe_token)
-         VALUES ($1, $2, $3, $4, $5)`,
+         VALUES ($1, $2, $3, $4, $5) RETURNING id`,
         [normalized, opts.walletAddress?.toLowerCase() ?? null, opts.consentVersion ?? null, opts.source ?? null, token]
       );
+      const subscriberId = inserted.rows[0]?.id;
+      // Send the day-0 ("welcome") step immediately rather than waiting for the hourly
+      // sweep or an external cron hitting /v1/newsletter/run — neither is guaranteed to
+      // run soon on Render's free tier, which previously left new subscribers with no
+      // email for an unpredictable (sometimes very long) delay.
+      for (const step of ONBOARDING_JOURNEY.filter((s) => s.delayDays === 0)) {
+        const sent = await this.sendEmail(normalized, step.templateId, token);
+        if (sent && subscriberId) {
+          await this.pool.query("INSERT INTO email_sends (subscriber_id, step_id) VALUES ($1, $2)", [subscriberId, step.id]);
+        }
+      }
       return { ok: true, unsubscribeToken: token };
     } catch (err) {
       console.error("[newsletter] Failed to subscribe:", err instanceof Error ? err.message : String(err));

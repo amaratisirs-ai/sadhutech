@@ -4,6 +4,7 @@ import type { ReactNode } from "react";
 
 export const metadata = {
   title: "Products — sadhutech",
+  description: "GENESIS's transaction firewall products — browser extension, MetaMask Snap, and API — for pre-sign crypto transaction risk checks.",
 };
 
 function ProductCard({
