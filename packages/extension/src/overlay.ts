@@ -40,6 +40,22 @@ export function showCreditNotice(creditsLeft: number): void {
   setTimeout(() => pill.remove(), 3000);
 }
 
+// Brief, auto-dismissing notice shown when a check couldn't actually happen (gate timeout,
+// network error, cold Render free-tier instance, ...) and the request failed open. Without
+// this, a skipped check looked identical to a fast, successful "allow" - the user had no way
+// to tell a screening was silently skipped.
+export function showSkippedCheckNotice(): void {
+  const pill = document.createElement("div");
+  pill.style.cssText = `
+    position: fixed; top: 16px; right: 16px; z-index: 2147483647; padding: 10px 14px;
+    border-radius: 999px; background: #451a03; border: 1px solid #f59e0b; color: #fcd34d;
+    font: 600 12px system-ui, sans-serif; box-shadow: 0 8px 24px rgba(0,0,0,0.35);
+  `;
+  pill.textContent = "⚠ GENESIS check skipped (couldn't reach the gate) — proceeding unscreened";
+  document.documentElement.appendChild(pill);
+  setTimeout(() => pill.remove(), 5000);
+}
+
 export function showOverlay(verdict: Exclude<Verdict, "allow">, plainEnglish: string): Promise<boolean> {
   return new Promise((resolve) => {
     const theme = THEME[verdict];
@@ -48,13 +64,17 @@ export function showOverlay(verdict: Exclude<Verdict, "allow">, plainEnglish: st
       position: fixed; inset: 0; z-index: 2147483647; display: flex; align-items: center;
       justify-content: center; background: rgba(0,0,0,0.75); font-family: system-ui, sans-serif;
     `;
+    // plainEnglish is set via textContent below, not interpolated into innerHTML - the gate
+    // only ever builds it from static text plus truncated addresses/numbers today, but
+    // textContent keeps this safe even if that ever changes (e.g. to include an on-chain
+    // token name/symbol, which malicious contracts sometimes weaponize for exactly this).
     root.innerHTML = `
       <div style="max-width: 420px; width: 90%; background: ${theme.bg}; border: 2px solid ${theme.border};
                   border-radius: 16px; padding: 24px; color: #f1f5f9; box-shadow: 0 20px 60px rgba(0,0,0,0.5);">
         <div style="font-size: 12px; font-weight: 700; letter-spacing: 0.05em; color: ${theme.border}; margin-bottom: 8px;">
           🛡 GENESIS &middot; ${theme.label}
         </div>
-        <p style="font-size: 14px; line-height: 1.5; margin: 0 0 20px;">${plainEnglish}</p>
+        <p id="genesis-message" style="font-size: 14px; line-height: 1.5; margin: 0 0 20px;"></p>
         <div style="display: flex; gap: 10px;">
           <button id="genesis-cancel" style="flex: 1; padding: 10px; border-radius: 8px; border: none;
                   background: #1e293b; color: #f1f5f9; font-weight: 600; cursor: pointer;">Cancel</button>
@@ -63,6 +83,8 @@ export function showOverlay(verdict: Exclude<Verdict, "allow">, plainEnglish: st
         </div>
       </div>
     `;
+    const messageEl = root.querySelector("#genesis-message");
+    if (messageEl) messageEl.textContent = plainEnglish;
     document.documentElement.appendChild(root);
 
     const cleanup = (proceed: boolean) => {

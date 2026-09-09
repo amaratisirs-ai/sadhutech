@@ -50,6 +50,12 @@ export function decodeSignature(req: SignatureRequest): SimulationResult {
     return { approvals, assetChanges, method: "personal_sign", counterparties, heuristic: true };
   }
 
+  // eth_sign signs an arbitrary 32-byte hash directly - there's no structure to decode at
+  // all (unlike EIP-712 typed data), so it's always flagged rather than attempted.
+  if (req.method === "eth_sign") {
+    return { approvals, assetChanges, method: "eth_sign", counterparties, heuristic: true };
+  }
+
   const typedData = parseTypedData(req.data);
   if (!typedData?.primaryType) {
     return { approvals, assetChanges, method: "unknown-typed-data", counterparties, heuristic: true };

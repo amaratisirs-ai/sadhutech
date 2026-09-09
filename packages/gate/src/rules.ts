@@ -179,5 +179,19 @@ export async function evaluate(
     });
   }
 
+  // 6. eth_sign signs an arbitrary hash with no structure at all — it can authorize
+  // almost anything and is deprecated; legitimate sites essentially never use it.
+  if (sim.method === "eth_sign") {
+    findings.push({
+      id: "signature.blind-eth-sign",
+      severity: "medium",
+      title: "Blind signature (eth_sign) requested",
+      description:
+        "eth_sign lets a site get you to sign an arbitrary 32-byte hash, which can " +
+        "authorize almost anything, including moving funds. It's deprecated and " +
+        "most legitimate sites never use it — treat this as a major red flag.",
+    });
+  }
+
   return findings;
 }

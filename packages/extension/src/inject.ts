@@ -16,7 +16,9 @@ import {
 const INTERCEPTED: ReadonlySet<string> = new Set<InterceptedMethod>([
   "eth_sendTransaction",
   "personal_sign",
+  "eth_signTypedData_v3",
   "eth_signTypedData_v4",
+  "eth_sign",
 ]);
 
 let nextId = 0;

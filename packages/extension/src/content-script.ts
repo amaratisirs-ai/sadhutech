@@ -11,7 +11,7 @@ import {
   type AnalyzeResponseMessage,
   type HandshakeMessage,
 } from "./messages.js";
-import { showOverlay, showChecking, showCreditNotice } from "./overlay.js";
+import { showOverlay, showChecking, showCreditNotice, showSkippedCheckNotice } from "./overlay.js";
 
 // Generated and broadcast the instant this script loads - before any page script has had a
 // chance to run (Chrome guarantees "document_start" content scripts execute first) - so
@@ -40,13 +40,15 @@ window.addEventListener(GENESIS_REQUEST_EVENT, async (event) => {
   } catch (err) {
     // Fail open: never block a signature because our own analysis pipeline had an error.
     dismissChecking();
+    showSkippedCheckNotice();
     await respond({ type: GENESIS_RESPONSE_EVENT, id: request.id, verdict: "allow", plainEnglish: "", proceed: true });
     return;
   }
 
   if (analysis.verdict === "allow") {
     dismissChecking();
-    if (typeof analysis.creditsLeft === "number") showCreditNotice(analysis.creditsLeft);
+    if (analysis.error) showSkippedCheckNotice();
+    else if (typeof analysis.creditsLeft === "number") showCreditNotice(analysis.creditsLeft);
     await respond({
       type: GENESIS_RESPONSE_EVENT,
       id: request.id,

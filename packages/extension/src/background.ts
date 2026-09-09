@@ -66,10 +66,14 @@ async function analyze(request: AnalyzeRequestMessage): Promise<Omit<AnalyzeResp
       };
     }
 
-    // personal_sign: params = [message, address]. eth_signTypedData_v4: params = [address, typedData].
-    const isTyped = request.method === "eth_signTypedData_v4";
-    const from = (isTyped ? request.params[0] : request.params[1]) as string | undefined;
-    const data = (isTyped ? request.params[1] : request.params[0]) as string | undefined;
+    // personal_sign: params = [message, address] (data-first). eth_signTypedData_v3/v4 and
+    // eth_sign: params = [address, data] (address-first) - note legacy eth_signTypedData
+    // (v1, not intercepted here) reverses this back to data-first AND uses a non-EIP712
+    // message format, which is why it's deliberately left out rather than guessed at.
+    const ADDRESS_FIRST_METHODS = new Set(["eth_signTypedData_v3", "eth_signTypedData_v4", "eth_sign"]);
+    const isAddressFirst = ADDRESS_FIRST_METHODS.has(request.method);
+    const from = (isAddressFirst ? request.params[0] : request.params[1]) as string | undefined;
+    const data = (isAddressFirst ? request.params[1] : request.params[0]) as string | undefined;
     if (!from || !data) throw new Error("Malformed signature request");
 
     const res = await fetchWithTimeout(`${GATE_URL}/v1/analyze-signature`, {

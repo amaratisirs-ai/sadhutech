@@ -17,9 +17,9 @@ one wallet's plugin API.
    wallet announces that way too - some dapps (Uniswap included) fetch a
    wallet's provider directly via EIP-6963 instead of `window.ethereum`, and
    missing that meant real transactions went completely unscreened.
-2. When a dapp calls `eth_sendTransaction`, `personal_sign`, or
-   `eth_signTypedData_v4`, `inject.ts` pauses the call and asks
-   **`content-script.ts`** (an isolated-world script bridging via
+2. When a dapp calls `eth_sendTransaction`, `personal_sign`,
+   `eth_signTypedData_v3`/`_v4`, or `eth_sign`, `inject.ts` pauses the call and
+   asks **`content-script.ts`** (an isolated-world script bridging via
    `window.dispatchEvent`) to analyze it.
 3. `content-script.ts` forwards the request to **`background.ts`** (the
    service worker - the only context allowed to call the GENESIS gate), which
@@ -111,8 +111,10 @@ working across reloads. If that keypair is ever regenerated, update
 
 ## Known limitations (MVP, not yet production-hardened)
 
-- No real icon assets yet (manifest omits `icons` - Chrome shows a default
-  placeholder). Needs real PNG icons before a Chrome Web Store submission.
-- `personal_sign`/`eth_signTypedData_v4` params are read positionally per the
-  standard EIP-1193 ordering; a small number of older wallets swap the order.
+- `personal_sign`/`eth_signTypedData_v3`/`_v4`/`eth_sign` params are read
+  positionally per the standard EIP-1193 ordering; a small number of older
+  wallets swap the order. Legacy `eth_signTypedData` (v1) is deliberately not
+  intercepted - it reverses that ordering again AND uses a non-EIP-712
+  message format, both of which made it too easy to get wrong for how rarely
+  it's used by modern dapps.
 - Not yet submitted anywhere - dev/unpacked install only.

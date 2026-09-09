@@ -96,8 +96,8 @@ export interface AnalyzeRequest {
 export interface SignatureRequest {
   chainId: ChainId;
   from: Address;
-  method: "personal_sign" | "eth_signTypedData" | "eth_signTypedData_v3" | "eth_signTypedData_v4";
-  /** Raw message for personal_sign; JSON-encoded EIP-712 typed data otherwise. */
+  method: "personal_sign" | "eth_signTypedData" | "eth_signTypedData_v3" | "eth_signTypedData_v4" | "eth_sign";
+  /** Raw message for personal_sign; raw hash for eth_sign; JSON-encoded EIP-712 typed data otherwise. */
   data: string;
   /** Origin of the site requesting the signature, when the wallet exposes it (e.g. Snap's signatureOrigin). */
   origin?: string;

@@ -81,4 +81,10 @@ describe("Chakravyuha pre-sign gate — signature requests", () => {
     const result = await analyzeSignature({ sig: sig("eth_signTypedData_v4", "not json") }, createIntel());
     expect(result.findings.map((f) => f.id)).toContain("signature.unknown-typed-data");
   });
+
+  it("flags eth_sign as a blind signature and warns", async () => {
+    const result = await analyzeSignature({ sig: sig("eth_sign", "0xdeadbeef") }, createIntel());
+    expect(result.findings.map((f) => f.id)).toContain("signature.blind-eth-sign");
+    expect(result.verdict).toBe("warn");
+  });
 });

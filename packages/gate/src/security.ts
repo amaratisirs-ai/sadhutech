@@ -245,7 +245,7 @@ export function validateSignatureRequest(body: unknown): ValidationError[] {
     });
   }
 
-  const validMethods = ["personal_sign", "eth_signTypedData", "eth_signTypedData_v3", "eth_signTypedData_v4"];
+  const validMethods = ["personal_sign", "eth_signTypedData", "eth_signTypedData_v3", "eth_signTypedData_v4", "eth_sign"];
   if (typeof sig.method !== "string" || !validMethods.includes(sig.method)) {
     errors.push({
       field: "sig.method",

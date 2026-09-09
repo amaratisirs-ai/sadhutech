@@ -170,6 +170,10 @@ function explain(
     parts.push("This signs data we couldn't fully decode — verify the site before signing.");
   }
 
+  if (sim.method === "eth_sign") {
+    parts.push("This is a blind signature (eth_sign) — it can authorize almost anything, and its effect can't be shown in advance.");
+  }
+
   if (parts.length === 0) {
     return "No risky permissions or transfers were detected — this looks like a normal transaction.";
   }

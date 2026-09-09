@@ -6,7 +6,7 @@ export const GENESIS_RESPONSE_EVENT = "genesis:analyze-response";
 // and not a forged CustomEvent from the page itself - see signResponse/verifyResponse below.
 export const GENESIS_HANDSHAKE_EVENT = "genesis:handshake";
 
-export type InterceptedMethod = "eth_sendTransaction" | "personal_sign" | "eth_signTypedData_v4";
+export type InterceptedMethod = "eth_sendTransaction" | "personal_sign" | "eth_signTypedData_v3" | "eth_signTypedData_v4" | "eth_sign";
 
 export interface AnalyzeRequestMessage {
   type: typeof GENESIS_REQUEST_EVENT;
