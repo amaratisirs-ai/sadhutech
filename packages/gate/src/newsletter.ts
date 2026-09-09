@@ -120,6 +120,13 @@ export class NewsletterService {
           to,
           subject: template.subject,
           template: { id: template.alias, variables: { UNSUB_URL: unsubscribeUrl } },
+          // RFC 8058 one-click unsubscribe - required by Gmail/Yahoo's bulk-sender rules
+          // (Feb 2024) and generally helps deliverability, though it doesn't guarantee
+          // Gmail's Promotions-tab classifier places mail in Primary instead.
+          headers: {
+            "List-Unsubscribe": `<${unsubscribeUrl}>`,
+            "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
+          },
         }),
       });
       if (!res.ok) {
