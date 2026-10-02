@@ -97,7 +97,7 @@ importers:
         specifier: ^1.16.1
         version: 1.16.1(typescript@5.9.3)(zod@3.25.76)
       fast-xml-parser:
-        specifier: ^5.11.1
+        specifier: ^5.7.0
         version: 5.11.1
       mermaid:
         specifier: ^11.17.2
