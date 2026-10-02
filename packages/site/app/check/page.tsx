@@ -11,6 +11,7 @@ import { DEEP_CHECK_ENABLED } from "@/src/pro-status";
 import { useGateStatus } from "@/src/gate-status";
 import { Genesis, withGenesisStyle } from "@/components/Genesis";
 import { trackEvent } from "@/src/analytics";
+import { isCompletedDeepCheckResponse } from "@/src/deep-check-response";
 
 const GATE_URL = process.env.NEXT_PUBLIC_GATE_URL || "https://genesis-gate.onrender.com";
 const ADDRESS_RE = /^0x[0-9a-fA-F]{40}$/;
@@ -277,11 +278,15 @@ export default function CheckPage() {
       if (!res.ok) {
         const error = await res.json().catch(() => ({}));
         setDeepMsg(error.code === "DEEP_CHECK_UNAVAILABLE"
-          ? "A third-party threat database could not complete the lookup. No credit was used; please try again later."
+          ? "Deep check is not available on this Gate instance. No credit was used; please try again later."
           : `Deep check failed (HTTP ${res.status}). Please try again.`);
         return;
       }
       const data = await res.json();
+      if (!isCompletedDeepCheckResponse(data)) {
+        setDeepMsg("Deep check was not completed by the Gate. No credit was used; please try again later.");
+        return;
+      }
       const outcome = resolveDecisionOutcome(data);
       const addressSummary = mode === "address" ? addressCheckResult(data) : null;
       const deepResult: Result = {

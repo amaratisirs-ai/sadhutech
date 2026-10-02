@@ -137,7 +137,13 @@ app.post<{ Body: AnalyzeRequest }>("/v1/analyze",
       let result: Awaited<ReturnType<typeof analyze>>;
       let deepCheckCached = false;
 
-      if (proReq && goplusAvailable() && proAccessService) {
+      if (proReq) {
+        if (!goplusAvailable() || !proAccessService) {
+          return reply.status(503).send({
+            error: "Deep check is not configured on this Gate instance.",
+            code: "DEEP_CHECK_UNAVAILABLE",
+          });
+        }
         const { wallet, message, signature, source } = proReq;
         if (!wallet || !isAddress(wallet) || !message || !signature) {
           return reply.status(400).send({ error: "Invalid deep-check request." });
