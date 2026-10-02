@@ -293,6 +293,8 @@ export default function CheckPage() {
       setResult(deepResult);
       if (data.deepCheckCached) {
         setDeepMsg("Showing the previous deep-check result. No credit used.");
+      } else if (data.deepCheckPartial) {
+        setDeepMsg("The first third-party check is shown. The additional threat database is unavailable; no credit was used. Try again to complete the Deep check.");
       } else if (data.deepCheckCompleted) {
         setDeepMsg(data.deepCheckFlagged
           ? "Deep check complete: a third-party threat database found reports. 1 credit used."

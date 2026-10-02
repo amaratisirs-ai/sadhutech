@@ -12,12 +12,13 @@ import { TESTER_HTML } from "./ui.js";
 import { initSyncService } from "./sync-external-threats.js";
 import type { ThreatIntelPostgres } from "./intel-postgres.js";
 import { ContributorsService } from "./contributors.js";
-import { ProAccessService } from "./pro-access.js";
+import { ProAccessService, type DeepCheckOnceResult } from "./pro-access.js";
 import { AuditLogService, getClientIp, lookupGeoIp } from "./audit-log.js";
 import { AnalyticsService, type AnalyticsEventType } from "./analytics.js";
 import { AdminTodosService } from "./admin-todos.js";
 import { verifyAdminAuth } from "./admin-auth.js";
-import { premiumAvailable, lookupChainAbuse } from "./chainabuse-lookup.js";
+import { premiumAvailable, lookupChainAbuse, type ChainAbuseHit } from "./chainabuse-lookup.js";
+import { runDeepCheckProviders } from "./deep-check-providers.js";
 import { goplusAvailable } from "./goplus-lookup.js";
 import { deepCheckRequestKey } from "./deep-check-key.js";
 import { NewsletterService, initNewsletterService, resendConfigured } from "./newsletter.js";
@@ -42,7 +43,16 @@ const authorizedApiKeys = loadApiKeys();
 // Initialize rate limiter: 100 requests per 15 minutes per IP
 const rateLimiter = new SimpleRateLimiter(100, 15 * 60 * 1000);
 
-class DeepCheckUnavailableError extends Error {}
+class DeepCheckPartialError extends Error {
+  constructor(readonly analysis: Awaited<ReturnType<typeof analyze>>) {
+    super("The secondary threat database is unavailable.");
+  }
+}
+
+type PaidDeepCheckValue = {
+  analysis: Awaited<ReturnType<typeof analyze>>;
+  hit: ChainAbuseHit;
+};
 
 // Contributors service (initialized during startup)
 let contributorsService: ContributorsService | null = null;
@@ -154,56 +164,63 @@ app.post<{ Body: AnalyzeRequest }>("/v1/analyze",
           return reply.status(401).send({ error: "Invalid or expired signature." });
         }
 
-        const deepCheck = await proAccessService.runDeepCheckOnce(
-          wallet,
-          deepCheckRequestKey(body),
-          async () => {
-            const hit = tx.to
-              ? await lookupChainAbuse(tx.to, (reason) => void auditLogService?.logIntegrationFailure("chainabuse", reason))
-              : null;
-            if (tx.to && !hit) {
-              throw new DeepCheckUnavailableError("ChainAbuse could not complete the lookup. No credit was used.");
+        let deepCheck: DeepCheckOnceResult<PaidDeepCheckValue> | null = null;
+        let partialAnalysis: Awaited<ReturnType<typeof analyze>> | null = null;
+        try {
+          deepCheck = await proAccessService.runDeepCheckOnce<PaidDeepCheckValue>(
+            wallet,
+            deepCheckRequestKey(body),
+            async () => {
+              const providers = await runDeepCheckProviders(
+                tx.to ?? tx.from,
+                () => analyze(body, intel, auditLogService ?? undefined, { includeGoPlusAddress: true }),
+                () => tx.to
+                  ? lookupChainAbuse(tx.to, (reason) => void auditLogService?.logIntegrationFailure("chainabuse", reason))
+                  : Promise.resolve({ flagged: false })
+              );
+              if (!providers.complete) throw new DeepCheckPartialError(providers.analysis);
+              return { analysis: providers.analysis, hit: providers.hit };
             }
-            const analysis = await analyze(body, intel, auditLogService ?? undefined, { includeGoPlusAddress: true });
-            if (hit?.flagged) {
-              analysis.findings.push({
-                id: "intel.chainabuse",
-                severity: "critical",
-                title: `ChainAbuse: reported as ${hit.category || "scam"}`,
-                description: `This address has ${hit.reports || 1} report(s) on ChainAbuse.`,
-                subject: tx.to!,
-              });
-              analysis.verdict = "block";
-            }
-            return { analysis, hit };
-          }
-        );
-
-        if (!deepCheck) {
-          return reply.status(402).send({ error: "No credits left. Buy more at /pro." });
+          );
+        } catch (error) {
+          if (!(error instanceof DeepCheckPartialError)) throw error;
+          partialAnalysis = error.analysis;
         }
 
-        result = deepCheck.value.analysis;
-        deepCheckCached = deepCheck.cached;
-        (result as any).creditsLeft = deepCheck.creditsLeft;
-        (result as any).deepCheckCached = deepCheck.cached;
-        (result as any).deepCheckCompleted = !!tx.to;
-        (result as any).deepCheckFlagged = !!deepCheck.value.hit?.flagged;
-        if (!deepCheck.cached) {
-          const hit = deepCheck.value.hit;
-          if (hit?.flagged) {
-            void auditLogService?.logSecurityEvent("chainabuse.flagged", tx.to, "critical", {
-              category: hit.category,
-              reports: hit.reports,
-            });
+        if (partialAnalysis) {
+          result = partialAnalysis;
+          deepCheckCached = false;
+          (result as any).creditsLeft = (await proAccessService.getStatus(wallet)).credits;
+          (result as any).deepCheckCompleted = false;
+          (result as any).deepCheckPartial = true;
+          (result as any).deepCheckCached = false;
+        } else {
+          if (!deepCheck) {
+            return reply.status(402).send({ error: "No credits left. Buy more at /pro." });
           }
-          void auditLogService?.logCreditConsumption(
-            wallet.toLowerCase(),
-            1,
-            result.verdict,
-            !!hit?.flagged,
-            source
-          );
+          result = deepCheck.value.analysis;
+          deepCheckCached = deepCheck.cached;
+          (result as any).creditsLeft = deepCheck.creditsLeft;
+          (result as any).deepCheckCached = deepCheck.cached;
+          (result as any).deepCheckCompleted = !!tx.to;
+          (result as any).deepCheckPartial = false;
+          (result as any).deepCheckFlagged = !!deepCheck.value.hit?.flagged;
+          if (!deepCheck.cached) {
+            const hit = deepCheck.value.hit;
+            if (hit?.flagged) {
+              void auditLogService?.logSecurityEvent("chainabuse.flagged", tx.to, "critical", {
+                category: hit.category,
+                reports: hit.reports,
+              });
+            }
+            void auditLogService?.logCreditConsumption(
+              wallet.toLowerCase(),
+              1,
+              result.verdict,
+              !!hit?.flagged,
+              source
+            );
+          }
         }
       } else {
         result = await analyze(body, intel, auditLogService ?? undefined);
@@ -218,9 +235,6 @@ app.post<{ Body: AnalyzeRequest }>("/v1/analyze",
       return result;
     } catch (err) {
       request.log.error(err);
-      if (err instanceof DeepCheckUnavailableError) {
-        return reply.status(503).send({ error: err.message, code: "DEEP_CHECK_UNAVAILABLE" });
-      }
       void analyticsService?.logEvent("error", {
         wallet: proReq?.wallet,
         chainId: tx.chainId,

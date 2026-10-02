@@ -5,6 +5,8 @@ export interface ChainAbuseHit {
   reports?: number;
 }
 
+const CHAINABUSE_TIMEOUT_MS = 3000;
+
 export function premiumAvailable(): boolean {
   return !!process.env.CHAINABUSE_API_KEY;
 }
@@ -13,10 +15,13 @@ export async function lookupChainAbuse(address: string, onFailure?: (reason: str
   const key = process.env.CHAINABUSE_API_KEY;
   if (!key) return null; // premium not configured — caller treats as "unavailable"
   try {
-    const auth = Buffer.from(`${key}:`).toString("base64");
+    const auth = Buffer.from(`${key}:${key}`).toString("base64");
     const res = await fetch(
       `https://api.chainabuse.com/v0/reports?address=${encodeURIComponent(address)}&perPage=5`,
-      { headers: { Authorization: `Basic ${auth}`, "User-Agent": "GENESIS-Gate/1.0" } }
+      {
+        headers: { Authorization: `Basic ${auth}`, "User-Agent": "GENESIS-Gate/1.0" },
+        signal: AbortSignal.timeout(CHAINABUSE_TIMEOUT_MS),
+      }
     );
     if (!res.ok) {
       console.error(`[chainabuse] failure: HTTP ${res.status}`);
