@@ -650,8 +650,7 @@ app.get<{ Querystring: { token?: string } }>(
   }
 );
 
-// Cron-triggerable (API-key protected) so delivery doesn't depend on the in-process
-// timer, which only runs while this instance happens to be awake.
+// API-key protected manual trigger for the newsletter sweep.
 app.post(
   "/v1/newsletter/run",
   { onRequest: [createRateLimitMiddleware(rateLimiter), createApiKeyMiddleware(authorizedApiKeys)] },

@@ -171,12 +171,7 @@ export class NewsletterService {
   }
 }
 
-/**
- * Runs sendDueEmails on startup, then on a fixed interval — mirrors
- * initSyncService's pattern. In-process timers are a best-effort fallback
- * only (Render free-tier instances sleep when idle); pair with an external
- * cron hitting POST /v1/newsletter/run for reliable delivery in production.
- */
+/** Runs due emails on startup and at a fixed interval while the gate is running. */
 export function initNewsletterService(service: NewsletterService, options?: { runOnStartup?: boolean; intervalHours?: number }): void {
   const { runOnStartup = true, intervalHours = 1 } = options || {};
   if (runOnStartup) {
