@@ -108,7 +108,7 @@ export default function HelpPage() {
       questions: [
         {
           q: "The checker says it's unavailable",
-          a: "The backend is briefly down or waking up from idle (the first check after a while can take up to a minute). Wait and try again. Status: github.com/amaratisirs-ai/sadhutech/issues.",
+          a: "The status check could not confirm the service is reachable from your browser. You can still try a check. If it fails, please try again shortly or report it at github.com/amaratisirs-ai/sadhutech/issues.",
         },
         {
           q: "I got a rate-limit or 'Forbidden' error",

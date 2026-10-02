@@ -7,6 +7,7 @@ import { useWallet } from "@/src/wallet/useWallet";
 const GATE_URL = process.env.NEXT_PUBLIC_GATE_URL || "https://genesis-gate.onrender.com";
 const CONSENT_VERSION = "2026-09";
 const CONSENT_ACCEPTED_KEY = "genesis_consent_accepted";
+const WALLET_CONNECTED_KEY = "genesis_wallet_connected";
 
 function short(address: string) {
   return `${address.slice(0, 6)}\u2026${address.slice(-4)}`;
@@ -23,20 +24,28 @@ function postConsent(address: string | undefined, context: string, email?: strin
 }
 
 /** Persistent "logged in" pill shown in the nav once a wallet is connected — address + live credit balance. */
-export function AccountWidget() {
+export function AccountWidget({ autoConnect = false }: { autoConnect?: boolean }) {
   const { address, isConnected, connect, disconnect } = useWallet();
   const [credits, setCredits] = useState<number | null>(null);
   const [open, setOpen] = useState(false);
-  const [showConsent, setShowConsent] = useState(false);
+  const [showConsent, setShowConsent] = useState(() => autoConnect && typeof window !== "undefined" && !window.localStorage.getItem(CONSENT_ACCEPTED_KEY));
   const [copied, setCopied] = useState(false);
   const [emailInput, setEmailInput] = useState("");
   const ref = useRef<HTMLDivElement>(null);
+  const autoConnectStarted = useRef(false);
+
+  useEffect(() => {
+    if (!autoConnect || autoConnectStarted.current) return;
+    autoConnectStarted.current = true;
+    if (window.localStorage.getItem(CONSENT_ACCEPTED_KEY)) connect();
+  }, [autoConnect, connect]);
 
   useEffect(() => {
     if (!isConnected || !address) {
       setCredits(null);
       return;
     }
+    window.localStorage.setItem(WALLET_CONNECTED_KEY, "1");
     let cancelled = false;
     fetch(`${GATE_URL}/v1/pro/status/${address}`)
       .then((r) => (r.ok ? r.json() : null))

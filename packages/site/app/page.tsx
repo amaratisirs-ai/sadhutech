@@ -1,8 +1,7 @@
-"use client";
-
 import Image from "next/image";
 import { Icon } from "@/components/Icon";
 import { Genesis, withGenesisStyle } from "@/components/Genesis";
+import HomeAddressCheck from "@/components/HomeAddressCheck";
 
 export default function Home() {
   const flowSteps = [
@@ -141,7 +140,7 @@ export default function Home() {
   return (
     <div className="space-y-16">
       {/* ===== HERO SECTION ===== */}
-      <section className="relative overflow-hidden rounded-2xl min-h-[560px] flex items-center">
+      <section className="relative isolate flex min-h-[620px] items-center overflow-hidden bg-slate-950">
         <Image
           src="/images/hero-homepage.jpg"
           alt="GENESIS shield decoding a transaction, surrounded by the Hive, Nucleus, Entanglement, and Multiverse concepts"
@@ -149,45 +148,30 @@ export default function Home() {
           priority
           className="object-cover object-[65%_center]"
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/85 to-slate-950/20" />
+        <div className="absolute inset-0 bg-slate-950/75 md:bg-gradient-to-r md:from-slate-950 md:via-slate-950/85 md:to-slate-950/20" />
         <div className="absolute inset-0 bg-gradient-to-t from-slate-950/60 via-transparent to-transparent" />
 
-        <div className="relative px-4 sm:px-8 py-12 sm:py-20">
-          <div className="space-y-5 max-w-xl">
-            <h1 className="text-4xl sm:text-5xl md:text-6xl font-black text-white leading-tight break-words">
-              Know What You're Really Signing
+        <div className="relative w-full px-5 py-9 sm:px-10 sm:py-16 lg:px-14">
+          <div className="max-w-2xl space-y-4 sm:space-y-6">
+            <p className="text-xs font-bold uppercase tracking-[0.14em] text-teal-300">GENESIS / Free address check</p>
+            <h1 className="max-w-xl text-4xl font-black leading-[1.07] text-white sm:text-5xl md:text-6xl">
+              Don&apos;t guess. Check the address.
             </h1>
 
-            <p className="text-lg sm:text-xl text-slate-200 leading-relaxed">
-              <Genesis /> decodes your transaction and checks it against threats confirmed by real people
-              -  not one company's private blocklist. Free forever, no install required.
+            <p className="max-w-xl text-base leading-relaxed text-slate-200 sm:text-lg">
+              Paste a wallet or contract address. See known warning signs before you interact.
             </p>
 
-            <div className="flex items-center gap-3 flex-wrap text-sm font-bold">
-              <span className="px-3 py-1 rounded-full bg-green-500/15 text-green-400 border border-green-500/30">ALLOW</span>
-              <span className="px-3 py-1 rounded-full bg-yellow-500/15 text-yellow-400 border border-yellow-500/30">WARN</span>
-              <span className="px-3 py-1 rounded-full bg-red-500/15 text-red-400 border border-red-500/30">BLOCK</span>
-              <span className="text-slate-400 font-normal">- before you sign, not after</span>
-            </div>
+            <HomeAddressCheck />
 
-            <div className="flex gap-4 flex-wrap pt-2">
+            <div className="flex flex-wrap gap-x-6 gap-y-3 pt-1 text-sm font-semibold sm:text-base">
               <a
                 href="/check"
-                className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-teal-500 to-teal-400 text-slate-950 rounded-lg font-bold hover:shadow-xl transition-all hover:shadow-teal-500/50 text-lg"
+                className="inline-flex items-center gap-2 text-white transition-colors hover:text-teal-200"
               >
-                <Icon name="search" className="w-5 h-5" /> Check a transaction  -  free
-              </a>
-              <a
-                href="/threats"
-                className="px-8 py-4 bg-slate-800/80 text-white rounded-lg font-bold border-2 border-teal-500 hover:border-teal-400 hover:shadow-lg transition-all backdrop-blur-sm"
-              >
-                See live threats
+                Check a transaction <Icon name="arrowRight" className="h-4 w-4 text-teal-300" />
               </a>
             </div>
-
-            <p className="text-xs text-slate-400 pt-2">
-              The nature-inspired architecture we're building toward  -  <a href="/whitepaper" className="text-teal-300 hover:underline font-semibold">see the vision →</a>
-            </p>
           </div>
         </div>
       </section>

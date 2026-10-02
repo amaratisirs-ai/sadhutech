@@ -1,17 +1,28 @@
 "use client";
 
 import { useEffect, useRef, useState, type ReactNode } from "react";
+import dynamic from "next/dynamic";
+import { usePathname } from "next/navigation";
 import { ThemeProvider } from "./theme-provider";
-import { Web3Provider } from "./web3-provider";
 import { Icon, type IconName } from "@/components/Icon";
-import { AccountWidget } from "@/components/AccountWidget";
 import { applySavedDisplaySettings } from "@/src/useDisplaySettings";
 import { GateStatusProvider, useGateStatus } from "@/src/gate-status";
-import { AnalyticsTracker } from "@/src/AnalyticsTracker";
+import { trackEvent } from "@/src/analytics";
+import { requiresWalletRuntime } from "@/src/wallet/routes";
+
+const WalletRuntime = dynamic(() => import("./wallet-runtime").then((module) => module.WalletRuntime));
+const AccountWidget = dynamic(() => import("@/components/AccountWidget").then((module) => module.AccountWidget));
 
 const GATE_URL = process.env.NEXT_PUBLIC_GATE_URL || "https://genesis-gate.onrender.com";
+const WALLET_CONNECTED_KEY = "genesis_wallet_connected";
 
 export function LayoutClient({ children }: { children: ReactNode }) {
+  const pathname = usePathname();
+  const walletRoute = requiresWalletRuntime(pathname);
+  const [walletRequested, setWalletRequested] = useState(false);
+  const [connectRequested, setConnectRequested] = useState(false);
+  const walletEnabled = walletRoute || walletRequested;
+  const trackedPath = useRef<string | null>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [showScrollTop, setShowScrollTop] = useState(false);
   const [subscribeEmail, setSubscribeEmail] = useState("");
@@ -19,7 +30,31 @@ export function LayoutClient({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     applySavedDisplaySettings();
+    if (window.localStorage.getItem(WALLET_CONNECTED_KEY)) {
+      const activation = window.setTimeout(() => setWalletRequested(true), 0);
+      return () => window.clearTimeout(activation);
+    }
   }, []);
+
+  useEffect(() => {
+    if (!walletRoute) return;
+    const activation = window.setTimeout(() => setWalletRequested(true), 0);
+    return () => window.clearTimeout(activation);
+  }, [walletRoute]);
+
+  useEffect(() => {
+    if (walletEnabled || trackedPath.current === pathname) return;
+    trackedPath.current = pathname;
+    trackEvent("page_view", { page: pathname });
+    const onError = (event: ErrorEvent) => trackEvent("error", { page: pathname, meta: { message: event.message?.slice(0, 300), source: "window.onerror" } });
+    const onRejection = (event: PromiseRejectionEvent) => trackEvent("error", { page: pathname, meta: { message: String(event.reason).slice(0, 300), source: "unhandledrejection" } });
+    window.addEventListener("error", onError);
+    window.addEventListener("unhandledrejection", onRejection);
+    return () => {
+      window.removeEventListener("error", onError);
+      window.removeEventListener("unhandledrejection", onRejection);
+    };
+  }, [pathname, walletEnabled]);
 
   useEffect(() => {
     const handleScroll = () => setShowScrollTop(window.scrollY > 400);
@@ -49,9 +84,7 @@ export function LayoutClient({ children }: { children: ReactNode }) {
     }
   };
 
-  return (
-    <Web3Provider>
-    <AnalyticsTracker />
+  const content = (
     <GateStatusProvider>
     <ThemeProvider>
       {/* Modern Sticky Nav  -  Dark with Teal Border */}
@@ -102,7 +135,11 @@ export function LayoutClient({ children }: { children: ReactNode }) {
             {/* Status Badge & CTA & Hamburger */}
             <div className="flex items-center gap-2 md:gap-3">
               <GateStatusBadge />
-              <AccountWidget />
+              {walletEnabled ? <AccountWidget autoConnect={connectRequested} /> : (
+                <button type="button" onClick={() => { setWalletRequested(true); setConnectRequested(true); }} className="inline-flex items-center rounded-full border border-teal-500/50 px-2.5 py-1.5 text-xs font-bold text-teal-200 transition-colors hover:border-teal-400 hover:text-white sm:px-3">
+                  Connect
+                </button>
+              )}
 
               {/* Hamburger Menu Button */}
               <button
@@ -260,14 +297,15 @@ export function LayoutClient({ children }: { children: ReactNode }) {
       </footer>
     </ThemeProvider>
     </GateStatusProvider>
-    </Web3Provider>
   );
+
+  return walletEnabled ? <WalletRuntime skipInitialPageView={connectRequested && !walletRoute}>{content}</WalletRuntime> : content;
 }
 
 function GateStatusBadge() {
   const status = useGateStatus();
-  const label = status === "waking" ? "Waking up…" : status === "checking" ? "Connecting…" : "Live";
-  const dotColor = status === "waking" ? "bg-amber-400" : status === "checking" ? "bg-slate-400" : "bg-teal-400";
+  const label = status === "unavailable" ? "Status unknown" : status === "checking" ? "Connecting…" : "Live";
+  const dotColor = status === "unavailable" ? "bg-amber-400" : status === "checking" ? "bg-slate-400" : "bg-teal-400";
   return (
     <div className="hidden sm:flex items-center gap-2 px-3 py-1 bg-teal-500/30 text-teal-200 text-xs font-semibold rounded-full border border-teal-400/50 backdrop-blur-sm">
       <span className={`w-2 h-2 rounded-full animate-pulse ${dotColor}`}></span>

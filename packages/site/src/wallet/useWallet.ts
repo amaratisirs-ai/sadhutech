@@ -17,6 +17,7 @@ export function useWallet() {
     disconnect: () => {
       try {
         localStorage.removeItem("genesis_pro_auth");
+        localStorage.removeItem("genesis_wallet_connected");
       } catch {
         // ignore storage failures
       }

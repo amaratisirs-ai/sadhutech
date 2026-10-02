@@ -130,8 +130,8 @@ export default function ProPage() {
           Pay what you like (min {MIN_USDC} USDC) in USDC on Base — {CREDITS_PER_USDC} check{CREDITS_PER_USDC === 1 ? "" : "s"} per
           USDC. No subscription, no account, just your wallet.
         </p>
-        {gateStatus === "waking" && (
-          <p className="text-xs text-amber-300">The server is waking up from idle — the first request may take up to a minute.</p>
+        {gateStatus === "unavailable" && (
+          <p className="text-xs text-amber-300">We couldn&apos;t confirm the checker&apos;s status. You can still try a check.</p>
         )}
       </header>
 

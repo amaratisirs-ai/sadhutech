@@ -383,8 +383,8 @@ export default function CheckPage() {
           Paste a crypto address or a transaction and <Genesis /> screens it against community threat intel  -  a plain-English
           verdict in seconds. No wallet connection, no signup.
         </p>
-        {gateStatus === "waking" && (
-          <p className="text-xs text-amber-300">The checker is waking up from idle — your first check may take up to a minute.</p>
+        {gateStatus === "unavailable" && (
+          <p className="text-xs text-amber-300">We couldn&apos;t confirm the checker&apos;s status. You can still try a check.</p>
         )}
       </header>
 

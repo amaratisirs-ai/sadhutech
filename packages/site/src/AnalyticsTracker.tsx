@@ -10,13 +10,18 @@ import { trackEvent } from "@/src/analytics";
  * has a WagmiProvider ancestor. Reports page views on route change and logins on
  * wallet connect, feeding the /admin 360° dashboard.
  */
-export function AnalyticsTracker() {
+export function AnalyticsTracker({ skipInitialPageView = false }: { skipInitialPageView?: boolean }) {
   const pathname = usePathname();
   const { address, isConnected } = useWallet();
   const wasConnected = useRef(false);
+  const skipFirstPageView = useRef(skipInitialPageView);
 
   useEffect(() => {
-    trackEvent("page_view", { page: pathname, wallet: isConnected ? address : undefined });
+    if (skipFirstPageView.current) {
+      skipFirstPageView.current = false;
+    } else {
+      trackEvent("page_view", { page: pathname, wallet: isConnected ? address : undefined });
+    }
     // Only re-fire on route change - wallet is attached best-effort, not a dependency.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pathname]);
