@@ -80,7 +80,7 @@ export default function HomeAddressCheck() {
           placeholder="0x… wallet or contract address"
           autoComplete="off"
           spellCheck={false}
-          className="min-h-14 min-w-0 flex-1 bg-transparent px-4 py-3 font-mono text-sm text-white outline-none placeholder:font-sans placeholder:text-slate-400 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-teal-300/40 disabled:opacity-70 sm:px-5"
+          className="min-h-14 min-w-0 flex-1 bg-transparent px-4 py-3 font-mono text-base text-white outline-none placeholder:font-sans placeholder:text-slate-400 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-teal-300/40 disabled:opacity-70 sm:px-5 sm:text-sm"
         />
         <button
           type="submit"
