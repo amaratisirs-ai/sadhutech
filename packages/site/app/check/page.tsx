@@ -266,7 +266,6 @@ export default function CheckPage() {
     try {
       const s = await refreshStatus(address);
       if (!s?.premium) { setDeepMsg("Deep checks (global scam-address intel) are launching soon."); return; }
-      if (!s.credits || s.credits < 1) { setDeepMsg("no-credits"); return; }
       const { message, signature } = await getProAuth(address);
       const res = await fetch(`${GATE_URL}/v1/analyze`, {
         method: "POST",
@@ -275,7 +274,13 @@ export default function CheckPage() {
       });
       if (res.status === 401) { persistProAuth(null); setDeepMsg("Your session expired - please try again."); return; }
       if (res.status === 402) { await refreshStatus(address); setDeepMsg("no-credits"); return; }
-      if (!res.ok) { setDeepMsg(`Deep check failed (HTTP ${res.status}). Please try again.`); return; }
+      if (!res.ok) {
+        const error = await res.json().catch(() => ({}));
+        setDeepMsg(error.code === "DEEP_CHECK_UNAVAILABLE"
+          ? "A third-party threat database could not complete the lookup. No credit was used; please try again later."
+          : `Deep check failed (HTTP ${res.status}). Please try again.`);
+        return;
+      }
       const data = await res.json();
       const outcome = resolveDecisionOutcome(data);
       const addressSummary = mode === "address" ? addressCheckResult(data) : null;
@@ -286,7 +291,13 @@ export default function CheckPage() {
         findings: addressSummary ? addressSummary.signals?.map((signal, index) => ({ id: `source.${index}`, title: signal.title, description: signal.description, severity: "info" })) ?? [] : data.findings ?? [],
       };
       setResult(deepResult);
-      if (data.deepCheckCached) setDeepMsg("Showing the previous deep-check result. No credit used.");
+      if (data.deepCheckCached) {
+        setDeepMsg("Showing the previous deep-check result. No credit used.");
+      } else if (data.deepCheckCompleted) {
+        setDeepMsg(data.deepCheckFlagged
+          ? "Deep check complete: a third-party threat database found reports. 1 credit used."
+          : "Deep check complete: no additional reports in the third-party threat databases. 1 credit used.");
+      }
       if (typeof data.creditsLeft === "number") setCredits(data.creditsLeft);
     } catch (e: unknown) {
       setDeepMsg(describeError(e));
@@ -595,7 +606,7 @@ export default function CheckPage() {
         <div className="rounded-2xl border border-slate-700 bg-slate-900/50 p-5 space-y-2">
           <h3 className="text-sm font-bold text-white">Where do the signals come from?</h3>
           <p className="text-xs text-slate-300">
-            Community reports need multiple independent reporters to be confirmed. We also check an independent security feed. Neither can guarantee a future transaction is safe. See the <a href="/threats" className="text-teal-300 hover:underline">live threat feed</a>.
+            Free checks use community reports. Pro Deep checks add GoPlus address security where available and ChainAbuse reports. Neither can guarantee a future transaction is safe. See the <a href="/threats" className="text-teal-300 hover:underline">live threat feed</a>.
           </p>
         </div>
         <div className="rounded-2xl border border-slate-700 bg-slate-900/50 p-5 space-y-2">

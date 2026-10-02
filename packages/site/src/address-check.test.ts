@@ -28,7 +28,7 @@ describe("homepage address check", () => {
     });
   });
 
-  it("reports both community and independent signals without raw provider codes", () => {
+  it("reports community and third-party signals without provider names or raw codes", () => {
     const result = addressCheckResult({ verdict: "warn", findings: [
       { id: "intel.unconfirmed", description: "0xabc has not reached quorum" },
       { id: "goplus.malicious-address", description: "GoPlus (blacklist_doubt, cybercrime)" },
@@ -36,15 +36,17 @@ describe("homepage address check", () => {
     expect(result.message).toContain("community report is awaiting confirmation");
     expect(result.message).toContain("independent security feed");
     expect(result.signals).toHaveLength(2);
-    expect(result.signals?.[1].title).toContain("GoPlus");
+    expect(result.signals?.[1].title).toBe("Third-party security database");
     expect(JSON.stringify(result)).not.toContain("blacklist_doubt");
+    expect(JSON.stringify(result)).not.toContain("GoPlus");
   });
 
   it("distinguishes the paid lookup from community reports", () => {
     const summary = addressCheckResult({ verdict: "block", findings: [{ id: "intel.chainabuse", description: "ChainAbuse report(s)" }] });
     expect(summary.message).toContain("additional deep check");
     expect(summary.message).not.toContain("community threat");
-    expect(summary.signals?.[0].title).toContain("ChainAbuse");
+    expect(summary.signals?.[0].title).toBe("Third-party threat database");
+    expect(JSON.stringify(summary)).not.toContain("ChainAbuse");
   });
 
   it("carries a checked address and its free result to the paid-check route without charging a credit", () => {

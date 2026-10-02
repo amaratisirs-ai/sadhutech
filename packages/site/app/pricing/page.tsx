@@ -25,8 +25,8 @@ const TIERS = [
     cta: { label: "Buy credits", href: "/pro", disabled: false },
     features: [
       "Everything in Free",
-      "Deep checks powered by enterprise threat intel",
-      "Deeper checks for supported EVM addresses",
+      "Third-party address security checks where available",
+      "Additional global scam-report database lookup",
       "Pay-as-you-go  -  no subscription, no account",
       "Pay what you like, min 1 USDC",
       "Checks tied to your wallet",
@@ -117,10 +117,7 @@ export default function PricingPage() {
       <section className="mx-auto max-w-5xl space-y-3 border-t border-[#B8C8C3] pt-6">
         <h3 className="text-lg font-bold text-[#152626]">How Free vs Pro works</h3>
         <p className="max-w-3xl text-sm text-[#465D5A]">
-          <strong className="text-[#152626]">Free</strong> checks against our community threat feed  -  thousands of
-          scam addresses reported and confirmed by the community. <strong className="text-[#152626]">Pro</strong> is
-          pay-as-you-go: buy credits with USDC from your wallet and get enterprise-grade threat intel, aggregated from
-          millions of addresses and scam reports worldwide, per check.
+          <strong className="text-[#152626]">Free</strong> checks use our community threat feed. <strong className="text-[#152626]">Pro</strong> adds third-party address security checks where available and an additional global scam-report lookup; one credit is used for each new deep-check result.
         </p>
         <p className="text-xs text-[#667A76]">
           We will never paywall basic safety or charge you to report a scam  -  that's what keeps everyone protected.

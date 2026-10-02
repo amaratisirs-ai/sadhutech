@@ -42,6 +42,8 @@ const authorizedApiKeys = loadApiKeys();
 // Initialize rate limiter: 100 requests per 15 minutes per IP
 const rateLimiter = new SimpleRateLimiter(100, 15 * 60 * 1000);
 
+class DeepCheckUnavailableError extends Error {}
+
 // Contributors service (initialized during startup)
 let contributorsService: ContributorsService | null = null;
 // Pro access service (wallet-based crypto payments; initialized during startup)
@@ -159,7 +161,10 @@ app.post<{ Body: AnalyzeRequest }>("/v1/analyze",
             const hit = tx.to
               ? await lookupChainAbuse(tx.to, (reason) => void auditLogService?.logIntegrationFailure("chainabuse", reason))
               : null;
-            const analysis = await analyze(body, intel, auditLogService ?? undefined);
+            if (tx.to && !hit) {
+              throw new DeepCheckUnavailableError("ChainAbuse could not complete the lookup. No credit was used.");
+            }
+            const analysis = await analyze(body, intel, auditLogService ?? undefined, { includeGoPlusAddress: true });
             if (hit?.flagged) {
               analysis.findings.push({
                 id: "intel.chainabuse",
@@ -182,6 +187,8 @@ app.post<{ Body: AnalyzeRequest }>("/v1/analyze",
         deepCheckCached = deepCheck.cached;
         (result as any).creditsLeft = deepCheck.creditsLeft;
         (result as any).deepCheckCached = deepCheck.cached;
+        (result as any).deepCheckCompleted = !!tx.to;
+        (result as any).deepCheckFlagged = !!deepCheck.value.hit?.flagged;
         if (!deepCheck.cached) {
           const hit = deepCheck.value.hit;
           if (hit?.flagged) {
@@ -211,6 +218,9 @@ app.post<{ Body: AnalyzeRequest }>("/v1/analyze",
       return result;
     } catch (err) {
       request.log.error(err);
+      if (err instanceof DeepCheckUnavailableError) {
+        return reply.status(503).send({ error: err.message, code: "DEEP_CHECK_UNAVAILABLE" });
+      }
       void analyticsService?.logEvent("error", {
         wallet: proReq?.wallet,
         chainId: tx.chainId,
@@ -280,7 +290,7 @@ app.post<{ Body: { addresses?: string[]; pro?: { wallet?: string; message?: stri
         addresses.map(async (address) => {
           const addr = address as Address;
           const tx = { chainId: 1, from: BULK_PROBE_FROM, to: addr, value: "1", data: "0x" as const };
-          const result = await analyze({ tx }, intel, auditLogService ?? undefined);
+          const result = await analyze({ tx }, intel, auditLogService ?? undefined, { includeGoPlusAddress: true });
           const hit = await lookupChainAbuse(addr, (reason) => void auditLogService?.logIntegrationFailure("chainabuse", reason));
           if (hit?.flagged) {
             result.findings.push({

@@ -23,7 +23,8 @@ import type { AuditLogService } from "./audit-log.js";
 export async function analyze(
   req: AnalyzeRequest,
   intel: ThreatIntel | ThreatIntelPostgres,
-  auditLog?: AuditLogService
+  auditLog?: AuditLogService,
+  options: { includeGoPlusAddress?: boolean } = {}
 ): Promise<RiskAssessment> {
   const simulation = await decodeTransaction(req.tx);
 
@@ -45,7 +46,7 @@ export async function analyze(
     }
   }
 
-  return finalize(simulation, intel, req.tx.chainId, extraFindings, auditLog);
+  return finalize(simulation, intel, req.tx.chainId, extraFindings, auditLog, options.includeGoPlusAddress);
 }
 
 /**
@@ -84,9 +85,10 @@ async function finalize(
   intel: ThreatIntel | ThreatIntelPostgres,
   chainId: number,
   extraFindings: RiskFinding[] = [],
-  auditLog?: AuditLogService
+  auditLog?: AuditLogService,
+  includeGoPlusAddress = false
 ): Promise<RiskAssessment> {
-  const findings = [...extraFindings, ...(await evaluate(simulation, intel, chainId, auditLog))];
+  const findings = [...extraFindings, ...(await evaluate(simulation, intel, chainId, auditLog, { includeGoPlusAddress }))];
   const score = scoreOf(findings);
   const verdict = verdictOf(findings, score);
   return {

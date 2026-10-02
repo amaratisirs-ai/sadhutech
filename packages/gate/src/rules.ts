@@ -15,7 +15,8 @@ export async function evaluate(
   sim: SimulationResult,
   intel: ThreatIntel | ThreatIntelPostgres,
   chainId: number,
-  auditLog?: AuditLogService
+  auditLog?: AuditLogService,
+  options: { includeGoPlusAddress?: boolean } = {}
 ): Promise<RiskFinding[]> {
   const findings: RiskFinding[] = [];
 
@@ -53,9 +54,8 @@ export async function evaluate(
       }
     }
 
-    // Free GoPlus Security cross-check (skipped if our own intel already confirmed
-    // this address as critical — no need to spend an external call on it).
-    if (!confirmedCritical) {
+    // Paid GoPlus cross-check is skipped when community intel already confirmed a critical threat.
+    if (options.includeGoPlusAddress && !confirmedCritical) {
       const goplus = await lookupMaliciousAddress(cp, chainId, (reason) =>
         void auditLog?.logIntegrationFailure("goplus-address", reason)
       );

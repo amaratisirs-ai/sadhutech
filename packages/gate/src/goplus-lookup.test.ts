@@ -43,7 +43,7 @@ describe("GoPlus Security cross-check", () => {
       );
     }) as unknown as typeof fetch;
 
-    const result = await analyze({ tx: tx(SUSPECT) }, createIntel());
+    const result = await analyze({ tx: tx(SUSPECT) }, createIntel(), undefined, { includeGoPlusAddress: true });
     expect(result.findings.map((f) => f.id)).toContain("goplus.malicious-address");
     expect(result.verdict).toBe("warn");
   });
@@ -54,7 +54,7 @@ describe("GoPlus Security cross-check", () => {
       return new Response(JSON.stringify({ code: 1, result: { phishing_activities: "0" } }), { status: 200 });
     }) as unknown as typeof fetch;
 
-    const result = await analyze({ tx: tx(SUSPECT) }, createIntel());
+    const result = await analyze({ tx: tx(SUSPECT) }, createIntel(), undefined, { includeGoPlusAddress: true });
     expect(result.findings.map((f) => f.id)).not.toContain("goplus.malicious-address");
     expect(result.verdict).toBe("allow");
   });
@@ -64,7 +64,7 @@ describe("GoPlus Security cross-check", () => {
       throw new Error("network down");
     }) as unknown as typeof fetch;
 
-    const result = await analyze({ tx: tx(SUSPECT) }, createIntel());
+    const result = await analyze({ tx: tx(SUSPECT) }, createIntel(), undefined, { includeGoPlusAddress: true });
     expect(result.findings.map((f) => f.id)).not.toContain("goplus.malicious-address");
     expect(result.verdict).toBe("allow");
   });
@@ -76,6 +76,16 @@ describe("GoPlus Security cross-check", () => {
     global.fetch = fetchSpy as unknown as typeof fetch;
 
     await analyze({ tx: tx(SUSPECT) }, createIntel());
+    expect(fetchSpy).not.toHaveBeenCalled();
+  });
+
+  it("does not run GoPlus address checks on the free/default analysis path", async () => {
+    const fetchSpy = vi.fn();
+    global.fetch = fetchSpy as unknown as typeof fetch;
+
+    const result = await analyze({ tx: tx(SUSPECT) }, createIntel());
+
+    expect(result.findings.map((finding) => finding.id)).not.toContain("goplus.malicious-address");
     expect(fetchSpy).not.toHaveBeenCalled();
   });
 

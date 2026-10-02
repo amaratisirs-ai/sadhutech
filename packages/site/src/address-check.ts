@@ -31,9 +31,9 @@ export function addressCheckResult(analysis: AddressAnalysis): AddressCheckResul
   const independent = analysis.findings?.find((finding) => finding.id?.startsWith("goplus."));
   const paid = analysis.findings?.find((finding) => finding.id === "intel.chainabuse");
   const signals = analysis.findings?.flatMap((finding) => {
-    if (finding.id === "intel.chainabuse") return [{ title: "Deep-check source (ChainAbuse)", description: "The additional paid lookup found reports about this address." }];
+    if (finding.id === "intel.chainabuse") return [{ title: "Third-party threat database", description: "An additional threat-data source reported this address." }];
     if (finding.id?.startsWith("intel.")) return [{ title: "Community report", description: finding.id === "intel.unconfirmed" ? "Reported by the community, but not yet confirmed by enough independent reporters." : "Confirmed in the community threat feed." }];
-    if (finding.id?.startsWith("goplus.")) return [{ title: "Independent security feed (GoPlus)", description: "This address was flagged by another security provider. Check the context before interacting." }];
+    if (finding.id?.startsWith("goplus.")) return [{ title: "Third-party security database", description: "This address was flagged by an independent threat-data source. Check the context before interacting." }];
     return [];
   });
   return {

@@ -82,6 +82,19 @@ describe("ProAccessService.runDeepCheckOnce", () => {
     expect(fake.getCredits()).toBe(1);
   });
 
+  it("serves a cached result when the first check used the wallet's last credit", async () => {
+    const fake = fakePool(1);
+    const service = new ProAccessService(fake.pool);
+    const run = vi.fn(async () => ({ verdict: "allow" }));
+
+    const first = await service.runDeepCheckOnce("0xabc", requestKey, run);
+    const repeated = await service.runDeepCheckOnce("0xabc", requestKey, run);
+
+    expect(first).toMatchObject({ creditsLeft: 0, cached: false });
+    expect(repeated).toMatchObject({ value: { verdict: "allow" }, creditsLeft: 0, cached: true });
+    expect(run).toHaveBeenCalledOnce();
+  });
+
   it("serializes concurrent duplicate requests so only one runs and charges", async () => {
     const fake = fakePool(1);
     const service = new ProAccessService(fake.pool);
