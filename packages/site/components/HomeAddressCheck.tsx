@@ -49,27 +49,26 @@ export default function HomeAddressCheck() {
         : "border-slate-500/50 bg-slate-900/85 text-slate-100";
 
   return (
-    <div className="w-full max-w-2xl border-t border-teal-300/50 pt-4 sm:pt-5">
-      <h2 className="mb-3 text-base font-bold text-white sm:text-lg">Check an address</h2>
-      <form onSubmit={handleCheck} className="flex flex-col gap-2 sm:flex-row">
+    <div className="w-full max-w-2xl border-t border-white/25 pt-5 sm:pt-6">
+      <form onSubmit={handleCheck} className="flex flex-col overflow-hidden rounded-md border border-teal-300/50 bg-slate-950/85 shadow-[0_18px_48px_rgba(2,6,23,0.36)] focus-within:border-teal-200 sm:flex-row">
         <label htmlFor="home-address" className="sr-only">Wallet or contract address</label>
         <input
           id="home-address"
           value={address}
           onChange={(event) => { setAddress(event.target.value); setResult(null); }}
           disabled={checking}
-          placeholder="Paste an address starting with 0x"
+          placeholder="0x… wallet or contract address"
           autoComplete="off"
           spellCheck={false}
-          className="min-w-0 flex-1 rounded-md border border-white/30 bg-slate-950/80 px-4 py-3 font-mono text-sm text-white outline-none placeholder:font-sans placeholder:text-slate-400 focus:border-teal-300 focus:ring-2 focus:ring-teal-300/25 disabled:opacity-70"
+          className="min-h-14 min-w-0 flex-1 bg-transparent px-4 py-3 font-mono text-sm text-white outline-none placeholder:font-sans placeholder:text-slate-400 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-teal-300/40 disabled:opacity-70 sm:px-5"
         />
         <button
           type="submit"
           disabled={checking}
-          className="inline-flex min-h-12 items-center justify-center gap-2 rounded-md bg-teal-300 px-5 font-bold text-slate-950 transition-colors hover:bg-teal-200 disabled:cursor-wait disabled:opacity-70"
+          className="inline-flex min-h-14 items-center justify-center gap-2 border-t border-teal-300/50 bg-teal-300 px-6 font-bold text-slate-950 transition-colors hover:bg-teal-200 disabled:cursor-wait disabled:opacity-70 sm:border-l sm:border-t-0"
         >
           <Icon name="search" className="h-4 w-4" />
-          {checking ? "Checking..." : "Check address"}
+          {checking ? "Checking..." : "Check"}
         </button>
       </form>
       {result && (
@@ -78,7 +77,7 @@ export default function HomeAddressCheck() {
           <p className="mt-1 text-sm leading-relaxed">{result.message}</p>
         </div>
       )}
-      <p className="mt-3 text-xs font-medium text-slate-200">No sign-in <span aria-hidden="true" className="px-1 text-teal-300">·</span> No wallet connection <span aria-hidden="true" className="px-1 text-teal-300">·</span> No private keys</p>
+      <p className="mt-4 text-xs font-medium text-slate-200">No sign-in <span aria-hidden="true" className="px-1 text-teal-300">·</span> No wallet connection <span aria-hidden="true" className="px-1 text-teal-300">·</span> No private keys</p>
       <details className="group mt-3 border-t border-white/15 pt-3 text-sm text-slate-200">
         <summary className="w-fit cursor-pointer list-none font-semibold text-teal-200 hover:text-teal-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-300 [&::-webkit-details-marker]:hidden">
           More about this check <span aria-hidden="true" className="inline-block transition-transform group-open:rotate-90">→</span>

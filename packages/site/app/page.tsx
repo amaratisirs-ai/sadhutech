@@ -5,32 +5,20 @@ import HomeAddressCheck from "@/components/HomeAddressCheck";
 
 export default function Home() {
   const flowSteps = [
-    { 
-      icon: (
-        <svg className="w-12 h-12 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-        </svg>
-      ),
-      label: "You sign a\ntransaction", 
-      step: "1" 
+    {
+      icon: "search" as const,
+      label: "Paste an address",
+      description: "Enter the wallet or contract address you want to look into.",
     },
-    { 
-      icon: (
-        <svg className="w-12 h-12 text-indigo-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-        </svg>
-      ),
-      label: "GENESIS\nanalyzes it", 
-      step: "2" 
+    {
+      icon: "shieldAlert" as const,
+      label: "Compare reports",
+      description: "GENESIS looks for available threat reports and warning signals.",
     },
-    { 
-      icon: (
-        <svg className="w-12 h-12 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12l2 2 4-4m7 0a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
-      ),
-      label: "You get a\nverdict", 
-      step: "3" 
+    {
+      icon: "eye" as const,
+      label: "Review the signal",
+      description: "See what was found, then review the actual transaction before signing.",
     },
   ];
 
@@ -140,27 +128,22 @@ export default function Home() {
   return (
     <div className="space-y-16">
       {/* ===== HERO SECTION ===== */}
-      <section className="relative isolate flex min-h-[620px] items-center overflow-hidden bg-slate-950">
+      <section className="relative isolate -mx-4 flex min-h-[540px] items-center overflow-hidden border-y border-teal-300/30 bg-slate-950 sm:-mx-6 md:min-h-[560px] lg:-mx-8" style={{ marginBottom: 0 }}>
         <Image
           src="/images/hero-homepage.jpg"
           alt="GENESIS shield decoding a transaction, surrounded by the Hive, Nucleus, Entanglement, and Multiverse concepts"
           fill
           priority
-          className="object-cover object-[65%_center]"
+          className="object-cover object-[68%_center] md:object-center"
         />
-        <div className="absolute inset-0 bg-slate-950/75 md:bg-gradient-to-r md:from-slate-950 md:via-slate-950/85 md:to-slate-950/20" />
-        <div className="absolute inset-0 bg-gradient-to-t from-slate-950/60 via-transparent to-transparent" />
+        <div className="absolute inset-0 bg-slate-950/65 md:bg-[linear-gradient(90deg,#020617_0%,rgba(2,6,23,0.94)_34%,rgba(2,6,23,0.10)_70%,transparent_100%)]" />
 
-        <div className="relative w-full px-5 py-9 sm:px-10 sm:py-16 lg:px-14">
-          <div className="max-w-2xl space-y-4 sm:space-y-6">
-            <p className="text-xs font-bold uppercase tracking-[0.14em] text-teal-300">GENESIS / Free address check</p>
-            <h1 className="max-w-xl text-4xl font-black leading-[1.07] text-white sm:text-5xl md:text-6xl">
-              Don&apos;t guess. Check the address.
+        <div className="relative mx-auto w-full max-w-7xl px-5 py-6 sm:px-10 md:py-10 lg:px-14">
+          <div className="max-w-2xl space-y-5 sm:space-y-7">
+            <h1 className="flex flex-col items-start gap-2 font-black uppercase leading-none text-white">
+              <span className="text-5xl sm:text-7xl lg:text-8xl">GENESIS</span>{" "}
+              <span className="border-l-2 border-teal-300 pl-3 text-xs font-bold tracking-[0.16em] text-teal-200 sm:text-sm">/ Free address check</span>
             </h1>
-
-            <p className="max-w-xl text-base leading-relaxed text-slate-200 sm:text-lg">
-              Paste a wallet or contract address. See known warning signs before you interact.
-            </p>
 
             <HomeAddressCheck />
 
@@ -177,31 +160,27 @@ export default function Home() {
       </section>
 
       {/* ===== HOW GENESIS WORKS ===== */}
-      <section id="how-it-works" className="space-y-8">
-        <div className="text-center">
-          <h2 className="text-4xl md:text-5xl font-black text-white mb-4">How <Genesis /> Works</h2>
-          <p className="text-slate-200 text-lg">3 simple steps between you and a scam</p>
-        </div>
-
-        <div className="grid md:grid-cols-3 gap-8">
-          {flowSteps.map((step, i) => (
-            <div key={i} className="relative">
-              <div className="bg-gradient-to-br from-teal-500/10 to-indigo-500/10 border-2 border-teal-500/30 rounded-2xl p-8 h-full space-y-4">
-                <div className="text-center">
-                  {step.icon}
-                  <h3 className="text-xl font-bold text-white mt-3">{withGenesisStyle(step.label)}</h3>
-                </div>
-                <p className="text-slate-300 text-sm text-center">
-                  {i === 0 && "Click 'send' or 'approve' in any app. Uniswap, OpenSea, etc."}
-                  {i === 1 && <><Genesis /> checks against community threat data in real-time. &lt;200ms analysis.</>}
-                  {i === 2 && "Clear verdict: is it safe to sign? Yes, maybe, or absolutely not."}
-                </p>
-              </div>
-              {i < 2 && (
-                <div className="hidden md:flex absolute top-1/2 -right-4 transform -translate-y-1/2 text-3xl text-teal-500">→</div>
-              )}
+      <section id="how-it-works" className="-mx-4 bg-[#E8F0ED] text-[#162A31] sm:-mx-6 lg:-mx-8">
+        <div className="mx-auto max-w-7xl px-5 py-10 sm:px-10 sm:py-14 lg:px-14">
+          <div className="mb-10 flex flex-col justify-between gap-5 md:flex-row md:items-end">
+            <div>
+              <p className="mb-3 text-xs font-bold uppercase tracking-[0.14em] text-[#A45332]">How the check works</p>
+              <h2 className="text-3xl font-black leading-tight sm:text-4xl">From address to insight.</h2>
             </div>
-          ))}
+            <p className="max-w-sm text-sm leading-relaxed text-[#4D646C]">A useful signal before you interact, not a promise that a future transaction is safe.</p>
+          </div>
+          <div className="grid border-t border-[#A9C1BE] md:grid-cols-3">
+            {flowSteps.map((step, index) => (
+              <div key={step.label} className="border-b border-[#A9C1BE] py-7 md:border-b-0 md:border-r md:px-8 md:first:pl-0 md:last:border-r-0 md:last:pr-0">
+                <div className="mb-8 flex items-center justify-between">
+                  <span className="font-mono text-xs font-bold text-[#A45332]">0{index + 1} / 03</span>
+                  <Icon name={step.icon} className="h-6 w-6 text-[#08776D]" />
+                </div>
+                <h3 className="mb-3 text-xl font-bold">{step.label}</h3>
+                <p className="max-w-xs text-sm leading-relaxed text-[#4D646C]">{step.description}</p>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
