@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { resolveDecisionOutcome, type DecisionOutcome } from "../../src/decision";
 import { addressCheckResult, addressProbe } from "@/src/address-check";
 import { Icon } from "@/components/Icon";
@@ -134,6 +134,7 @@ export default function CheckPage() {
   const [deepMsg, setDeepMsg] = useState<string | null>(null);
   const [deepDetailsOpen, setDeepDetailsOpen] = useState(false);
   const [pendingDeepCheck, setPendingDeepCheck] = useState(false);
+  const deepCheckInFlight = useRef(false);
   const [bulkInput, setBulkInput] = useState("");
   const [bulkResults, setBulkResults] = useState<BulkResult[] | null>(null);
   const [bulkBusy, setBulkBusy] = useState(false);
@@ -252,10 +253,15 @@ export default function CheckPage() {
   const runDeepCheck = async () => {
     setDeepMsg(null);
     if (!lastTx || !address) return;
+    if (deepCheckInFlight.current) {
+      setDeepMsg("Deep check is already running. Please wait for the result.");
+      return;
+    }
     if (!DEEP_CHECK_ENABLED) {
       setDeepMsg("Deep checks are launching soon — check back shortly.");
       return;
     }
+    deepCheckInFlight.current = true;
     setDeepBusy(true);
     try {
       const s = await refreshStatus(address);
@@ -273,17 +279,20 @@ export default function CheckPage() {
       const data = await res.json();
       const outcome = resolveDecisionOutcome(data);
       const addressSummary = mode === "address" ? addressCheckResult(data) : null;
-      setResult((prev) => ({
-        title: prev ? `${prev.title.replace(/ · deep$/, "")} · deep` : "Deep check",
+      const deepResult: Result = {
+        title: result?.title ? `${result.title.replace(/ · deep$/, "")} · deep` : "Deep check",
         outcome,
         message: addressSummary?.message || data.plainEnglish || outcome.reason,
         findings: addressSummary ? addressSummary.signals?.map((signal, index) => ({ id: `source.${index}`, title: signal.title, description: signal.description, severity: "info" })) ?? [] : data.findings ?? [],
-      }));
+      };
+      setResult(deepResult);
+      if (data.deepCheckCached) setDeepMsg("Showing the previous deep-check result. No credit used.");
       if (typeof data.creditsLeft === "number") setCredits(data.creditsLeft);
     } catch (e: unknown) {
       setDeepMsg(describeError(e));
       trackEvent(e instanceof WalletTimeoutError ? "stuck" : "error", { page: "/check", wallet: address, meta: { flow: "deep-check", message: describeError(e) } });
     } finally {
+      deepCheckInFlight.current = false;
       setDeepBusy(false);
     }
   };

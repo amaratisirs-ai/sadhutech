@@ -19,6 +19,7 @@ import { AdminTodosService } from "./admin-todos.js";
 import { verifyAdminAuth } from "./admin-auth.js";
 import { premiumAvailable, lookupChainAbuse } from "./chainabuse-lookup.js";
 import { goplusAvailable } from "./goplus-lookup.js";
+import { deepCheckRequestKey } from "./deep-check-key.js";
 import { NewsletterService, initNewsletterService, resendConfigured } from "./newsletter.js";
 import {
   loadApiKeys,
@@ -125,74 +126,87 @@ app.post<{ Body: AnalyzeRequest }>("/v1/analyze",
     const body = request.body;
     const tx = body.tx!; // TypeScript safe now after validation
 
-    // Optional Pro "deep check": signed by the wallet, spends 1 credit, adds ChainAbuse intel.
-    let proMeta: { creditsLeft: number; flagged: boolean; category?: string; reports?: number } | null = null;
     const proReq = (request.body as any).pro as
       | { wallet?: string; message?: string; signature?: string; source?: string }
       | undefined;
-    if (proReq && premiumAvailable() && proAccessService) {
-      const { wallet, message, signature, source } = proReq;
-      if (!wallet || !isAddress(wallet) || !message || !signature) {
-        return reply.status(400).send({ error: "Invalid deep-check request." });
-      }
-      let signer: string;
-      try {
-        signer = await recoverMessageAddress({ message, signature: signature as `0x${string}` });
-      } catch {
-        return reply.status(401).send({ error: "Bad signature." });
-      }
-      const tsMatch = /ts:\s*(\S+)/.exec(message);
-      const timestamp = tsMatch?.[1];
-      // Both the Snap (one-time onHomePage auth) and the web (cached signature, see
-      // check/page.tsx's getProAuth) reuse a signed credential across requests rather
-      // than re-signing every call, so both get the same 24h freshness window.
-      const freshnessWindowMs = 24 * 60 * 60 * 1000;
-      const fresh = timestamp ? Math.abs(Date.now() - Date.parse(timestamp)) < freshnessWindowMs : false;
-      if (signer.toLowerCase() !== wallet.toLowerCase() || !fresh || !message.toLowerCase().includes(wallet.toLowerCase())) {
-        return reply.status(401).send({ error: "Invalid or expired signature." });
-      }
-      // Perform the premium lookup (the value the credit buys), then spend the credit.
-      const hit = tx.to
-        ? await lookupChainAbuse(tx.to, (reason) => void auditLogService?.logIntegrationFailure("chainabuse", reason))
-        : null;
-      const remaining = await proAccessService.consume(wallet.toLowerCase(), 1);
-      if (remaining === null) {
-        return reply.status(402).send({ error: "No credits left. Buy more at /pro." });
-      }
-      proMeta = { creditsLeft: remaining, flagged: !!hit?.flagged, category: hit?.category, reports: hit?.reports };
-    }
-
     try {
-      const result = await analyze(body, intel, auditLogService ?? undefined);
-      if (proMeta) {
-        (result as any).creditsLeft = proMeta.creditsLeft;
-        if (proMeta.flagged) {
-          result.findings.push({
-            id: "intel.chainabuse",
-            severity: "critical",
-            title: `ChainAbuse: reported as ${proMeta.category || "scam"}`,
-            description: `This address has ${proMeta.reports || 1} report(s) on ChainAbuse.`,
-            subject: tx.to!,
-          });
-          (result as any).verdict = "block";
-          void auditLogService?.logSecurityEvent("chainabuse.flagged", tx.to, "critical", {
-            category: proMeta.category,
-            reports: proMeta.reports,
-          });
+      let result: Awaited<ReturnType<typeof analyze>>;
+      let deepCheckCached = false;
+
+      if (proReq && premiumAvailable() && proAccessService) {
+        const { wallet, message, signature, source } = proReq;
+        if (!wallet || !isAddress(wallet) || !message || !signature) {
+          return reply.status(400).send({ error: "Invalid deep-check request." });
         }
-        void auditLogService?.logCreditConsumption(
-          proReq!.wallet!.toLowerCase(),
-          1,
-          (result as any).verdict,
-          proMeta.flagged,
-          proReq!.source
+        let signer: string;
+        try {
+          signer = await recoverMessageAddress({ message, signature: signature as `0x${string}` });
+        } catch {
+          return reply.status(401).send({ error: "Bad signature." });
+        }
+        const tsMatch = /ts:\s*(\S+)/.exec(message);
+        const timestamp = tsMatch?.[1];
+        const freshnessWindowMs = 24 * 60 * 60 * 1000;
+        const fresh = timestamp ? Math.abs(Date.now() - Date.parse(timestamp)) < freshnessWindowMs : false;
+        if (signer.toLowerCase() !== wallet.toLowerCase() || !fresh || !message.toLowerCase().includes(wallet.toLowerCase())) {
+          return reply.status(401).send({ error: "Invalid or expired signature." });
+        }
+
+        const deepCheck = await proAccessService.runDeepCheckOnce(
+          wallet,
+          deepCheckRequestKey(body),
+          async () => {
+            const hit = tx.to
+              ? await lookupChainAbuse(tx.to, (reason) => void auditLogService?.logIntegrationFailure("chainabuse", reason))
+              : null;
+            const analysis = await analyze(body, intel, auditLogService ?? undefined);
+            if (hit?.flagged) {
+              analysis.findings.push({
+                id: "intel.chainabuse",
+                severity: "critical",
+                title: `ChainAbuse: reported as ${hit.category || "scam"}`,
+                description: `This address has ${hit.reports || 1} report(s) on ChainAbuse.`,
+                subject: tx.to!,
+              });
+              analysis.verdict = "block";
+            }
+            return { analysis, hit };
+          }
         );
+
+        if (!deepCheck) {
+          return reply.status(402).send({ error: "No credits left. Buy more at /pro." });
+        }
+
+        result = deepCheck.value.analysis;
+        deepCheckCached = deepCheck.cached;
+        (result as any).creditsLeft = deepCheck.creditsLeft;
+        (result as any).deepCheckCached = deepCheck.cached;
+        if (!deepCheck.cached) {
+          const hit = deepCheck.value.hit;
+          if (hit?.flagged) {
+            void auditLogService?.logSecurityEvent("chainabuse.flagged", tx.to, "critical", {
+              category: hit.category,
+              reports: hit.reports,
+            });
+          }
+          void auditLogService?.logCreditConsumption(
+            wallet.toLowerCase(),
+            1,
+            result.verdict,
+            !!hit?.flagged,
+            source
+          );
+        }
+      } else {
+        result = await analyze(body, intel, auditLogService ?? undefined);
       }
+
       void analyticsService?.logEvent("analyze", {
         wallet: proReq?.wallet,
         chainId: tx.chainId,
         verdict: (result as any).verdict,
-        meta: { endpoint: "analyze", pro: !!proMeta, findings: result.findings.length, source: proReq?.source },
+        meta: { endpoint: "analyze", pro: !!proReq, deepCheckCached, findings: result.findings.length, source: proReq?.source },
       });
       return result;
     } catch (err) {
