@@ -115,12 +115,12 @@ export function LayoutClient({ children }: { children: ReactNode }) {
               <div className="hidden items-center gap-1 lg:flex">
                 <NavLink href="/products">Products</NavLink>
                 <NavLink href="/check">Check</NavLink>
+                <NavLink href="/news">News</NavLink>
                 <NavDropdown
                   label="Community"
                   items={[
                     { href: "/report", label: "Report a Threat" },
                     { href: "/community", label: "Community" },
-                    { href: "/news", label: "News & Articles" },
                     { href: "https://github.com/amaratisirs-ai/sadhutech", label: "GitHub", external: true },
                   ]}
                 />
@@ -176,11 +176,11 @@ export function LayoutClient({ children }: { children: ReactNode }) {
               <div className="space-y-1">
                 <MobileNavLink href="/" onClick={() => setMobileMenuOpen(false)}>Home</MobileNavLink>
                 <MobileNavLink href="/products" onClick={() => setMobileMenuOpen(false)}>Products</MobileNavLink>
+                <MobileNavLink href="/news" onClick={() => setMobileMenuOpen(false)}>News &amp; Articles</MobileNavLink>
 
                 <MobileSectionLabel>Community</MobileSectionLabel>
                 <MobileNavLink href="/report" onClick={() => setMobileMenuOpen(false)}>Report a Threat</MobileNavLink>
                 <MobileNavLink href="/community" onClick={() => setMobileMenuOpen(false)}>Community</MobileNavLink>
-                <MobileNavLink href="/news" onClick={() => setMobileMenuOpen(false)}>News & Articles</MobileNavLink>
                 <MobileNavLink href="https://github.com/amaratisirs-ai/sadhutech" onClick={() => setMobileMenuOpen(false)}>GitHub</MobileNavLink>
 
                 <MobileSectionLabel>Resources</MobileSectionLabel>
@@ -220,7 +220,7 @@ export function LayoutClient({ children }: { children: ReactNode }) {
           <BottomNavLink href="/threats" label="Threats" icon={<ThreatsIcon />} />
           <BottomNavLink href="/check" label="Check" icon={<ProtectIcon />} />
           <BottomNavLink href="/report" label="Report" icon={<ReportIcon />} />
-          <BottomNavLink href="/help" label="Help" icon={<HelpIcon />} />
+          <BottomNavLink href="/news" label="News" icon={<Icon name="newspaper" className="h-6 w-6" />} />
         </div>
       </nav>
 
@@ -470,10 +470,3 @@ function ReportIcon() {
   );
 }
 
-function HelpIcon() {
-  return (
-    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.291-.994.599 0 .11.023.207.066.286m0 0a9.75 9.75 0 01-.466 4.04m.466-4.04a9.75 9.75 0 001.457 4.04m0 0a9.75 9.75 0 001.457-4.04m0 0a9.75 9.75 0 01-.466-4.04" />
-    </svg>
-  );
-}

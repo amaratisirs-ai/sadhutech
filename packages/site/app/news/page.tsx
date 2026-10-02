@@ -3,8 +3,9 @@
 import { useEffect, useState } from "react";
 import { withGenesisStyle } from "@/components/Genesis";
 import { Icon } from "@/components/Icon";
+import type { NewsItem } from "@/src/news-feed";
 
-type Tab = "threats" | "articles" | "tips" | "stats";
+type Tab = "news" | "threats" | "articles" | "tips" | "stats";
 
 interface BlogPostMeta {
   slug: string;
@@ -99,11 +100,14 @@ export default function NewsPage() {
   const [error, setError] = useState<string | null>(null);
   const [filter, setFilter] = useState<string | null>(null);
   const [timeWindow, setTimeWindow] = useState<number>(168);
-  const [activeTab, setActiveTab] = useState<Tab>("threats");
+  const [activeTab, setActiveTab] = useState<Tab>("news");
   const [offset, setOffset] = useState(0);
   const [hasMore, setHasMore] = useState(true);
   const [posts, setPosts] = useState<BlogPostMeta[]>([]);
   const [postsLoading, setPostsLoading] = useState(true);
+  const [news, setNews] = useState<NewsItem[]>([]);
+  const [newsLoading, setNewsLoading] = useState(true);
+  const [newsError, setNewsError] = useState(false);
 
   // Fetch threats with pagination
   const fetchThreats = async (fetchOffset: number = 0) => {
@@ -161,46 +165,21 @@ export default function NewsPage() {
       .finally(() => setPostsLoading(false));
   }, []);
 
+  useEffect(() => {
+    fetch("/api/news")
+      .then((response) => {
+        if (!response.ok) throw new Error("News unavailable");
+        return response.json();
+      })
+      .then((data: { items: NewsItem[] }) => setNews(data.items))
+      .catch(() => setNewsError(true))
+      .finally(() => setNewsLoading(false));
+  }, []);
+
   // Load more handler
   const handleLoadMore = () => {
     fetchThreats(offset);
   };
-
-  if (loading && activeTab === "threats")
-    return (
-      <div className="flex items-center justify-center min-h-96">
-        <div className="text-center space-y-4">
-          <div className="w-12 h-12 rounded-lg bg-indigo-500/20 flex items-center justify-center mx-auto animate-spin">
-            <svg className="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-          </div>
-          <p className="text-slate-400 font-medium">Loading latest threats...</p>
-        </div>
-      </div>
-    );
-
-  if (error && activeTab === "threats")
-    return (
-      <div className="relative overflow-hidden rounded-xl backdrop-blur-xl bg-gradient-to-br from-red-500/5 via-rose-500/5 to-red-500/5 border border-red-500/20 p-6">
-        <div className="flex items-start gap-4">
-          <svg className="w-5 h-5 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-          </svg>
-          <div>
-            <p className="font-semibold text-red-300">Failed to load threats</p>
-            <p className="text-sm text-red-300/70 mt-1">{error}</p>
-          </div>
-        </div>
-      </div>
-    );
-
-  if (!allThreats.length && !loading && activeTab === "threats")
-    return (
-      <div className="relative overflow-hidden rounded-xl backdrop-blur-xl bg-gradient-to-br from-slate-500/5 via-slate-500/5 to-slate-500/5 border border-slate-500/20 p-6">
-        <p className="text-slate-300">No threats detected in the past {timeWindow / 24} days.</p>
-      </div>
-    );
 
   const filteredThreats = filter ? allThreats.filter((t) => t.category === filter) : allThreats;
 
@@ -212,16 +191,17 @@ export default function NewsPage() {
           <svg className="w-8 h-8 text-amber-500" fill="currentColor" viewBox="0 0 24 24">
             <path d="M15.5 1h-8C6.12 1 5 2.12 5 3.5v17C5 21.88 6.12 23 7.5 23h8c1.38 0 2.5-1.12 2.5-2.5v-17C18 2.12 16.88 1 15.5 1zm-4 21c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm4.5-4H7V4h9v14z" />
           </svg>
-          <h1 className="text-4xl font-bold text-white">Breaking Threats</h1>
+          <h1 className="text-4xl font-bold text-white">News &amp; Articles</h1>
         </div>
         <p className="text-slate-400 mt-2">
-          Real-time threat intelligence powered by {stats?.total || 0} active malicious addresses
+          Security and crypto safety reporting from independent publishers, alongside GENESIS research and community threat data.
         </p>
       </div>
 
       {/* Tab Navigation */}
       <div className="flex flex-wrap gap-2 p-3 bg-slate-900/30 rounded-lg border border-slate-700 sticky top-16 z-40">
         {[
+          { id: "news" as Tab, label: "Latest News" },
           { id: "threats" as Tab, label: "Breaking Threats" },
           { id: "articles" as Tab, label: "Articles & Research" },
           { id: "tips" as Tab, label: "Safety Tips" },
@@ -244,9 +224,43 @@ export default function NewsPage() {
         ))}
       </div>
 
+      {activeTab === "news" && (
+        <section className="space-y-4" aria-label="Latest security news">
+          {newsLoading && <p className="text-slate-400">Loading latest news...</p>}
+          {newsError && <p role="alert" className="text-amber-300">News feeds are temporarily unavailable. Try again later, or browse our Articles &amp; Research tab.</p>}
+          {!newsLoading && !newsError && news.length === 0 && (
+            <p className="text-slate-400">No recent security stories from our sources right now. Check back later.</p>
+          )}
+          {news.map((story) => (
+            <a
+              key={story.url}
+              href={story.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block border-t border-slate-700 py-4 transition-colors hover:border-teal-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-400"
+            >
+              <div className="mb-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-teal-300">
+                <span>{story.category}</span>
+                <span className="text-slate-400">{story.source}</span>
+                <time dateTime={story.publishedAt} className="text-slate-400">
+                  {new Date(story.publishedAt).toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" })}
+                </time>
+              </div>
+              <h2 className="text-base font-semibold text-white sm:text-lg">{story.title} <span aria-hidden="true" className="text-teal-300">↗</span></h2>
+            </a>
+          ))}
+          {news.length > 0 && <p className="text-xs text-slate-400">Headlines link to the original publishers. GENESIS does not independently verify their reporting.</p>}
+        </section>
+      )}
+
       {/* Tab: Breaking Threats */}
       {activeTab === "threats" && (
         <div className="space-y-6">
+          {loading && <p className="text-slate-400">Loading latest threats...</p>}
+          {error && <p role="alert" className="text-red-300">Failed to load threats: {error}</p>}
+          {!loading && !error && allThreats.length === 0 && (
+            <p className="text-slate-400">No threats detected in the past {timeWindow / 24} days.</p>
+          )}
           {/* Time Window Filter */}
           <div className="flex flex-wrap items-center gap-2 p-3 bg-slate-900/30 rounded-lg border border-slate-700">
             <span className="text-sm font-medium text-slate-400">Time:</span>
