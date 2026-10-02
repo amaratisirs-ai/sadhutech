@@ -29,7 +29,7 @@ export default function HelpPage() {
         },
         {
           q: "What can I check?",
-          a: "Any EVM address or transaction  -  Ethereum, Polygon, Arbitrum, Optimism, and Avalanche  -  for free against the community feed. Pro adds third-party address security checks where available and an additional global scam-report lookup on supported EVM addresses; cross-chain coverage (BTC, Solana & more) is on the roadmap, not live yet.",
+          a: "Any EVM address or transaction  -  Ethereum, Polygon, Arbitrum, Optimism, and Avalanche  -  for free against the community feed. Pro adds a third-party address security check where available; cross-chain coverage (BTC, Solana & more) is on the roadmap, not live yet.",
         },
         {
           q: "Is GENESIS free?",
@@ -41,7 +41,7 @@ export default function HelpPage() {
         },
         {
           q: "What's the difference between Free and Pro?",
-          a: "Free covers EVM address and transaction checks against the community threat feed. Pro adds third-party address security checks where available and an additional global scam-report lookup per address, billed per credit and paid with USDC on Base  -  no subscription, no account. There's also a Business/API tier for wallets, dapps, and security teams  -  see /pricing.",
+          a: "Free covers EVM address and transaction checks against the community threat feed. Pro adds a third-party address security check where available, billed per credit and paid with USDC on Base  -  no subscription, no account. There's also a Business/API tier for wallets, dapps, and security teams  -  see /pricing.",
         },
         {
           q: "Is my data safe?",
@@ -66,7 +66,7 @@ export default function HelpPage() {
         },
         {
           q: "What does a Pro 'deep check' do?",
-          a: "It adds third-party address security checks where available and an additional lookup against a global scam-report database on top of the free community check. It costs 1 credit for a new result, requires a connected wallet to sign a message proving ownership, and never touches your keys or funds. Repeating the same check within 24 hours returns its previous result without another credit.",
+          a: "It adds a third-party address security check where available on top of the free community check. It costs 1 credit for a new result, requires a connected wallet to sign a message proving ownership, and never touches your keys or funds. Repeating the same check within 24 hours returns its previous result without another credit.",
         },
         {
           q: "How fast is a check?",
@@ -95,7 +95,7 @@ export default function HelpPage() {
         },
         {
           q: "Who maintains the threat database?",
-          a: "The community. Security researchers and users report threats, and multiple independent reporters confirm them before they count. Pro checks also use third-party address security and global scam-report databases where available  -  see /partners.",
+          a: "The community. Security researchers and users report threats, and multiple independent reporters confirm them before they count. Pro checks also use a third-party address security source where available  -  see /partners.",
         },
         {
           q: "What's in the threat database?",

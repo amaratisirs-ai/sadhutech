@@ -293,12 +293,11 @@ export default function CheckPage() {
       setResult(deepResult);
       if (data.deepCheckCached) {
         setDeepMsg("Showing the previous deep-check result. No credit used.");
-      } else if (data.deepCheckPartial) {
-        setDeepMsg("The first third-party check is shown. The additional threat database is unavailable; no credit was used. Try again to complete the Deep check.");
       } else if (data.deepCheckCompleted) {
-        setDeepMsg(data.deepCheckFlagged
-          ? "Deep check complete: a third-party threat database found reports. 1 credit used."
-          : "Deep check complete: no additional reports in the third-party threat databases. 1 credit used.");
+        const resultText = data.deepCheckFlagged
+          ? "Additional address risk signals were found."
+          : "No additional address risk signals were found.";
+        setDeepMsg(`Deep check complete: ${resultText} 1 credit used.`);
       }
       if (typeof data.creditsLeft === "number") setCredits(data.creditsLeft);
     } catch (e: unknown) {
@@ -608,7 +607,7 @@ export default function CheckPage() {
         <div className="rounded-2xl border border-slate-700 bg-slate-900/50 p-5 space-y-2">
           <h3 className="text-sm font-bold text-white">Where do the signals come from?</h3>
           <p className="text-xs text-slate-300">
-            Free checks use community reports. Pro Deep checks add GoPlus address security where available and ChainAbuse reports. Neither can guarantee a future transaction is safe. See the <a href="/threats" className="text-teal-300 hover:underline">live threat feed</a>.
+            Free checks use community reports. Pro Deep checks add a third-party address security signal where available. Neither can guarantee a future transaction is safe. See the <a href="/threats" className="text-teal-300 hover:underline">live threat feed</a>.
           </p>
         </div>
         <div className="rounded-2xl border border-slate-700 bg-slate-900/50 p-5 space-y-2">

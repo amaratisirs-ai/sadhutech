@@ -17,8 +17,7 @@ import { AuditLogService, getClientIp, lookupGeoIp } from "./audit-log.js";
 import { AnalyticsService, type AnalyticsEventType } from "./analytics.js";
 import { AdminTodosService } from "./admin-todos.js";
 import { verifyAdminAuth } from "./admin-auth.js";
-import { premiumAvailable, lookupChainAbuse, type ChainAbuseHit } from "./chainabuse-lookup.js";
-import { runDeepCheckProviders } from "./deep-check-providers.js";
+import { premiumAvailable } from "./chainabuse-lookup.js";
 import { goplusAvailable } from "./goplus-lookup.js";
 import { deepCheckRequestKey } from "./deep-check-key.js";
 import { NewsletterService, initNewsletterService, resendConfigured } from "./newsletter.js";
@@ -43,15 +42,8 @@ const authorizedApiKeys = loadApiKeys();
 // Initialize rate limiter: 100 requests per 15 minutes per IP
 const rateLimiter = new SimpleRateLimiter(100, 15 * 60 * 1000);
 
-class DeepCheckPartialError extends Error {
-  constructor(readonly analysis: Awaited<ReturnType<typeof analyze>>) {
-    super("The secondary threat database is unavailable.");
-  }
-}
-
 type PaidDeepCheckValue = {
   analysis: Awaited<ReturnType<typeof analyze>>;
-  hit: ChainAbuseHit;
 };
 
 // Contributors service (initialized during startup)
@@ -145,7 +137,7 @@ app.post<{ Body: AnalyzeRequest }>("/v1/analyze",
       let result: Awaited<ReturnType<typeof analyze>>;
       let deepCheckCached = false;
 
-      if (proReq && premiumAvailable() && proAccessService) {
+      if (proReq && goplusAvailable() && proAccessService) {
         const { wallet, message, signature, source } = proReq;
         if (!wallet || !isAddress(wallet) || !message || !signature) {
           return reply.status(400).send({ error: "Invalid deep-check request." });
@@ -164,63 +156,32 @@ app.post<{ Body: AnalyzeRequest }>("/v1/analyze",
           return reply.status(401).send({ error: "Invalid or expired signature." });
         }
 
-        let deepCheck: DeepCheckOnceResult<PaidDeepCheckValue> | null = null;
-        let partialAnalysis: Awaited<ReturnType<typeof analyze>> | null = null;
-        try {
-          deepCheck = await proAccessService.runDeepCheckOnce<PaidDeepCheckValue>(
-            wallet,
-            deepCheckRequestKey(body),
-            async () => {
-              const providers = await runDeepCheckProviders(
-                tx.to ?? tx.from,
-                () => analyze(body, intel, auditLogService ?? undefined, { includeGoPlusAddress: true }),
-                () => tx.to
-                  ? lookupChainAbuse(tx.to, (reason) => void auditLogService?.logIntegrationFailure("chainabuse", reason))
-                  : Promise.resolve({ flagged: false })
-              );
-              if (!providers.complete) throw new DeepCheckPartialError(providers.analysis);
-              return { analysis: providers.analysis, hit: providers.hit };
-            }
-          );
-        } catch (error) {
-          if (!(error instanceof DeepCheckPartialError)) throw error;
-          partialAnalysis = error.analysis;
-        }
+        const deepCheck = await proAccessService.runDeepCheckOnce<PaidDeepCheckValue>(
+          wallet,
+          deepCheckRequestKey(body),
+          async () => {
+            const analysis = await analyze(body, intel, auditLogService ?? undefined, { includeGoPlusAddress: true });
+            return { analysis };
+          }
+        );
 
-        if (partialAnalysis) {
-          result = partialAnalysis;
-          deepCheckCached = false;
-          (result as any).creditsLeft = (await proAccessService.getStatus(wallet)).credits;
-          (result as any).deepCheckCompleted = false;
-          (result as any).deepCheckPartial = true;
-          (result as any).deepCheckCached = false;
-        } else {
-          if (!deepCheck) {
-            return reply.status(402).send({ error: "No credits left. Buy more at /pro." });
-          }
-          result = deepCheck.value.analysis;
-          deepCheckCached = deepCheck.cached;
-          (result as any).creditsLeft = deepCheck.creditsLeft;
-          (result as any).deepCheckCached = deepCheck.cached;
-          (result as any).deepCheckCompleted = !!tx.to;
-          (result as any).deepCheckPartial = false;
-          (result as any).deepCheckFlagged = !!deepCheck.value.hit?.flagged;
-          if (!deepCheck.cached) {
-            const hit = deepCheck.value.hit;
-            if (hit?.flagged) {
-              void auditLogService?.logSecurityEvent("chainabuse.flagged", tx.to, "critical", {
-                category: hit.category,
-                reports: hit.reports,
-              });
-            }
-            void auditLogService?.logCreditConsumption(
-              wallet.toLowerCase(),
-              1,
-              result.verdict,
-              !!hit?.flagged,
-              source
-            );
-          }
+        if (!deepCheck) {
+          return reply.status(402).send({ error: "No credits left. Buy more at /pro." });
+        }
+        result = deepCheck.value.analysis;
+        deepCheckCached = deepCheck.cached;
+        (result as any).creditsLeft = deepCheck.creditsLeft;
+        (result as any).deepCheckCached = deepCheck.cached;
+        (result as any).deepCheckCompleted = !!tx.to;
+        (result as any).deepCheckFlagged = result.findings.some((finding) => finding.id === "goplus.malicious-address");
+        if (!deepCheck.cached) {
+          void auditLogService?.logCreditConsumption(
+            wallet.toLowerCase(),
+            1,
+            result.verdict,
+            (result as any).deepCheckFlagged,
+            source
+          );
         }
       } else {
         result = await analyze(body, intel, auditLogService ?? undefined);
@@ -266,7 +227,7 @@ app.post<{ Body: { addresses?: string[]; pro?: { wallet?: string; message?: stri
       });
     }
 
-    if (!premiumAvailable() || !proAccessService) {
+    if (!goplusAvailable() || !proAccessService) {
       return reply.status(503).send({ error: "Bulk check requires Pro credits, which aren't configured yet." });
     }
 
@@ -305,21 +266,6 @@ app.post<{ Body: { addresses?: string[]; pro?: { wallet?: string; message?: stri
           const addr = address as Address;
           const tx = { chainId: 1, from: BULK_PROBE_FROM, to: addr, value: "1", data: "0x" as const };
           const result = await analyze({ tx }, intel, auditLogService ?? undefined, { includeGoPlusAddress: true });
-          const hit = await lookupChainAbuse(addr, (reason) => void auditLogService?.logIntegrationFailure("chainabuse", reason));
-          if (hit?.flagged) {
-            result.findings.push({
-              id: "intel.chainabuse",
-              severity: "critical",
-              title: `ChainAbuse: reported as ${hit.category || "scam"}`,
-              description: `This address has ${hit.reports || 1} report(s) on ChainAbuse.`,
-              subject: addr,
-            });
-            (result as any).verdict = "block";
-            void auditLogService?.logSecurityEvent("chainabuse.flagged", address, "critical", {
-              category: hit.category,
-              reports: hit.reports,
-            });
-          }
           return { address, ...result };
         })
       );
@@ -327,7 +273,7 @@ app.post<{ Body: { addresses?: string[]; pro?: { wallet?: string; message?: stri
         wallet.toLowerCase(),
         addresses.length,
         results.some((r) => r.verdict === "block") ? "block" : results.some((r) => r.verdict === "warn") ? "warn" : "allow",
-        results.some((r) => (r as any).findings?.some((f: any) => f.id === "intel.chainabuse")),
+        results.some((r) => (r as any).findings?.some((f: any) => f.id === "goplus.malicious-address")),
         source
       );
       void analyticsService?.logEvent("analyze", {
@@ -482,7 +428,7 @@ app.get<{ Params: { address: string } }>("/v1/pro/status/:address", async (reque
     return reply.status(503).send({ error: "Pro status unavailable." });
   }
   const s = await proAccessService.getStatus(address);
-  return { ...s, premium: premiumAvailable() };
+  return { ...s, premium: goplusAvailable() };
 });
 
 // ============================================================================
