@@ -3,6 +3,9 @@
   "note": "Blog content for the marketing site. Each post is a Markdown file with YAML frontmatter (title, description, slug, pubDate, author, tags, draft). Order below is intended display order; `featured` pins the hero post.",
   "posts": [
     { "slug": "nature-already-solved-security", "featured": true },
+    { "slug": "read-token-approvals", "featured": false },
+    { "slug": "phishing-response-playbook", "featured": false },
+    { "slug": "read-security-incident-reports", "featured": false },
     { "slug": "how-wallets-get-drained", "featured": false },
     { "slug": "beyond-the-warning", "featured": false }
   ]

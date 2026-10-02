@@ -150,11 +150,12 @@ export default function NewsPage() {
 
   // Initial fetch when component mounts or timeWindow changes
   useEffect(() => {
+    if (activeTab !== "threats") return;
     setOffset(0);
     setAllThreats([]);
     setHasMore(true);
     fetchThreats(0);
-  }, [timeWindow]);
+  }, [timeWindow, activeTab]);
 
   // Articles come from our own content/blog markdown files, not the gate API.
   useEffect(() => {
@@ -194,18 +195,16 @@ export default function NewsPage() {
           <h1 className="text-4xl font-bold text-white">News &amp; Articles</h1>
         </div>
         <p className="text-slate-400 mt-2">
-          Security and crypto safety reporting from independent publishers, alongside GENESIS research and community threat data.
+          Security and crypto safety reporting from independent publishers, alongside GENESIS research and practical safety guidance.
         </p>
       </div>
 
       {/* Tab Navigation */}
-      <div className="flex flex-wrap gap-2 p-3 bg-slate-900/30 rounded-lg border border-slate-700 sticky top-16 z-40">
+      <div className="grid grid-cols-3 gap-2 p-2 bg-slate-900/30 rounded-lg border border-slate-700 sm:flex">
         {[
           { id: "news" as Tab, label: "Latest News" },
-          { id: "threats" as Tab, label: "Breaking Threats" },
           { id: "articles" as Tab, label: "Articles & Research" },
           { id: "tips" as Tab, label: "Safety Tips" },
-          { id: "stats" as Tab, label: "Statistics" },
         ].map((tab) => (
           <button
             key={tab.id}
@@ -213,7 +212,7 @@ export default function NewsPage() {
               setActiveTab(tab.id);
               setFilter(null);
             }}
-            className={`px-4 py-2 rounded-lg font-semibold transition-all text-sm ${
+            className={`min-h-12 px-1.5 py-2 rounded-lg font-semibold leading-tight transition-all text-xs sm:px-4 sm:text-sm ${
               activeTab === tab.id
                 ? "bg-indigo-600 text-white shadow-lg"
                 : "bg-slate-800 text-slate-300 hover:bg-slate-700"
@@ -449,12 +448,18 @@ export default function NewsPage() {
       {activeTab === "tips" && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {[
-            { icon: <Icon name="checkCircle" className="w-6 h-6" />, title: "Verify URLs", desc: "Check official websites, not phishing clones" },
-            { icon: <Icon name="lock" className="w-6 h-6" />, title: "Never Share Keys", desc: "Legitimate services never ask for private keys" },
-            { icon: <Icon name="warning" className="w-6 h-6" />, title: "Review Approvals", desc: "Check token approvals carefully before signing" },
-            { icon: <Icon name="search" className="w-6 h-6" />, title: "Research First", desc: "Verify projects and teams before transactions" },
-            { icon: <Icon name="block" className="w-6 h-6" />, title: "Trust Your Gut", desc: "Stop if something feels wrong" },
-            { icon: <Icon name="shield" className="w-6 h-6" />, title: "Use GENESIS", desc: "Always verify transactions before signing" },
+            { icon: <Icon name="link" className="w-6 h-6" />, title: "Open the official site yourself", desc: "Type a known address or use a saved bookmark. Do not trust a sponsored search result or DM link." },
+            { icon: <Icon name="key" className="w-6 h-6" />, title: "Keep recovery phrases offline", desc: "Never type a seed phrase into a website or send it to support. No legitimate claim requires it." },
+            { icon: <Icon name="warning" className="w-6 h-6" />, title: "Read the spender and amount", desc: "Before approving a token, check the contract address and whether the allowance is unlimited." },
+            { icon: <Icon name="document" className="w-6 h-6" />, title: "Inspect gasless signatures", desc: "A free-to-sign permit can still grant spending rights. Read the domain, spender, value, and deadline." },
+            { icon: <Icon name="wallet" className="w-6 h-6" />, title: "Review old permissions", desc: "Inspect token and NFT approvals with a trusted explorer; revoke permissions you no longer need." },
+            { icon: <Icon name="globe" className="w-6 h-6" />, title: "Check the network", desc: "Confirm the chain and destination address in your wallet, not just in the website's preview." },
+            { icon: <Icon name="search" className="w-6 h-6" />, title: "Verify urgent news", desc: "Cross-check incident instructions against the project's official site before signing a rescue transaction." },
+            { icon: <Icon name="lock" className="w-6 h-6" />, title: "Use a separate wallet", desc: "Keep long-term holdings apart from the wallet you use to try unfamiliar apps." },
+            { icon: <Icon name="refresh" className="w-6 h-6" />, title: "Update devices and wallets", desc: "Install browser, OS, and wallet updates from their official channels, not pop-up prompts." },
+            { icon: <Icon name="block" className="w-6 h-6" />, title: "Stop when pressured", desc: "Scammers use fake deadlines. Pause and verify independently before signing or transferring funds." },
+            { icon: <Icon name="shield" className="w-6 h-6" />, title: "Check before signing", desc: "Use a transaction checker for another view of the action; a clean result is not proof of safety." },
+            { icon: <Icon name="bell" className="w-6 h-6" />, title: "Act on a compromised key", desc: "If a recovery phrase was exposed, create a new wallet and move remaining assets. Revoking approvals is not enough." },
           ].map((tip, i) => (
             <div key={i} className="bg-slate-900/30 border border-slate-700 rounded-lg p-4">
               <div className="flex gap-3">
