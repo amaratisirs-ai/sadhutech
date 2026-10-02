@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { resolveDecisionOutcome, type DecisionOutcome } from "../../src/decision";
+import { addressCheckResult, addressProbe } from "@/src/address-check";
 import { Icon } from "@/components/Icon";
 import { useWallet } from "@/src/wallet/useWallet";
 import { useProAuth, WalletTimeoutError } from "@/src/wallet/useProAuth";
@@ -68,7 +69,7 @@ function detectNonEvmChain(addr: string): string | null {
   return null;
 }
 
-function VerdictCard({ result }: { result: Result }) {
+function VerdictCard({ result, addressCheck = false }: { result: Result; addressCheck?: boolean }) {
   if (result.error) {
     return (
       <div className="rounded-xl border border-rose-500/50 bg-rose-900/20 p-5">
@@ -84,10 +85,10 @@ function VerdictCard({ result }: { result: Result }) {
   const verdict = result.outcome?.verdict ?? "warn";
   const theme =
     verdict === "allow"
-      ? { border: "border-emerald-500/50", bg: "bg-emerald-900/20", label: "text-emerald-300", icon: "checkCircle" as const, head: "Looks safe" }
+      ? { border: "border-emerald-500/50", bg: "bg-emerald-900/20", label: "text-emerald-300", icon: "checkCircle" as const, head: addressCheck ? "No reports found" : "Looks safe" }
       : verdict === "block"
-        ? { border: "border-rose-500/50", bg: "bg-rose-900/20", label: "text-rose-300", icon: "block" as const, head: "Do not sign" }
-        : { border: "border-amber-500/50", bg: "bg-amber-900/20", label: "text-amber-300", icon: "warning" as const, head: "Be careful" };
+        ? { border: "border-rose-500/50", bg: "bg-rose-900/20", label: "text-rose-300", icon: "block" as const, head: addressCheck ? "Known danger flagged" : "Do not sign" }
+        : { border: "border-amber-500/50", bg: "bg-amber-900/20", label: "text-amber-300", icon: "warning" as const, head: addressCheck ? "Look closer before interacting" : "Be careful" };
 
   return (
     <div className={`rounded-xl border p-5 space-y-3 ${theme.border} ${theme.bg}`}>
@@ -141,7 +142,11 @@ export default function CheckPage() {
 
   useEffect(() => {
     const raw = sessionStorage.getItem("genesis_check_pending");
-    if (!raw) return;
+    if (!raw) {
+      const linkedAddress = new URLSearchParams(window.location.search).get("address") ?? "";
+      if (ADDRESS_RE.test(linkedAddress)) setAddressInput(linkedAddress);
+      return;
+    }
     sessionStorage.removeItem("genesis_check_pending");
     try {
       const saved = JSON.parse(raw);
@@ -193,17 +198,13 @@ export default function CheckPage() {
     setResult(null);
     setDeepMsg(null);
     try {
-      const tx = { chainId: 1, from: PROBE_FROM, to: addr, value: "1", data: "0x" };
+      const tx = addressProbe(addr);
       setLastTx(tx);
       const data = await analyzeTx(tx);
       const outcome = resolveDecisionOutcome(data);
-      const intel = (data.findings ?? []).find((f: { id?: string }) => String(f?.id).startsWith("intel."));
-      const message = intel
-        ? intel.description
-        : outcome.verdict === "allow"
-          ? "No known threats found for this address in the community feed. A clean result isn't a guarantee  -  stay cautious with new contracts."
-          : outcome.reason;
-      setResult({ title: `Safety check · ${short(addr)}`, outcome, message, findings: intel ? [intel] : [] });
+      const summary = addressCheckResult(data);
+      const findings = summary.signals?.map((signal, index) => ({ id: `source.${index}`, title: signal.title, description: signal.description, severity: "info" })) ?? [];
+      setResult({ title: `Safety check · ${short(addr)}`, outcome, message: summary.message, findings });
     } catch (e) {
       setResult({ title: "Address check", error: e instanceof Error ? e.message : "Check failed" });
     } finally {
@@ -271,11 +272,12 @@ export default function CheckPage() {
       if (!res.ok) { setDeepMsg(`Deep check failed (HTTP ${res.status}). Please try again.`); return; }
       const data = await res.json();
       const outcome = resolveDecisionOutcome(data);
+      const addressSummary = mode === "address" ? addressCheckResult(data) : null;
       setResult((prev) => ({
         title: prev ? `${prev.title.replace(/ · deep$/, "")} · deep` : "Deep check",
         outcome,
-        message: data.plainEnglish || outcome.reason,
-        findings: data.findings ?? [],
+        message: addressSummary?.message || data.plainEnglish || outcome.reason,
+        findings: addressSummary ? addressSummary.signals?.map((signal, index) => ({ id: `source.${index}`, title: signal.title, description: signal.description, severity: "info" })) ?? [] : data.findings ?? [],
       }));
       if (typeof data.creditsLeft === "number") setCredits(data.creditsLeft);
     } catch (e: unknown) {
@@ -415,7 +417,7 @@ export default function CheckPage() {
       {mode === "address" ? (
         <section className="bg-slate-900/60 border-2 border-teal-500/40 rounded-2xl p-6 space-y-4">
           <div>
-            <h2 className="text-xl font-bold text-white flex items-center gap-2"><Icon name="search" className="w-5 h-5 text-teal-400" /> Is this address safe?</h2>
+            <h2 className="text-xl font-bold text-white flex items-center gap-2"><Icon name="search" className="w-5 h-5 text-teal-400" /> Check an address</h2>
             <p className="text-sm text-slate-300 mt-1">
               About to approve a contract, connect to a dApp, or send funds? Paste that address first.
             </p>
@@ -537,7 +539,7 @@ export default function CheckPage() {
         </section>
       )}
 
-      {result && <VerdictCard result={result} />}
+      {result && <VerdictCard result={result} addressCheck={mode === "address"} />}
 
       {result && !result.error && lastTx && (
         <div className="rounded-xl border border-amber-500/30 bg-amber-900/10 p-4 flex flex-col sm:flex-row sm:items-center gap-3 justify-between">
@@ -582,10 +584,9 @@ export default function CheckPage() {
       {/* Trust + report */}
       <section className="grid sm:grid-cols-2 gap-4">
         <div className="rounded-2xl border border-slate-700 bg-slate-900/50 p-5 space-y-2">
-          <h3 className="text-sm font-bold text-white">Why trust the verdict?</h3>
+          <h3 className="text-sm font-bold text-white">Where do the signals come from?</h3>
           <p className="text-xs text-slate-300">
-            Threats are community-reported and confirmed by multiple independent reporters before they count  -  no single
-            person can flag an address alone. See the <a href="/threats" className="text-teal-300 hover:underline">live threat feed</a>.
+            Community reports need multiple independent reporters to be confirmed. We also check an independent security feed. Neither can guarantee a future transaction is safe. See the <a href="/threats" className="text-teal-300 hover:underline">live threat feed</a>.
           </p>
         </div>
         <div className="rounded-2xl border border-slate-700 bg-slate-900/50 p-5 space-y-2">

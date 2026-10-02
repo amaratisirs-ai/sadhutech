@@ -43,6 +43,15 @@ export function LayoutClient({ children }: { children: ReactNode }) {
   }, [walletRoute]);
 
   useEffect(() => {
+    if (!mobileMenuOpen) return;
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setMobileMenuOpen(false);
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [mobileMenuOpen]);
+
+  useEffect(() => {
     if (walletEnabled || trackedPath.current === pathname) return;
     trackedPath.current = pathname;
     trackEvent("page_view", { page: pathname });
@@ -87,24 +96,23 @@ export function LayoutClient({ children }: { children: ReactNode }) {
   const content = (
     <GateStatusProvider>
     <ThemeProvider>
-      {/* Modern Sticky Nav  -  Dark with Teal Border */}
-      <nav className="bg-slate-950 backdrop-blur-xl border-b-2 border-teal-500 sticky top-0 z-50 shadow-lg">
+      <nav className="sticky top-0 z-50 border-b border-[#30423F] bg-[#081311]/95 backdrop-blur-xl">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center gap-4 md:gap-8">
+          <div className="flex h-[4.5rem] items-center justify-between">
+            <div className="flex min-w-0 items-center gap-4 md:gap-7">
               {/* Logo */}
-              <a href="/" className="flex items-center gap-3 group" onClick={() => setMobileMenuOpen(false)}>
-                <img src="/logo.png" alt="GENESIS" className="w-14 h-14 object-contain" />
-                <span className="hidden sm:flex flex-col leading-none">
-                  <span className="font-script text-3xl tracking-wide bg-gradient-to-r from-white via-slate-200 to-teal-300 bg-clip-text text-transparent">
+              <a href="/" className="group flex shrink-0 items-center gap-2.5" onClick={() => setMobileMenuOpen(false)}>
+                <img src="/logo.png" alt="GENESIS" className="h-11 w-11 object-contain md:h-12 md:w-12" />
+                <span className="hidden flex-col leading-none sm:flex">
+                  <span className="font-script text-[1.7rem] text-[#F3F5F2]">
                     Genesis
                   </span>
-                  <span className="text-[10px] font-semibold tracking-widest text-teal-400/70 uppercase mt-0.5">by sadhutech</span>
+                  <span className="mt-1 text-[9px] font-semibold uppercase tracking-[0.14em] text-[#91AFA7]">by sadhutech</span>
                 </span>
               </a>
 
               {/* Desktop Nav */}
-              <div className="hidden md:flex items-center gap-1">
+              <div className="hidden items-center gap-1 lg:flex">
                 <NavLink href="/products">Products</NavLink>
                 <NavLink href="/check">Check</NavLink>
                 <NavDropdown
@@ -133,10 +141,10 @@ export function LayoutClient({ children }: { children: ReactNode }) {
             </div>
 
             {/* Status Badge & CTA & Hamburger */}
-            <div className="flex items-center gap-2 md:gap-3">
+            <div className="flex shrink-0 items-center gap-2 md:gap-3">
               <GateStatusBadge />
               {walletEnabled ? <AccountWidget autoConnect={connectRequested} /> : (
-                <button type="button" onClick={() => { setWalletRequested(true); setConnectRequested(true); }} className="inline-flex items-center rounded-full border border-teal-500/50 px-2.5 py-1.5 text-xs font-bold text-teal-200 transition-colors hover:border-teal-400 hover:text-white sm:px-3">
+                <button type="button" onClick={() => { setWalletRequested(true); setConnectRequested(true); }} className="inline-flex min-h-10 items-center rounded-md bg-[#BCE6DB] px-3 text-xs font-bold text-[#10201D] transition-colors hover:bg-[#F3F5F2] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#BCE6DB] sm:px-4">
                   Connect
                 </button>
               )}
@@ -144,8 +152,10 @@ export function LayoutClient({ children }: { children: ReactNode }) {
               {/* Hamburger Menu Button */}
               <button
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="md:hidden p-2 text-teal-300 hover:bg-teal-500/20 rounded-lg transition-all"
+                className="flex h-11 w-11 items-center justify-center rounded-md text-[#BCE6DB] transition-colors hover:bg-[#1B302C] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#BCE6DB] lg:hidden"
                 aria-label="Toggle menu"
+                aria-expanded={mobileMenuOpen}
+                aria-controls="mobile-navigation"
               >
                 {mobileMenuOpen ? (
                   <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -162,7 +172,7 @@ export function LayoutClient({ children }: { children: ReactNode }) {
 
           {/* Mobile Menu Overlay */}
           {mobileMenuOpen && (
-            <div className="md:hidden border-t border-teal-500/20 bg-slate-900 py-4">
+            <div id="mobile-navigation" className="max-h-[calc(100dvh-10rem)] overflow-y-auto overscroll-contain border-t border-[#30423F] bg-[#0C1816] py-3 lg:hidden">
               <div className="space-y-1">
                 <MobileNavLink href="/" onClick={() => setMobileMenuOpen(false)}>Home</MobileNavLink>
                 <MobileNavLink href="/products" onClick={() => setMobileMenuOpen(false)}>Products</MobileNavLink>
@@ -204,7 +214,7 @@ export function LayoutClient({ children }: { children: ReactNode }) {
       </button>
 
       {/* Bottom Navigation (Mobile App-like) */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-slate-950 border-t-2 border-teal-500 backdrop-blur-xl z-40 safe-bottom">
+      <nav className="fixed bottom-0 left-0 right-0 z-40 border-t border-[#30423F] bg-[#081311]/95 backdrop-blur-xl safe-bottom md:hidden">
         <div className="flex justify-around items-center h-20">
           <BottomNavLink href="/" label="Home" icon={<HomeIcon />} />
           <BottomNavLink href="/threats" label="Threats" icon={<ThreatsIcon />} />
@@ -307,7 +317,7 @@ function GateStatusBadge() {
   const label = status === "unavailable" ? "Status unknown" : status === "checking" ? "Connecting…" : "Live";
   const dotColor = status === "unavailable" ? "bg-amber-400" : status === "checking" ? "bg-slate-400" : "bg-teal-400";
   return (
-    <div className="hidden sm:flex items-center gap-2 px-3 py-1 bg-teal-500/30 text-teal-200 text-xs font-semibold rounded-full border border-teal-400/50 backdrop-blur-sm">
+    <div className="hidden items-center gap-2 rounded-md border border-[#30423F] bg-[#12201D] px-3 py-1.5 text-xs font-semibold text-[#BCE6DB] sm:flex">
       <span className={`w-2 h-2 rounded-full animate-pulse ${dotColor}`}></span>
       {label}
     </div>
@@ -315,10 +325,12 @@ function GateStatusBadge() {
 }
 
 function NavLink({ href, children }: { href: string; children: ReactNode }) {
+  const active = usePathname() === href;
   return (
     <a
       href={href}
-      className="px-3 py-2 text-sm font-bold text-teal-300 hover:text-white hover:bg-teal-500/20 rounded-lg transition-all flex items-center gap-2"
+      aria-current={active ? "page" : undefined}
+      className={`flex items-center gap-2 rounded-md px-3 py-2 text-sm font-semibold transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#BCE6DB] ${active ? "bg-[#1B302C] text-[#F3F5F2]" : "text-[#B6C8C2] hover:bg-[#152522] hover:text-[#F3F5F2]"}`}
     >
       {children}
     </a>
@@ -334,6 +346,8 @@ function NavDropdown({
 }) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
+  const pathname = usePathname();
+  const active = items.some((item) => item.href === pathname);
 
   useEffect(() => {
     if (!open) return;
@@ -341,16 +355,24 @@ function NavDropdown({
       if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
     };
     document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setOpen(false);
+    };
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
   }, [open]);
 
   return (
     <div ref={ref} className="relative" onMouseEnter={() => setOpen(true)} onMouseLeave={() => setOpen(false)}>
       <button
         type="button"
-        onClick={() => setOpen(true)}
+        onClick={() => setOpen(!open)}
         aria-expanded={open}
-        className="px-3 py-2 text-sm font-bold text-teal-300 hover:text-white hover:bg-teal-500/20 rounded-lg transition-all flex items-center gap-1.5"
+        aria-controls={`dropdown-${label.toLowerCase()}`}
+        className={`flex items-center gap-1.5 rounded-md px-3 py-2 text-sm font-semibold transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#BCE6DB] ${active || open ? "bg-[#1B302C] text-[#F3F5F2]" : "text-[#B6C8C2] hover:bg-[#152522] hover:text-[#F3F5F2]"}`}
       >
         {label}
         <svg className={`w-3.5 h-3.5 transition-transform ${open ? "rotate-180" : ""}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -358,8 +380,8 @@ function NavDropdown({
         </svg>
       </button>
       {open && (
-        <div className="absolute left-0 top-full pt-2 w-56 z-50">
-          <div className="bg-slate-900 border border-teal-500/30 rounded-xl shadow-xl shadow-black/40 py-2 overflow-hidden">
+        <div id={`dropdown-${label.toLowerCase()}`} className="absolute left-0 top-full z-50 w-64 pt-2">
+          <div className="overflow-hidden rounded-lg border border-[#30423F] bg-[#0F1B19] py-1.5 shadow-xl shadow-black/25">
             {items.map((item) => (
               <a
                 key={item.href}
@@ -367,7 +389,8 @@ function NavDropdown({
                 target={item.external ? "_blank" : undefined}
                 rel={item.external ? "noopener noreferrer" : undefined}
                 onClick={() => setOpen(false)}
-                className="flex items-center gap-2 px-4 py-2.5 text-sm font-semibold text-teal-200 hover:text-white hover:bg-teal-500/10 transition-all"
+                aria-current={item.href === pathname ? "page" : undefined}
+                className={`flex items-center gap-2 px-4 py-2.5 text-sm font-medium transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#BCE6DB] ${item.href === pathname ? "bg-[#1B302C] text-[#F3F5F2]" : "text-[#B6C8C2] hover:bg-[#172723] hover:text-[#F3F5F2]"}`}
               >
                 {item.icon && <Icon name={item.icon} className="w-4 h-4 shrink-0" />}
                 {item.label}
@@ -382,16 +405,18 @@ function NavDropdown({
 
 function MobileSectionLabel({ children }: { children: ReactNode }) {
   return (
-    <p className="px-4 pt-4 pb-1 text-xs font-bold uppercase tracking-wider text-teal-500/70">{children}</p>
+    <p className="mx-4 border-b border-[#30423F] px-1 pb-1 pt-4 text-[10px] font-bold uppercase tracking-[0.14em] text-[#91AFA7]">{children}</p>
   );
 }
 
 function MobileNavLink({ href, children, onClick }: { href: string; children: ReactNode; onClick?: () => void }) {
+  const active = usePathname() === href;
   return (
     <a
       href={href}
       onClick={onClick}
-      className="block px-4 py-3 text-base font-bold text-teal-300 hover:text-white hover:bg-teal-500/20 rounded-lg transition-all"
+      aria-current={active ? "page" : undefined}
+      className={`mx-1 block rounded-md px-4 py-3 text-sm font-semibold transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-inset focus-visible:outline-[#BCE6DB] ${active ? "bg-[#1B302C] text-[#F3F5F2]" : "text-[#B6C8C2] hover:bg-[#152522] hover:text-[#F3F5F2]"}`}
     >
       {children}
     </a>
@@ -399,10 +424,12 @@ function MobileNavLink({ href, children, onClick }: { href: string; children: Re
 }
 
 function BottomNavLink({ href, label, icon }: { href: string; label: string; icon: ReactNode }) {
+  const active = usePathname() === href;
   return (
     <a
       href={href}
-      className="flex flex-col items-center justify-center gap-1 w-full h-full text-teal-300 hover:text-white hover:bg-teal-500/20 transition-all group min-h-20"
+      aria-current={active ? "page" : undefined}
+      className={`group flex h-full min-h-20 w-full flex-col items-center justify-center gap-1 border-t-2 transition-colors ${active ? "border-[#BCE6DB] bg-[#12201D] text-[#F3F5F2]" : "border-transparent text-[#91AFA7] hover:bg-[#12201D] hover:text-[#F3F5F2]"}`}
     >
       <div className="group-hover:scale-110 transition-transform text-2xl">{icon}</div>
       <span className="text-xs font-semibold">{label}</span>

@@ -118,19 +118,18 @@ export default function ReportPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900">
-      <div className="max-w-2xl mx-auto px-4 py-12">
-        <div className="mb-8">
-          <Link href="/" className="text-blue-400 hover:text-blue-300 mb-4 inline-block">
+    <div className="mx-auto max-w-3xl space-y-8">
+        <div className="space-y-3 text-center">
+          <Link href="/" className="inline-block text-sm font-semibold text-teal-300 hover:text-teal-200">
             ← Back to home
           </Link>
-          <h1 className="text-4xl font-bold text-white mb-2">Report a Threat</h1>
-          <p className="text-slate-300">
+          <h1 className="text-4xl font-black text-white sm:text-5xl">Report a Threat</h1>
+          <p className="mx-auto max-w-xl text-slate-300">
             Help protect the crypto community by reporting malicious contracts and draining addresses across all blockchains.
           </p>
         </div>
 
-        <div className="bg-slate-800 border border-slate-700 rounded-lg p-8 shadow-lg">
+        <div className="space-y-4 rounded-2xl border-2 border-teal-500/40 bg-slate-900/60 p-6">
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Address Input */}
             <div>
@@ -144,7 +143,7 @@ export default function ReportPage() {
                 value={address}
                 onChange={(e) => setAddress(e.target.value)}
                 required
-                className="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full rounded-lg border-2 border-slate-600 bg-slate-800 px-4 py-3 font-mono text-sm text-white placeholder-slate-400 outline-none focus:border-teal-400"
               />
               <p className="text-xs text-slate-400 mt-1">
                 Must be a valid Ethereum address (0x followed by 40 hex characters)
@@ -160,7 +159,7 @@ export default function ReportPage() {
                 id="category"
                 value={category}
                 onChange={(e) => setCategory(e.target.value)}
-                className="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full rounded-lg border-2 border-slate-600 bg-slate-800 px-4 py-3 text-white outline-none focus:border-teal-400"
               >
                 {THREAT_CATEGORIES.map((cat) => (
                   <option key={cat.value} value={cat.value}>
@@ -186,7 +185,7 @@ export default function ReportPage() {
                 onChange={(e) => setDescription(e.target.value)}
                 rows={4}
                 maxLength={1000}
-                className="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                className="w-full resize-none rounded-lg border-2 border-slate-600 bg-slate-800 px-4 py-3 text-white placeholder-slate-400 outline-none focus:border-teal-400"
               />
             </div>
 
@@ -202,7 +201,7 @@ export default function ReportPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                className="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full rounded-lg border-2 border-slate-600 bg-slate-800 px-4 py-3 text-white placeholder-slate-400 outline-none focus:border-teal-400"
               />
               <p className="text-xs text-slate-400 mt-1">
                 Used to credit your report and build your reporter reputation. Kept private  -  never shown publicly or shared.
@@ -220,7 +219,7 @@ export default function ReportPage() {
                 placeholder="How you appear on the leaderboard"
                 value={reporterName}
                 onChange={(e) => setReporterName(e.target.value)}
-                className="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full rounded-lg border-2 border-slate-600 bg-slate-800 px-4 py-3 text-white placeholder-slate-400 outline-none focus:border-teal-400"
               />
             </div>
 
@@ -235,7 +234,7 @@ export default function ReportPage() {
             <button
               type="submit"
               disabled={loading || !address || !email || (!!TURNSTILE_SITE_KEY && !turnstileToken)}
-              className="w-full px-6 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-slate-600 disabled:cursor-not-allowed text-white font-medium rounded-lg transition"
+              className="w-full rounded-lg bg-teal-500 px-6 py-3 font-bold text-slate-950 transition hover:bg-teal-400 disabled:cursor-not-allowed disabled:opacity-50"
             >
               {loading ? 'Reporting…' : 'Report Threat'}
             </button>
@@ -255,7 +254,7 @@ export default function ReportPage() {
         </div>
 
         {/* Info Box */}
-        <div className="mt-8 bg-slate-700 border border-slate-600 rounded-lg p-6">
+        <div className="rounded-2xl border border-slate-700 bg-slate-900/50 p-5 sm:p-6">
           <h2 className="text-lg font-semibold text-white mb-3">How It Works</h2>
           <ul className="space-y-2 text-slate-300 text-sm">
             <li className="flex gap-2"><Icon name="check" className="w-4 h-4 mt-0.5 text-green-400 flex-shrink-0" /><span><strong>Submit:</strong> Report a malicious address (Ethereum, Polygon, Arbitrum, Optimism, etc.)</span></li>
@@ -266,11 +265,10 @@ export default function ReportPage() {
         </div>
 
         {/* Real community stat */}
-        <div className="mt-8 bg-slate-700 rounded-lg p-6 text-center">
-          <div className="text-4xl font-bold text-blue-400">{threatCount !== null ? threatCount.toLocaleString() : ' - '}</div>
+        <div className="rounded-2xl border border-slate-700 bg-slate-900/50 p-5 text-center sm:p-6">
+          <div className="text-4xl font-bold text-teal-300">{threatCount !== null ? threatCount.toLocaleString() : ' - '}</div>
           <div className="text-sm text-slate-400 mt-1">Malicious addresses in the community threat feed</div>
         </div>
-      </div>
     </div>
   );
 }

@@ -136,7 +136,7 @@ export default function Home() {
           priority
           className="object-cover object-[68%_center] md:object-center"
         />
-        <div className="absolute inset-0 bg-slate-950/65 md:bg-[linear-gradient(90deg,#020617_0%,rgba(2,6,23,0.94)_34%,rgba(2,6,23,0.10)_70%,transparent_100%)]" />
+        <div className="absolute inset-0 bg-slate-950/40 md:bg-[linear-gradient(90deg,#020617_0%,rgba(2,6,23,0.74)_34%,rgba(2,6,23,0.08)_70%,transparent_100%)]" />
 
         <div className="relative mx-auto w-full max-w-7xl px-5 py-6 sm:px-10 md:py-10 lg:px-14">
           <div className="max-w-2xl space-y-5 sm:space-y-7">
@@ -184,6 +184,7 @@ export default function Home() {
         </div>
       </section>
 
+      <div className="home-editorial -mx-4 space-y-16 bg-[#F3F5F2] px-5 py-10 text-[#152626] sm:-mx-6 sm:px-8 sm:py-16 lg:-mx-8">
       {/* ===== WHY THIS MATTERS ===== */}
       <section className="space-y-8">
         <div className="text-center">
@@ -695,6 +696,7 @@ export default function Home() {
           </a>
         </div>
       </section>
+      </div>
     </div>
   );
 }

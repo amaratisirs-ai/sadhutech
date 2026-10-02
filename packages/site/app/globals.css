@@ -110,3 +110,39 @@ html {
 .glow-teal:hover {
   box-shadow: 0 0 30px rgba(20, 184, 166, 0.6), 0 0 60px rgba(20, 184, 166, 0.3);
 }
+
+.home-editorial [class*="bg-slate-900"],
+.home-editorial [class*="bg-slate-800"] {
+  background-color: #ffffff !important;
+  background-image: none !important;
+}
+
+.home-editorial [class*="bg-gradient-to"] {
+  background-color: #e1e9e5 !important;
+  background-image: none !important;
+}
+
+.home-editorial [class~="text-white"] {
+  color: #152626 !important;
+}
+
+.home-editorial [class*="text-slate-200"],
+.home-editorial [class*="text-slate-300"] {
+  color: #465d5a !important;
+}
+
+.home-editorial [class*="text-slate-400"] {
+  color: #667a76 !important;
+}
+
+.home-editorial [class*="border-slate-700"],
+.home-editorial [class*="border-teal-500"] {
+  border-color: #b8c8c3 !important;
+}
+
+.home-editorial .glow-red,
+.home-editorial .glow-orange,
+.home-editorial .glow-yellow,
+.home-editorial .glow-teal {
+  box-shadow: none;
+}

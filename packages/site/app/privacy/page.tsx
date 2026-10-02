@@ -7,11 +7,14 @@ export const metadata = {
 
 export default function PrivacyPage() {
   return (
-    <div className="max-w-3xl mx-auto space-y-8 py-8 text-slate-200">
-      <header className="space-y-2">
-        <h1 className="text-3xl font-black text-white">Privacy Policy</h1>
-        <p className="text-sm text-slate-400">Last updated: September 2026</p>
+    <article className="-mx-4 min-h-screen space-y-10 bg-[#F3F5F2] px-5 py-10 text-[#465D5A] sm:-mx-6 sm:px-8 sm:py-16 lg:-mx-8 [&_a]:text-[#08776D] [&_h2]:text-[#152626] [&_section]:border-t [&_section]:border-[#B8C8C3] [&_section]:pt-6">
+      <header className="mx-auto max-w-3xl space-y-3 border-b border-[#B8C8C3] pb-8">
+        <p className="text-xs font-bold uppercase tracking-[0.14em] text-[#A65B3D]">Legal / GENESIS</p>
+        <h1 className="text-3xl font-black text-[#152626] sm:text-4xl">Privacy Policy</h1>
+        <p className="text-sm text-[#667A76]">Last updated: September 2026</p>
       </header>
+
+      <div className="mx-auto max-w-3xl space-y-10 leading-relaxed">
 
       <section className="space-y-3">
         <h2 className="text-xl font-bold text-white">1. What we collect</h2>
@@ -85,6 +88,7 @@ export default function PrivacyPage() {
           also our <a href="/terms" className="underline text-teal-300">Terms of Service</a>.
         </p>
       </section>
-    </div>
+      </div>
+    </article>
   );
 }

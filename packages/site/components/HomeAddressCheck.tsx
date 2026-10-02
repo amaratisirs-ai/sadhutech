@@ -1,16 +1,17 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useRef, useState, type FormEvent } from "react";
+import Link from "next/link";
 import { Icon } from "@/components/Icon";
-import { addressCheckResult, addressInputError, type AddressCheckResult } from "@/src/address-check";
+import { addressCheckHandoff, addressCheckResult, addressInputError, addressProbe, type AddressAnalysis, type AddressCheckResult } from "@/src/address-check";
 
 const GATE_URL = process.env.NEXT_PUBLIC_GATE_URL || "https://genesis-gate.onrender.com";
-const PROBE_FROM = "0x1111111111111111111111111111111111111111";
-
 export default function HomeAddressCheck() {
   const [address, setAddress] = useState("");
   const [checking, setChecking] = useState(false);
   const [result, setResult] = useState<AddressCheckResult | null>(null);
+  const [checked, setChecked] = useState<{ address: string; analysis: AddressAnalysis } | null>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   async function handleCheck(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -23,16 +24,18 @@ export default function HomeAddressCheck() {
 
     setChecking(true);
     setResult(null);
+    setChecked(null);
     try {
       const response = await fetch(`${GATE_URL}/v1/analyze`, {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ tx: { chainId: 1, from: PROBE_FROM, to: target, value: "1", data: "0x" } }),
+        body: JSON.stringify({ tx: addressProbe(target) }),
       });
       if (!response.ok) throw new Error("The checker is unavailable right now. Please try again shortly.");
 
-      const analysis = await response.json();
+      const analysis: AddressAnalysis = await response.json();
       setResult(addressCheckResult(analysis));
+      setChecked({ address: target, analysis });
     } catch (error) {
       setResult({ title: "Check unavailable", message: error instanceof Error ? error.message : "Please try again shortly." });
     } finally {
@@ -48,14 +51,31 @@ export default function HomeAddressCheck() {
         ? "border-teal-400/50 bg-teal-950/40 text-teal-100"
         : "border-slate-500/50 bg-slate-900/85 text-slate-100";
 
+  function checkAnother() {
+    setAddress("");
+    setResult(null);
+    setChecked(null);
+    inputRef.current?.focus();
+  }
+
+  function continueToDeepCheck() {
+    if (!checked) return;
+    try {
+      sessionStorage.setItem("genesis_check_pending", JSON.stringify(addressCheckHandoff(checked.address, checked.analysis)));
+    } catch {
+      // The linked address still pre-fills /check if session storage is unavailable.
+    }
+  }
+
   return (
     <div className="w-full max-w-2xl border-t border-white/25 pt-5 sm:pt-6">
       <form onSubmit={handleCheck} className="flex flex-col overflow-hidden rounded-md border border-teal-300/50 bg-slate-950/85 shadow-[0_18px_48px_rgba(2,6,23,0.36)] focus-within:border-teal-200 sm:flex-row">
         <label htmlFor="home-address" className="sr-only">Wallet or contract address</label>
         <input
           id="home-address"
+          ref={inputRef}
           value={address}
-          onChange={(event) => { setAddress(event.target.value); setResult(null); }}
+          onChange={(event) => { setAddress(event.target.value); setResult(null); setChecked(null); }}
           disabled={checking}
           placeholder="0x… wallet or contract address"
           autoComplete="off"
@@ -72,9 +92,28 @@ export default function HomeAddressCheck() {
         </button>
       </form>
       {result && (
-        <div role="status" aria-live="polite" className={`mt-3 rounded-md border px-4 py-3 ${resultStyle}`}>
-          <p className="text-sm font-bold">{result.title}</p>
-          <p className="mt-1 text-sm leading-relaxed">{result.message}</p>
+        <div className={`mt-3 rounded-md border px-4 py-3 ${resultStyle}`}>
+          <div role="status" aria-live="polite">
+            <p className="text-sm font-bold">{result.title}</p>
+            <p className="mt-1 text-sm leading-relaxed">{result.message}</p>
+          </div>
+          {result.signals && result.signals.length > 0 && (
+            <details className="mt-3 border-t border-current/20 pt-2 text-xs">
+              <summary className="w-fit cursor-pointer font-semibold">Why was it flagged?</summary>
+              <ul className="mt-2 space-y-2">
+                {result.signals.map((signal) => <li key={signal.title}><strong>{signal.title}:</strong> {signal.description}</li>)}
+              </ul>
+            </details>
+          )}
+          <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-3 border-t border-current/20 pt-3 text-sm font-bold">
+            {checked && (
+              <Link href={`/check?address=${encodeURIComponent(checked.address)}`} onClick={continueToDeepCheck} className="inline-flex items-center gap-1 underline underline-offset-4 hover:text-white">
+                Continue to Deep check <Icon name="arrowRight" className="h-4 w-4" />
+              </Link>
+            )}
+            <button type="button" onClick={checkAnother} className="underline underline-offset-4 hover:text-white">Check another address</button>
+          </div>
+          {checked && <p className="mt-2 text-xs">Deep check costs 1 credit and requires wallet confirmation.</p>}
         </div>
       )}
       <p className="mt-4 text-xs font-medium text-slate-200">No sign-in <span aria-hidden="true" className="px-1 text-teal-300">·</span> No wallet connection <span aria-hidden="true" className="px-1 text-teal-300">·</span> No private keys</p>

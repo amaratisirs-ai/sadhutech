@@ -5,33 +5,34 @@ import { Genesis } from "@/components/Genesis";
 
 export default function WhitepaperPage() {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 text-white">
+    <article className="min-h-screen bg-[#F3F5F2] text-[#1D2A2A]">
       {/* Header */}
-      <div className="bg-gradient-to-r from-indigo-950 to-slate-950 py-16 px-6 border-b-2 border-teal-500/30">
-        <div className="max-w-6xl mx-auto">
-          <h1 className="text-5xl font-black text-teal-400 mb-4">
+      <header className="border-b border-[#B8C8C3] bg-[#E1E9E5] px-5 py-9 sm:px-8 sm:py-20">
+        <div className="mx-auto max-w-5xl">
+          <p className="mb-4 text-[11px] font-bold uppercase tracking-[0.12em] text-[#A65B3D] sm:mb-6 sm:text-xs">Research note / September 2026</p>
+          <h1 className="mb-5 max-w-4xl text-[clamp(1.6rem,6vw,3.6rem)] font-black leading-[1.14] text-[#152626]">
             <Genesis />: Nature-Inspired Security Architecture
           </h1>
-          <p className="text-xl text-slate-300 font-semibold">
+          <p className="max-w-3xl text-lg leading-relaxed text-[#465D5A] sm:text-xl">
             A Whitepaper on Decentralized, Emergent, and Self-Healing Defense
           </p>
-          <div className="flex flex-wrap items-center gap-3 mt-4">
-            <p className="text-sm text-slate-500">Version 1.0 | September 2026</p>
-            <span className="text-xs font-bold uppercase tracking-wide text-teal-300 bg-teal-500/10 border border-teal-500/30 rounded-full px-3 py-1">
+          <div className="mt-7 flex flex-wrap items-center gap-3 border-t border-[#B8C8C3] pt-5">
+            <p className="text-sm font-medium text-[#465D5A]">Version 1.0 | September 2026</p>
+            <span className="border-l-2 border-[#B06443] pl-3 text-xs font-bold uppercase leading-relaxed text-[#7A452F]">
               Vision &amp; roadmap  -  describes where we're headed, not everything below is live today
             </span>
           </div>
         </div>
-      </div>
+      </header>
 
       {/* Main Content */}
-      <div className="max-w-6xl mx-auto px-6 py-16 space-y-16">
+      <div className="mx-auto max-w-5xl space-y-16 px-5 py-14 sm:px-8 sm:py-20">
 
         {/* Design Philosophy */}
-        <section className="space-y-8">
-          <div className="border-l-4 border-teal-500 pl-6 py-4">
-            <h2 className="text-3xl font-black text-teal-400 mb-4">Our Approach</h2>
-            <p className="text-slate-300 text-lg leading-relaxed">
+        <section className="border-t border-[#B8C8C3] pt-8">
+          <div className="grid gap-5 md:grid-cols-[minmax(0,0.4fr)_minmax(0,1fr)] md:gap-10">
+            <h2 className="text-2xl font-black text-[#152626]">Our Approach</h2>
+            <p className="text-[#465D5A] text-base leading-relaxed sm:text-lg">
               Nature builds resilient systems through <strong>decentralization, emergence, and self-healing</strong>  -  a
               hive survives losing individual bees, an immune system adapts to new threats, an ecosystem recovers after
               damage. <Genesis /> is modeled on those same principles: instead of one gate and one detection model, we're
@@ -42,58 +43,58 @@ export default function WhitepaperPage() {
         </section>
 
         {/* sadhutech product roadmap */}
-        <section className="space-y-6">
-          <div className="border-l-4 border-teal-500 pl-6 py-4">
-            <h2 className="text-3xl font-black text-teal-400 mb-2">The roadmap</h2>
-            <p className="text-slate-300">
+        <section className="space-y-6 border-t border-[#B8C8C3] pt-8">
+          <div className="grid gap-4 md:grid-cols-[minmax(0,0.4fr)_minmax(0,1fr)] md:gap-10">
+            <h2 className="text-2xl font-black text-[#152626]">The roadmap</h2>
+            <p className="text-[#465D5A]">
               <Genesis />  -  for crypto  -  is live today across two surfaces; everything else is where the same
               philosophy goes next.
             </p>
           </div>
-          <div className="grid md:grid-cols-2 gap-4">
-            <div className="bg-slate-900/50 border border-teal-500/30 rounded-lg p-5 space-y-1">
-              <p className="text-xs font-bold uppercase tracking-wide text-emerald-300">Live</p>
-              <h3 className="font-bold text-white"><Genesis /> Check &amp; <Genesis /> Extension</h3>
-              <p className="text-slate-400 text-sm">Web checker (free + Pro) and a browser extension for real-time verdicts with any wallet.</p>
+          <div className="grid border-t border-[#B8C8C3] sm:grid-cols-2">
+            <div className="space-y-1 border-b border-[#B8C8C3] py-5 sm:pr-6">
+              <p className="text-xs font-bold uppercase text-[#08776D]">Live</p>
+              <h3 className="font-bold text-[#152626]"><Genesis /> Check &amp; <Genesis /> Extension</h3>
+              <p className="text-[#465D5A] text-sm">Web checker (free + Pro) and a browser extension for real-time verdicts with any wallet.</p>
             </div>
-            <div className="bg-slate-900/50 border border-slate-700 rounded-lg p-5 space-y-1">
-              <p className="text-xs font-bold uppercase tracking-wide text-amber-300">Next</p>
-              <h3 className="font-bold text-white"><Genesis /> Wallet Guard</h3>
-              <p className="text-slate-400 text-sm">Automatic protection built into any wallet or browser, not just MetaMask.</p>
+            <div className="space-y-1 border-b border-[#B8C8C3] py-5 sm:border-l sm:pl-6">
+              <p className="text-xs font-bold uppercase text-[#A65B3D]">Next</p>
+              <h3 className="font-bold text-[#152626]"><Genesis /> Wallet Guard</h3>
+              <p className="text-[#465D5A] text-sm">Automatic protection built into any wallet or browser, not just MetaMask.</p>
             </div>
-            <div className="bg-slate-900/50 border border-slate-700 rounded-lg p-5 space-y-1">
-              <p className="text-xs font-bold uppercase tracking-wide text-slate-400">Planned</p>
-              <h3 className="font-bold text-white">Mobile &amp; laptop protection</h3>
-              <p className="text-slate-400 text-sm">The same pre-action firewall model, applied to phones and computers.</p>
+            <div className="space-y-1 border-b border-[#B8C8C3] py-5 sm:pr-6">
+              <p className="text-xs font-bold uppercase text-[#667A76]">Planned</p>
+              <h3 className="font-bold text-[#152626]">Mobile &amp; laptop protection</h3>
+              <p className="text-[#465D5A] text-sm">The same pre-action firewall model, applied to phones and computers.</p>
             </div>
-            <div className="bg-slate-900/50 border border-slate-700 rounded-lg p-5 space-y-1">
-              <p className="text-xs font-bold uppercase tracking-wide text-slate-400">Planned</p>
-              <h3 className="font-bold text-white">SaaS protection</h3>
-              <p className="text-slate-400 text-sm">Catching risky OAuth grants and integrations across your team's apps.</p>
+            <div className="space-y-1 border-b border-[#B8C8C3] py-5 sm:border-l sm:pl-6">
+              <p className="text-xs font-bold uppercase text-[#667A76]">Planned</p>
+              <h3 className="font-bold text-[#152626]">SaaS protection</h3>
+              <p className="text-[#465D5A] text-sm">Catching risky OAuth grants and integrations across your team's apps.</p>
             </div>
           </div>
-          <a href="/products" className="inline-block text-teal-300 hover:text-white hover:underline text-sm font-semibold">
+          <a href="/products" className="inline-block text-[#08776D] hover:text-[#152626] hover:underline text-sm font-semibold">
             See the products page →
           </a>
         </section>
 
         {/* 4 Pillars */}
-        <section className="space-y-8">
-          <div className="border-l-4 border-teal-500 pl-6 py-4">
-            <h2 className="text-3xl font-black text-teal-400 mb-2">The Solution: 4 Natural Pillars</h2>
-            <p className="text-slate-300"><Genesis /> implements four mechanisms from nature, using cryptography and distributed systems.</p>
+        <section className="space-y-8 border-t border-[#B8C8C3] pt-8">
+          <div className="max-w-3xl">
+            <h2 className="mb-2 text-2xl font-black text-[#152626]">The Solution: 4 Natural Pillars</h2>
+            <p className="text-[#465D5A]"><Genesis /> implements four mechanisms from nature, using cryptography and distributed systems.</p>
           </div>
 
           {/* Pillar 1: Hive */}
-          <div className="bg-gradient-to-r from-amber-950/40 to-slate-900/40 border-l-4 border-amber-500 rounded-lg p-8 space-y-4">
+          <div className="space-y-4 border-t border-[#B8C8C3] pt-6">
             <div className="flex items-center gap-4">
-              <div className="text-amber-400"><Icon name="users" className="w-10 h-10" /></div>
+              <div className="text-[#A65B3D]"><Icon name="users" className="w-8 h-8" /></div>
               <div>
-                <h3 className="text-2xl font-bold text-amber-400">Hive: Emergent Swarm Detection</h3>
-                <p className="text-sm text-slate-400">No single decision-maker; consensus from the colony</p>
+                <h3 className="text-xl font-bold text-[#152626]">Hive: Emergent Swarm Detection</h3>
+                <p className="text-sm text-[#667A76]">No single decision-maker; consensus from the colony</p>
               </div>
             </div>
-            <div className="bg-slate-900/50 rounded p-4 text-slate-300 text-sm space-y-2">
+            <div className="space-y-2 pl-12 text-sm leading-relaxed text-[#465D5A]">
               <p><strong>How it works:</strong> Independent nodes analyze a transaction. Threats emerge from quorum voting, not a central algorithm.</p>
               <p><strong>Why it's resilient:</strong> Compromise one node, others still vote. Compromise 33%, consensus holds. Unpredictable decision topology.</p>
               <p><strong>Engineering:</strong> Threshold signatures, Byzantine consensus, Sybil-resistant threat feeds</p>
@@ -101,15 +102,15 @@ export default function WhitepaperPage() {
           </div>
 
           {/* Pillar 2: Nucleus */}
-          <div className="bg-gradient-to-r from-purple-950/40 to-slate-900/40 border-l-4 border-purple-500 rounded-lg p-8 space-y-4">
+          <div className="space-y-4 border-t border-[#B8C8C3] pt-6">
             <div className="flex items-center gap-4">
-              <div className="text-purple-400"><Icon name="atom" className="w-10 h-10" /></div>
+              <div className="text-[#08776D]"><Icon name="atom" className="w-8 h-8" /></div>
               <div>
-                <h3 className="text-2xl font-bold text-purple-400">Nucleus: Layered Atomic Protection</h3>
-                <p className="text-sm text-slate-400">Concentric rings around the crown jewels</p>
+                <h3 className="text-xl font-bold text-[#152626]">Nucleus: Layered Atomic Protection</h3>
+                <p className="text-sm text-[#667A76]">Concentric rings around the crown jewels</p>
               </div>
             </div>
-            <div className="bg-slate-900/50 rounded p-4 text-slate-300 text-sm space-y-2">
+            <div className="space-y-2 pl-12 text-sm leading-relaxed text-[#465D5A]">
               <p><strong>How it works:</strong> Critical assets (keys, permits, approvals) are wrapped in nested validation layers. Each layer is independent.</p>
               <p><strong>Why it's resilient:</strong> Bypass layer 1, you hit layer 2. Each layer has its own entropy and keypair. Attacker can't prepare a single universal exploit.</p>
               <p><strong>Engineering:</strong> Atomic transactions, key derivation, multi-sig quorum at each layer</p>
@@ -117,15 +118,15 @@ export default function WhitepaperPage() {
           </div>
 
           {/* Pillar 3: Entanglement Fabric */}
-          <div className="bg-gradient-to-r from-cyan-950/40 to-slate-900/40 border-l-4 border-cyan-500 rounded-lg p-8 space-y-4">
+          <div className="space-y-4 border-t border-[#B8C8C3] pt-6">
             <div className="flex items-center gap-4">
-              <div className="text-cyan-400"><Icon name="link" className="w-10 h-10" /></div>
+              <div className="text-[#08776D]"><Icon name="link" className="w-8 h-8" /></div>
               <div>
-                <h3 className="text-2xl font-bold text-cyan-400">Entanglement Fabric: Quantum-Safe Trust</h3>
-                <p className="text-sm text-slate-400">Unclonable bonds between participants</p>
+                <h3 className="text-xl font-bold text-[#152626]">Entanglement Fabric: Quantum-Safe Trust</h3>
+                <p className="text-sm text-[#667A76]">Unclonable bonds between participants</p>
               </div>
             </div>
-            <div className="bg-slate-900/50 rounded p-4 text-slate-300 text-sm space-y-2">
+            <div className="space-y-2 pl-12 text-sm leading-relaxed text-[#465D5A]">
               <p><strong>How it works:</strong> Trust relationships are established via PQC (post-quantum cryptography) and contextual binding. Credentials are tied to session state, not replayable.</p>
               <p><strong>Why it's resilient:</strong> Steal a certificate, it's useless without the context. Replay a transaction, entropy has changed. Post-quantum cryptography is designed to resist attacks from quantum computers, not just classical ones.</p>
               <p><strong>Engineering:</strong> CRYSTALS-Kyber/Dilithium, session-scoped contexts, entropy mixing</p>
@@ -133,15 +134,15 @@ export default function WhitepaperPage() {
           </div>
 
           {/* Pillar 4: Multiverse */}
-          <div className="bg-gradient-to-r from-indigo-950/40 to-slate-900/40 border-l-4 border-indigo-500 rounded-lg p-8 space-y-4">
+          <div className="space-y-4 border-t border-[#B8C8C3] pt-6">
             <div className="flex items-center gap-4">
-              <div className="text-indigo-400"><Icon name="network" className="w-10 h-10" /></div>
+              <div className="text-[#A65B3D]"><Icon name="network" className="w-8 h-8" /></div>
               <div>
-                <h3 className="text-2xl font-bold text-indigo-400">Multiverse: Deception & Self-Healing</h3>
-                <p className="text-sm text-slate-400">Parallel universes for containment and rollback</p>
+                <h3 className="text-xl font-bold text-[#152626]">Multiverse: Deception & Self-Healing</h3>
+                <p className="text-sm text-[#667A76]">Parallel universes for containment and rollback</p>
               </div>
             </div>
-            <div className="bg-slate-900/50 rounded p-4 text-slate-300 text-sm space-y-2">
+            <div className="space-y-2 pl-12 text-sm leading-relaxed text-[#465D5A]">
               <p><strong>How it works:</strong> When anomalies are detected, the session forks. User gets a decoy environment; attacker navigates a controlled labyrinth.</p>
               <p><strong>Why it's resilient:</strong> Attacker wastes resources in the decoy. Legitimate sessions roll back cleanly. Self-healing via retroactive consensus.</p>
               <p><strong>Engineering:</strong> Fork-on-risk, decoy honeypot generation, rollback journals, consensus-driven healing</p>
@@ -150,80 +151,79 @@ export default function WhitepaperPage() {
         </section>
 
         {/* Use Case Flow */}
-        <section className="space-y-8">
-          <div className="border-l-4 border-teal-500 pl-6 py-4">
-            <h2 className="text-3xl font-black text-teal-400">Use Case: Transaction Analysis</h2>
+        <section className="space-y-8 border-t border-[#B8C8C3] pt-8">
+          <div>
+            <h2 className="text-2xl font-black text-[#152626]">Use Case: Transaction Analysis</h2>
           </div>
 
           <div className="space-y-6">
             {/* Step 1 */}
-            <div className="flex gap-6">
+            <div className="flex gap-4 sm:gap-6">
               <div className="flex flex-col items-center">
-                <div className="w-12 h-12 bg-teal-500 rounded-full flex items-center justify-center font-bold text-white text-lg">1</div>
-                <div className="w-1 h-16 bg-teal-500/30 mt-2"></div>
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#08776D] font-bold text-white">1</div>
+                <div className="mt-2 h-12 w-px bg-[#B8C8C3]"></div>
               </div>
-              <div className="bg-slate-900/50 border-l-4 border-teal-500 rounded p-6 flex-1">
-                <h3 className="font-bold text-teal-400 mb-2">User submits transaction</h3>
-                <p className="text-slate-400 text-sm">Wallet sends calldata to <Genesis />. No private keys leave the device.</p>
+              <div className="min-w-0 flex-1 border-t border-[#B8C8C3] py-3">
+                <h3 className="mb-2 font-bold text-[#152626]">User submits transaction</h3>
+                <p className="text-sm text-[#465D5A]">Wallet sends calldata to <Genesis />. No private keys leave the device.</p>
               </div>
             </div>
 
             {/* Step 2 */}
-            <div className="flex gap-6">
+            <div className="flex gap-4 sm:gap-6">
               <div className="flex flex-col items-center">
-                <div className="w-12 h-12 bg-amber-500 rounded-full flex items-center justify-center font-bold text-white text-lg">2</div>
-                <div className="w-1 h-16 bg-amber-500/30 mt-2"></div>
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#A65B3D] font-bold text-white">2</div>
+                <div className="mt-2 h-12 w-px bg-[#B8C8C3]"></div>
               </div>
-              <div className="bg-slate-900/50 border-l-4 border-amber-500 rounded p-6 flex-1">
-                <h3 className="font-bold text-amber-400 mb-2">Hive votes on risk</h3>
-                <p className="text-slate-400 text-sm">Swarm of independent nodes analyzes the calldata. Quorum determines severity: INFO, MEDIUM, HIGH, CRITICAL.</p>
+              <div className="min-w-0 flex-1 border-t border-[#B8C8C3] py-3">
+                <h3 className="mb-2 font-bold text-[#152626]">Hive votes on risk</h3>
+                <p className="text-sm text-[#465D5A]">Swarm of independent nodes analyzes the calldata. Quorum determines severity: INFO, MEDIUM, HIGH, CRITICAL.</p>
               </div>
             </div>
 
             {/* Step 3 */}
-            <div className="flex gap-6">
+            <div className="flex gap-4 sm:gap-6">
               <div className="flex flex-col items-center">
-                <div className="w-12 h-12 bg-purple-500 rounded-full flex items-center justify-center font-bold text-white text-lg">3</div>
-                <div className="w-1 h-16 bg-purple-500/30 mt-2"></div>
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#08776D] font-bold text-white">3</div>
+                <div className="mt-2 h-12 w-px bg-[#B8C8C3]"></div>
               </div>
-              <div className="bg-slate-900/50 border-l-4 border-purple-500 rounded p-6 flex-1">
-                <h3 className="font-bold text-purple-400 mb-2">Nucleus evaluates privilege</h3>
-                <p className="text-slate-400 text-sm">If risky, Nucleus checks: Is this a critical asset? Is the user authorized? Are the amounts reasonable?</p>
+              <div className="min-w-0 flex-1 border-t border-[#B8C8C3] py-3">
+                <h3 className="mb-2 font-bold text-[#152626]">Nucleus evaluates privilege</h3>
+                <p className="text-sm text-[#465D5A]">If risky, Nucleus checks: Is this a critical asset? Is the user authorized? Are the amounts reasonable?</p>
               </div>
             </div>
 
             {/* Step 4 */}
-            <div className="flex gap-6">
+            <div className="flex gap-4 sm:gap-6">
               <div className="flex flex-col items-center">
-                <div className="w-12 h-12 bg-cyan-500 rounded-full flex items-center justify-center font-bold text-white text-lg">4</div>
-                <div className="w-1 h-16 bg-cyan-500/30 mt-2"></div>
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#A65B3D] font-bold text-white">4</div>
+                <div className="mt-2 h-12 w-px bg-[#B8C8C3]"></div>
               </div>
-              <div className="bg-slate-900/50 border-l-4 border-cyan-500 rounded p-6 flex-1">
-                <h3 className="font-bold text-cyan-400 mb-2">Entanglement Fabric validates trust</h3>
-                <p className="text-slate-400 text-sm">Session context is checked. Credentials verified against quantum-safe bonds. No replay attacks possible.</p>
+              <div className="min-w-0 flex-1 border-t border-[#B8C8C3] py-3">
+                <h3 className="mb-2 font-bold text-[#152626]">Entanglement Fabric validates trust</h3>
+                <p className="text-sm text-[#465D5A]">Session context is checked. Credentials verified against quantum-safe bonds. No replay attacks possible.</p>
               </div>
             </div>
 
             {/* Step 5 */}
-            <div className="flex gap-6">
+            <div className="flex gap-4 sm:gap-6">
               <div className="flex flex-col items-center">
-                <div className="w-12 h-12 bg-indigo-500 rounded-full flex items-center justify-center font-bold text-white text-lg">5</div>
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#08776D] font-bold text-white">5</div>
               </div>
-              <div className="bg-slate-900/50 border-l-4 border-indigo-500 rounded p-6 flex-1">
-                <h3 className="font-bold text-indigo-400 mb-2">Multiverse renders verdict</h3>
-                <p className="text-slate-400 text-sm"><strong>ALLOW:</strong> Safe to sign. <strong>WARN:</strong> Risky but not malicious. <strong>BLOCK:</strong> Likely exploit; fork to decoy universe.</p>
+              <div className="min-w-0 flex-1 border-t border-[#B8C8C3] py-3">
+                <h3 className="mb-2 font-bold text-[#152626]">Multiverse renders verdict</h3>
+                <p className="text-sm text-[#465D5A]"><strong>ALLOW:</strong> Safe to sign. <strong>WARN:</strong> Risky but not malicious. <strong>BLOCK:</strong> Likely exploit; fork to decoy universe.</p>
               </div>
             </div>
           </div>
         </section>
 
         {/* Architecture Diagram */}
-        <section className="space-y-8">
-          <div className="border-l-4 border-teal-500 pl-6 py-4">
-            <h2 className="text-3xl font-black text-teal-400">High-Level Architecture</h2>
-          </div>
-
-          <div className="bg-gradient-to-b from-slate-900/50 to-slate-800/50 border-2 border-teal-500/30 rounded-lg p-4 overflow-x-auto">
+        <section className="space-y-6 border-t border-[#B8C8C3] pt-8">
+          <h2 className="text-2xl font-black text-[#152626]">High-Level Architecture</h2>
+          <details className="group border-y border-[#B8C8C3]">
+            <summary className="flex cursor-pointer items-center justify-between py-4 text-sm font-bold text-[#08776D] focus-visible:outline-2 focus-visible:outline-[#08776D]">View proposed architecture diagram <span aria-hidden="true" className="transition-transform group-open:rotate-90">→</span></summary>
+          <div className="overflow-x-auto rounded-md bg-[#152626] p-4">
             {/* Level 1: User Wallet */}
             <div className="flex justify-center mb-3">
               <div className="bg-gradient-to-r from-indigo-900/60 to-indigo-800/60 border-2 border-indigo-500/60 rounded-lg px-6 py-2 w-full max-w-xs text-center">
@@ -327,45 +327,42 @@ export default function WhitepaperPage() {
               </div>
             </div>
           </div>
+          </details>
         </section>
 
         {/* Why Nature's Approach Works */}
-        <section className="space-y-8">
-          <div className="border-l-4 border-teal-500 pl-6 py-4">
-            <h2 className="text-3xl font-black text-teal-400">Why Nature's Approach Works</h2>
-          </div>
+        <section className="space-y-8 border-t border-[#B8C8C3] pt-8">
+          <h2 className="text-2xl font-black text-[#152626]">Why Nature's Approach Works</h2>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="bg-teal-950/30 border-2 border-teal-500/50 rounded-lg p-6">
-              <h3 className="font-bold text-teal-400 mb-3">Decentralization</h3>
-              <p className="text-slate-300 text-sm leading-relaxed">No central authority. Swarm consensus is resistant to compromise. Even if 30% of nodes are corrupted, the colony adapts.</p>
+          <div className="grid gap-x-8 gap-y-5 md:grid-cols-2">
+            <div className="border-t border-[#B8C8C3] pt-5">
+              <h3 className="mb-3 font-bold text-[#152626]">Decentralization</h3>
+              <p className="text-sm leading-relaxed text-[#465D5A]">No central authority. Swarm consensus is resistant to compromise. Even if 30% of nodes are corrupted, the colony adapts.</p>
             </div>
-            <div className="bg-teal-950/30 border-2 border-teal-500/50 rounded-lg p-6">
-              <h3 className="font-bold text-teal-400 mb-3">Emergent Behavior</h3>
-              <p className="text-slate-300 text-sm leading-relaxed">Threats arise from collective voting, not a hardcoded rule. Attackers can't predict what the swarm will decide.</p>
+            <div className="border-t border-[#B8C8C3] pt-5">
+              <h3 className="mb-3 font-bold text-[#152626]">Emergent Behavior</h3>
+              <p className="text-sm leading-relaxed text-[#465D5A]">Threats arise from collective voting, not a hardcoded rule. Attackers can't predict what the swarm will decide.</p>
             </div>
-            <div className="bg-teal-950/30 border-2 border-teal-500/50 rounded-lg p-6">
-              <h3 className="font-bold text-teal-400 mb-3">Unpredictability</h3>
-              <p className="text-slate-300 text-sm leading-relaxed">Topology is dynamic. Credentials are contextual and time-bound. Scan patterns rotate. Attackers see a moving target.</p>
+            <div className="border-t border-[#B8C8C3] pt-5">
+              <h3 className="mb-3 font-bold text-[#152626]">Unpredictability</h3>
+              <p className="text-sm leading-relaxed text-[#465D5A]">Topology is dynamic. Credentials are contextual and time-bound. Scan patterns rotate. Attackers see a moving target.</p>
             </div>
-            <div className="bg-teal-950/30 border-2 border-teal-500/50 rounded-lg p-6">
-              <h3 className="font-bold text-teal-400 mb-3">Self-Healing</h3>
-              <p className="text-slate-300 text-sm leading-relaxed">Compromised branches are isolated via Multiverse. Rollback via consensus. The system regenerates without manual intervention.</p>
+            <div className="border-t border-[#B8C8C3] pt-5">
+              <h3 className="mb-3 font-bold text-[#152626]">Self-Healing</h3>
+              <p className="text-sm leading-relaxed text-[#465D5A]">Compromised branches are isolated via Multiverse. Rollback via consensus. The system regenerates without manual intervention.</p>
             </div>
           </div>
         </section>
 
         {/* Conclusion */}
-        <section className="space-y-6">
-          <div className="border-l-4 border-teal-500 pl-6 py-4">
-            <h2 className="text-3xl font-black text-teal-400">Conclusion</h2>
-          </div>
+        <section className="space-y-6 border-t border-[#B8C8C3] pt-8">
+          <h2 className="text-2xl font-black text-[#152626]">Conclusion</h2>
 
-          <div className="bg-gradient-to-r from-teal-950/30 to-indigo-950/30 border-2 border-teal-500/30 rounded-lg p-8">
-            <p className="text-slate-300 leading-relaxed mb-4">
+          <div className="border-l-2 border-[#A65B3D] pl-5 sm:pl-7">
+            <p className="mb-4 leading-relaxed text-[#465D5A]">
               <Genesis /> is a security platform that embraces nature's wisdom: <strong>decentralization, emergent consensus, unpredictability, and self-healing</strong>. By modeling our architecture on biological systems, we create defenses that survive adversarial pressure  -  not because they're unbreakable, but because they're incomprehensibly adaptable.
             </p>
-            <p className="text-slate-400 text-sm italic">
+            <p className="text-sm italic text-[#667A76]">
               "Nature doesn't build fortresses. It builds ecosystems."
             </p>
           </div>
@@ -373,10 +370,10 @@ export default function WhitepaperPage() {
       </div>
 
       {/* Footer */}
-      <div className="border-t border-teal-500/20 mt-20 py-8 px-6 text-center text-slate-500 text-sm">
+      <div className="border-t border-[#B8C8C3] px-5 py-8 text-center text-sm text-[#667A76] sm:px-8">
         <p><Genesis /> Whitepaper v1.0 | September 2026</p>
         <p className="text-xs mt-2">Nature-Inspired Security Architecture</p>
       </div>
-    </div>
+    </article>
   );
 }

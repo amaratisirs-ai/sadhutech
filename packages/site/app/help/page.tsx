@@ -152,15 +152,15 @@ export default function HelpPage() {
   ];
 
   return (
-    <div className="space-y-12">
+    <div className="-mx-4 space-y-12 bg-[#F3F5F2] px-5 py-10 text-[#465D5A] sm:-mx-6 sm:px-8 sm:py-16 lg:-mx-8 [&_h2]:text-[#152626]">
       {/* Header */}
-      <div className="text-center space-y-4">
-        <div className="flex justify-center text-teal-400"><Icon name="question" className="w-16 h-16" /></div>
-        <h1 className="text-5xl font-black text-white">Help & Support</h1>
-        <p className="text-lg text-teal-200 max-w-2xl mx-auto">
+      <header className="mx-auto max-w-5xl space-y-4 border-b border-[#B8C8C3] pb-8">
+        <p className="text-xs font-bold uppercase tracking-[0.14em] text-[#A65B3D]">Support / GENESIS</p>
+        <h1 className="text-4xl font-black text-[#152626] sm:text-5xl">Help &amp; Support</h1>
+        <p className="max-w-2xl text-lg text-[#465D5A]">
           Find answers to common questions or get in touch with our team.
         </p>
-      </div>
+      </header>
 
       {/* Quick Links */}
       <div className="grid md:grid-cols-3 gap-6">
@@ -168,29 +168,29 @@ export default function HelpPage() {
           href="https://github.com/amaratisirs-ai/sadhutech/issues"
           target="_blank"
           rel="noopener noreferrer"
-          className="bg-slate-900/50 border border-teal-500/30 rounded-2xl p-8 hover:border-teal-500/60 hover:shadow-lg hover:shadow-teal-500/20 transition-all group"
+          className="group border-t border-[#B8C8C3] py-6 transition-colors hover:border-[#08776D]"
         >
-          <div className="text-teal-400 mb-3"><Icon name="bug" className="w-8 h-8" /></div>
-          <h3 className="font-bold text-white group-hover:text-teal-300">Report a Bug</h3>
-          <p className="text-sm text-slate-400 mt-2">Found something broken? Let us know on GitHub.</p>
+          <div className="mb-3 text-[#08776D]"><Icon name="bug" className="h-7 w-7" /></div>
+          <h3 className="font-bold text-[#152626] group-hover:text-[#08776D]">Report a Bug</h3>
+          <p className="mt-2 text-sm text-[#465D5A]">Found something broken? Let us know on GitHub.</p>
         </a>
 
         <a
           href="/report"
-          className="bg-slate-900/50 border border-teal-500/30 rounded-2xl p-8 hover:border-teal-500/60 hover:shadow-lg hover:shadow-teal-500/20 transition-all group"
+          className="group border-t border-[#B8C8C3] py-6 transition-colors hover:border-[#08776D]"
         >
-          <div className="text-teal-400 mb-3"><Icon name="bell" className="w-8 h-8" /></div>
-          <h3 className="font-bold text-white group-hover:text-teal-300">Report a Threat</h3>
-          <p className="text-sm text-slate-400 mt-2">Submit a dangerous address to the threat database.</p>
+          <div className="mb-3 text-[#08776D]"><Icon name="bell" className="h-7 w-7" /></div>
+          <h3 className="font-bold text-[#152626] group-hover:text-[#08776D]">Report a Threat</h3>
+          <p className="mt-2 text-sm text-[#465D5A]">Submit a dangerous address to the threat database.</p>
         </a>
 
         <a
           href="mailto:security@sadhutech.com"
-          className="bg-slate-900/50 border border-teal-500/30 rounded-2xl p-8 hover:border-teal-500/60 hover:shadow-lg hover:shadow-teal-500/20 transition-all group"
+          className="group border-t border-[#B8C8C3] py-6 transition-colors hover:border-[#08776D]"
         >
-          <div className="text-teal-400 mb-3"><Icon name="mail" className="w-8 h-8" /></div>
-          <h3 className="font-bold text-white group-hover:text-teal-300">Email Support</h3>
-          <p className="text-sm text-slate-400 mt-2">security@sadhutech.com  -  We usually respond within 24h</p>
+          <div className="mb-3 text-[#08776D]"><Icon name="mail" className="h-7 w-7" /></div>
+          <h3 className="font-bold text-[#152626] group-hover:text-[#08776D]">Email Support</h3>
+          <p className="mt-2 text-sm text-[#465D5A]">security@sadhutech.com  -  We usually respond within 24h</p>
         </a>
       </div>
 
@@ -208,15 +208,15 @@ export default function HelpPage() {
                 return (
                   <div
                     key={idx}
-                    className="bg-slate-800/50 border border-slate-700 rounded-lg overflow-hidden hover:border-teal-500/30 transition-all"
+                    className="overflow-hidden border-t border-[#B8C8C3]"
                   >
                     <button
                       onClick={() => setOpenFaq(isOpen ? null : globalIdx)}
-                      className="w-full px-6 py-4 flex justify-between items-start text-left hover:bg-slate-700/50 transition-all"
+                      className="flex w-full items-start justify-between px-2 py-4 text-left transition-colors hover:bg-[#E1E9E5]"
                     >
-                      <span className="font-bold text-white">{withGenesisStyle(item.q)}</span>
+                      <span className="font-bold text-[#152626]">{withGenesisStyle(item.q)}</span>
                       <span
-                        className={`text-2xl text-teal-300 transition-transform flex-shrink-0 ml-4 ${
+                        className={`ml-4 flex-shrink-0 text-2xl text-[#08776D] transition-transform ${
                           isOpen ? "rotate-180" : ""
                         }`}
                       >
@@ -225,8 +225,8 @@ export default function HelpPage() {
                     </button>
 
                     {isOpen && (
-                      <div className="px-6 py-4 bg-slate-900/50 border-t border-slate-700">
-                        <p className="text-slate-300">{withGenesisStyle(item.a)}</p>
+                      <div className="border-t border-[#B8C8C3] px-2 py-4">
+                        <p className="text-[#465D5A]">{withGenesisStyle(item.a)}</p>
                       </div>
                     )}
                   </div>
@@ -238,16 +238,16 @@ export default function HelpPage() {
       </div>
 
       {/* Still Can't Find Help? */}
-      <section className="bg-gradient-to-br from-teal-500/10 to-indigo-500/10 border-2 border-teal-500/30 rounded-2xl p-12 text-center space-y-4">
-        <h2 className="text-2xl font-bold text-white">Still need help?</h2>
-        <p className="text-slate-300 max-w-2xl mx-auto">
+      <section className="space-y-4 border-t border-[#B8C8C3] pt-8">
+        <h2 className="text-2xl font-bold text-[#152626]">Still need help?</h2>
+        <p className="max-w-2xl text-[#465D5A]">
           We're here to help. Reach out and we'll get back to you as soon as possible.
         </p>
 
-        <div className="flex flex-col sm:flex-row gap-4 justify-center mt-6">
+        <div className="mt-6 flex flex-col gap-4 sm:flex-row">
           <a
             href="mailto:security@sadhutech.com"
-            className="px-6 py-3 bg-teal-500 text-slate-950 font-bold rounded-xl hover:bg-teal-400 transition-all"
+            className="rounded-md bg-[#152626] px-6 py-3 text-center font-bold text-white transition-colors hover:bg-[#28524E]"
           >
             Email security@sadhutech.com
           </a>
@@ -255,7 +255,7 @@ export default function HelpPage() {
             href="https://github.com/amaratisirs-ai/sadhutech/discussions"
             target="_blank"
             rel="noopener noreferrer"
-            className="px-6 py-3 border-2 border-teal-500 text-teal-300 font-bold rounded-xl hover:bg-teal-500/10 transition-all"
+            className="rounded-md border border-[#08776D] px-6 py-3 text-center font-bold text-[#08776D] transition-colors hover:bg-[#E1E9E5]"
           >
             Ask on GitHub Discussions
           </a>
