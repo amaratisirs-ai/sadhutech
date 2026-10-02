@@ -20,11 +20,24 @@ describe("news feed", () => {
     );
     expect(parseNewsFeed(xml, source, now)).toEqual([{
       title: "Wallet phishing campaign",
+      summary: "",
       url: "https://therecord.media/wallet-phishing",
       source: "The Record",
       category: "Security",
       publishedAt: "2026-10-01T20:15:00.000Z",
     }]);
+  });
+
+  it("extracts a short plain-text excerpt without images or publisher boilerplate", () => {
+    const description = `<p><img src="https://example.com/cover.jpg" alt="Cover"></p><p>Summary Attackers used a fake site &amp; stolen credentials to target users.</p><p>The post <a href="https://therecord.media/attack">Security report</a> appeared first on The Record.</p>`;
+    const xml = feed(`<item><title>Security attack report</title><link>https://therecord.media/attack</link><pubDate>Thu, 01 Oct 2026 20:15:00 GMT</pubDate><description><![CDATA[${description}]]></description></item>`);
+    expect(parseNewsFeed(xml, source, now)[0].summary).toBe("Attackers used a fake site & stolen credentials to target users.");
+
+    const longDescription = "Attackers targeted wallets with phishing links. ".repeat(12);
+    const longXml = feed(`<item><title>Wallet phishing</title><link>https://therecord.media/wallets</link><pubDate>Thu, 01 Oct 2026 20:15:00 GMT</pubDate><description>${longDescription}</description></item>`);
+    const summary = parseNewsFeed(longXml, source, now)[0].summary;
+    expect(summary.length).toBeLessThanOrEqual(223);
+    expect(summary).toMatch(/\.\.\.$/);
   });
 
   it("returns valid stories when another publisher fails", async () => {

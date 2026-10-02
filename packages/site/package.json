@@ -20,6 +20,7 @@
     "@walletconnect/types": "^2.24.0",
     "@walletconnect/web3wallet": "^1.16.1",
     "fast-xml-parser": "^5.11.1",
+    "html-to-text": "^10.0.1",
     "mermaid": "^11.17.2",
     "next": "16.3.4",
     "qrcode.react": "^4.2.0",
@@ -30,6 +31,7 @@
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
+    "@types/html-to-text": "^9.0.4",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",

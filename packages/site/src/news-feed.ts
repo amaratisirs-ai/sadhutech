@@ -1,7 +1,9 @@
 import { XMLParser } from "fast-xml-parser";
+import { convert } from "html-to-text";
 
 export interface NewsItem {
   title: string;
+  summary: string;
   url: string;
   source: string;
   category: "Crypto safety" | "Security";
@@ -17,6 +19,18 @@ const sources = [
 
 const relevant = /hack|breach|exploit|vulnerab|phish|scam|fraud|ransomware|malware|wallet|drain|theft|stolen|steal|attack|security|zero.day|compromis|launder|sanction|backdoor|credential|data leak|data expos|cyberattack/i;
 const parser = new XMLParser({ ignoreAttributes: false });
+
+function summarize(description: unknown): string {
+  if (typeof description !== "string") return "";
+  const text = convert(description, { wordwrap: false, selectors: [
+    { selector: "img", format: "skip" },
+    { selector: "a", options: { ignoreHref: true } },
+    { selector: "p", options: { leadingLineBreaks: 0, trailingLineBreaks: 0 } },
+  ] }).split(/The post .+ appeared first on /i)[0]
+    .replace(/\s+/g, " ").replace(/\s*\[\.\.\.\]\s*$/, "").trim().replace(/^Summary\s+/i, "");
+  if (text.length <= 220) return text;
+  return `${text.slice(0, 220).replace(/\s+\S*$/, "").trimEnd()}...`;
+}
 
 export function parseNewsFeed(xml: string, source: { name: string; host: string; category: NewsItem["category"] }, now = Date.now()): NewsItem[] {
   const channel = parser.parse(xml)?.rss?.channel;
@@ -35,7 +49,7 @@ export function parseNewsFeed(xml: string, source: { name: string; host: string;
     if (!relevant.test(title) || url.protocol !== "https:" || url.hostname !== source.host ||
         !Number.isFinite(publishedAt.getTime()) || publishedAt.getTime() > now ||
         now - publishedAt.getTime() > 30 * 24 * 60 * 60 * 1000) return [];
-    return [{ title, url: url.toString(), source: source.name, category: source.category, publishedAt: publishedAt.toISOString() }];
+    return [{ title, summary: summarize(item.description), url: url.toString(), source: source.name, category: source.category, publishedAt: publishedAt.toISOString() }];
   });
 }
 

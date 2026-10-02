@@ -246,6 +246,7 @@ export default function NewsPage() {
                 </time>
               </div>
               <h2 className="text-base font-semibold text-white sm:text-lg">{story.title} <span aria-hidden="true" className="text-teal-300">↗</span></h2>
+              {story.summary && <p className="mt-2 text-sm leading-relaxed text-slate-300">{story.summary}</p>}
             </a>
           ))}
           {news.length > 0 && <p className="text-xs text-slate-400">Headlines link to the original publishers. GENESIS does not independently verify their reporting.</p>}
