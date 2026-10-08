@@ -10,8 +10,8 @@ import { GateStatusProvider, useGateStatus } from "@/src/gate-status";
 import { trackEvent } from "@/src/analytics";
 import { requiresWalletRuntime } from "@/src/wallet/routes";
 
-const WalletRuntime = dynamic(() => import("./wallet-runtime").then((module) => module.WalletRuntime));
-const AccountWidget = dynamic(() => import("@/components/AccountWidget").then((module) => module.AccountWidget));
+const WalletRuntime = dynamic(() => import("./wallet-runtime").then((module) => module.WalletRuntime), { ssr: false });
+const AccountWidget = dynamic(() => import("@/components/AccountWidget").then((module) => module.AccountWidget), { ssr: false });
 
 const GATE_URL = process.env.NEXT_PUBLIC_GATE_URL || "https://genesis-gate.onrender.com";
 const WALLET_CONNECTED_KEY = "genesis_wallet_connected";
