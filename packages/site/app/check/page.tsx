@@ -8,10 +8,10 @@ import { useWallet } from "@/src/wallet/useWallet";
 import { useProAuth, WalletTimeoutError } from "@/src/wallet/useProAuth";
 import { friendlyWalletError } from "@/src/wallet/errors";
 import { DEEP_CHECK_ENABLED } from "@/src/pro-status";
-import { useGateStatus } from "@/src/gate-status";
 import { Genesis, withGenesisStyle } from "@/components/Genesis";
 import { trackEvent } from "@/src/analytics";
 import { isCompletedDeepCheckResponse } from "@/src/deep-check-response";
+import { DeepCheckProgress, deepCheckProgress, type DeepCheckPhase } from "@/components/DeepCheckProgress";
 
 const GATE_URL = process.env.NEXT_PUBLIC_GATE_URL || "https://genesis-gate.onrender.com";
 const ADDRESS_RE = /^0x[0-9a-fA-F]{40}$/;
@@ -122,8 +122,7 @@ function VerdictCard({ result, addressCheck = false }: { result: Result; address
 
 export default function CheckPage() {
   const { address, isConnected, connect } = useWallet();
-  const gateStatus = useGateStatus();
-  const { proAuth, getProAuth, persistProAuth } = useProAuth();
+  const { proAuth, getProAuth, persistProAuth, isSigning } = useProAuth();
   const [mode, setMode] = useState<Mode>("address");
   const [addressInput, setAddressInput] = useState("");
   const [dataInput, setDataInput] = useState("");
@@ -132,6 +131,7 @@ export default function CheckPage() {
   const [credits, setCredits] = useState<number | null>(null);
   const [lastTx, setLastTx] = useState<Record<string, unknown> | null>(null);
   const [deepBusy, setDeepBusy] = useState(false);
+  const [deepPhase, setDeepPhase] = useState<DeepCheckPhase>("credits");
   const [deepMsg, setDeepMsg] = useState<string | null>(null);
   const [deepDetailsOpen, setDeepDetailsOpen] = useState(false);
   const [pendingDeepCheck, setPendingDeepCheck] = useState(false);
@@ -239,7 +239,7 @@ export default function CheckPage() {
 
   const refreshStatus = async (addr: string) => {
     try {
-      const r = await fetch(`${GATE_URL}/v1/pro/status/${addr}`);
+      const r = await fetch(`${GATE_URL}/v1/pro/status/${addr}`, { signal: AbortSignal.timeout(10_000), cache: "no-store" });
       if (!r.ok) return null;
       const s = await r.json();
       setCredits(typeof s.credits === "number" ? s.credits : 0);
@@ -264,12 +264,17 @@ export default function CheckPage() {
     }
     deepCheckInFlight.current = true;
     setDeepBusy(true);
+    setDeepPhase("credits");
     try {
       const s = await refreshStatus(address);
+      if (!s) { setDeepMsg("Could not load your credit balance. Please try again."); return; }
       if (!s?.premium) { setDeepMsg("Deep checks (global scam-address intel) are launching soon."); return; }
+      if (!s.credits || s.credits < 1) { setDeepMsg("no-credits"); return; }
       const { message, signature } = await getProAuth(address);
+      setDeepPhase("checking");
       const res = await fetch(`${GATE_URL}/v1/analyze`, {
         method: "POST",
+        signal: AbortSignal.timeout(60_000),
         headers: { "content-type": "application/json" },
         body: JSON.stringify({ tx: lastTx, pro: { wallet: address, message, signature } }),
       });
@@ -306,7 +311,9 @@ export default function CheckPage() {
       }
       if (typeof data.creditsLeft === "number") setCredits(data.creditsLeft);
     } catch (e: unknown) {
-      setDeepMsg(describeError(e));
+      setDeepMsg(e instanceof Error && (e.name === "TimeoutError" || e.name === "AbortError")
+        ? "The deep-check response timed out. The request may still have completed; check your credit balance before retrying."
+        : describeError(e));
       trackEvent(e instanceof WalletTimeoutError ? "stuck" : "error", { page: "/check", wallet: address, meta: { flow: "deep-check", message: describeError(e) } });
     } finally {
       deepCheckInFlight.current = false;
@@ -411,9 +418,6 @@ export default function CheckPage() {
           Paste a crypto address or a transaction and <Genesis /> screens it against community threat intel  -  a plain-English
           verdict in seconds. No wallet connection, no signup.
         </p>
-        {gateStatus === "unavailable" && (
-          <p className="text-xs text-amber-300">We couldn&apos;t confirm the checker&apos;s status. You can still try a check.</p>
-        )}
       </header>
 
       {/* Mode toggle */}
@@ -587,13 +591,15 @@ export default function CheckPage() {
             <button
               onClick={startDeepCheck}
               disabled={deepBusy}
+              aria-busy={deepBusy}
               className="px-4 py-2 rounded-lg bg-amber-400 text-slate-950 text-sm font-bold hover:bg-amber-300 disabled:opacity-50 transition whitespace-nowrap"
             >
-              {deepBusy ? "Working…" : isConnected ? "Deep check (1 credit)" : "Connect & deep check"}
+              {deepBusy ? deepCheckProgress[isSigning ? "wallet" : deepPhase].label : isConnected ? "Deep check (1 credit)" : "Connect & deep check"}
             </button>
           </div>
         </div>
       )}
+      {deepBusy && <DeepCheckProgress phase={isSigning ? "wallet" : deepPhase} />}
       {deepDetailsOpen && (
         <div className="rounded-xl border border-slate-700 bg-slate-900/60 p-4 text-xs text-slate-300 space-y-2">
           <p>A deep check queries an independent, continuously-updated database of over a million confirmed scam addresses, drainer contracts, and sanctioned wallets - built from security researchers and community reports.</p>

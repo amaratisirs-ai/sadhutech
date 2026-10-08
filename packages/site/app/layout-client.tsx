@@ -10,8 +10,8 @@ import { GateStatusProvider, useGateStatus } from "@/src/gate-status";
 import { trackEvent } from "@/src/analytics";
 import { requiresWalletRuntime } from "@/src/wallet/routes";
 
-const WalletRuntime = dynamic(() => import("./wallet-runtime").then((module) => module.WalletRuntime));
-const AccountWidget = dynamic(() => import("@/components/AccountWidget").then((module) => module.AccountWidget));
+const WalletRuntime = dynamic(() => import("./wallet-runtime").then((module) => module.WalletRuntime), { ssr: false });
+const AccountWidget = dynamic(() => import("@/components/AccountWidget").then((module) => module.AccountWidget), { ssr: false });
 
 const GATE_URL = process.env.NEXT_PUBLIC_GATE_URL || "https://genesis-gate.onrender.com";
 const WALLET_CONNECTED_KEY = "genesis_wallet_connected";
@@ -314,10 +314,10 @@ export function LayoutClient({ children }: { children: ReactNode }) {
 
 function GateStatusBadge() {
   const status = useGateStatus();
-  const label = status === "unavailable" ? "Status unknown" : status === "checking" ? "Connecting…" : "Live";
+  const label = status === "unavailable" ? "Waking up.." : status === "checking" ? "Connecting…" : "Live";
   const dotColor = status === "unavailable" ? "bg-amber-400" : status === "checking" ? "bg-slate-400" : "bg-teal-400";
   return (
-    <div className="hidden items-center gap-2 rounded-md border border-[#30423F] bg-[#12201D] px-3 py-1.5 text-xs font-semibold text-[#BCE6DB] sm:flex">
+    <div role="status" className="hidden items-center gap-2 rounded-md border border-[#30423F] bg-[#12201D] px-3 py-1.5 text-xs font-semibold text-[#BCE6DB] sm:flex">
       <span className={`w-2 h-2 rounded-full animate-pulse ${dotColor}`}></span>
       {label}
     </div>

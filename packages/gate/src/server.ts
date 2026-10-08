@@ -21,6 +21,7 @@ import { premiumAvailable } from "./chainabuse-lookup.js";
 import { goplusAvailable } from "./goplus-lookup.js";
 import { deepCheckRequestKey } from "./deep-check-key.js";
 import { NewsletterService, initNewsletterService, resendConfigured } from "./newsletter.js";
+import { corsMiddleware } from "./cors.js";
 import {
   loadApiKeys,
   createApiKeyMiddleware,
@@ -67,30 +68,7 @@ let newsletterService: NewsletterService | null = null;
 app.addHook("onRequest", createSecurityHeadersMiddleware());
 
 // 2. Handle CORS (restricted origin, not "*")
-app.addHook("onRequest", async (req, reply) => {
-  const origin = req.headers.origin;
-
-  // Allow specific origins only (localhost for dev, production domains)
-  const allowedOrigins = [
-    "http://localhost:3000",
-    "http://localhost:8787",
-    "https://sadhutech-site.vercel.app", // Legacy (during transition)
-    "https://sadhutech.com", // Production
-    "https://genesis-gate.onrender.com",
-  ];
-
-  if (allowedOrigins.includes(origin ?? "")) {
-    reply.header("access-control-allow-origin", origin);
-  } else if (!origin) {
-    // No origin = same-site request, allow it
-    reply.header("access-control-allow-origin", "*");
-  }
-  // Otherwise: deny by not setting header (browser enforces SOP)
-
-  reply.header("access-control-allow-headers", "content-type, x-api-key");
-  reply.header("access-control-allow-methods", "GET,POST,OPTIONS");
-  if (req.method === "OPTIONS") reply.status(204).send();
-});
+app.addHook("onRequest", corsMiddleware);
 
 app.get("/", async (_req, reply) => {
   reply.header("content-type", "text/html; charset=utf-8");
