@@ -35,7 +35,7 @@ export function withTimeout<T>(promise: Promise<T>, ms: number, message: string)
  * /extension-connect so the signing logic only lives in one place.
  */
 export function useProAuth() {
-  const { signMessageAsync } = useSignMessage();
+  const { signMessageAsync, isPending: isSigning } = useSignMessage();
   const [proAuth, setProAuth] = useState<ProAuth | null>(null);
 
   // Reads any cached auth after mount only - localStorage isn't available during Next.js SSR.
@@ -73,5 +73,5 @@ export function useProAuth() {
     return auth;
   };
 
-  return { proAuth, getProAuth, persistProAuth };
+  return { proAuth, getProAuth, persistProAuth, isSigning };
 }

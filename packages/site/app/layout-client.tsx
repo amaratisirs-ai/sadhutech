@@ -314,10 +314,10 @@ export function LayoutClient({ children }: { children: ReactNode }) {
 
 function GateStatusBadge() {
   const status = useGateStatus();
-  const label = status === "unavailable" ? "Status unknown" : status === "checking" ? "Connecting…" : "Live";
+  const label = status === "unavailable" ? "Waking up.." : status === "checking" ? "Connecting…" : "Live";
   const dotColor = status === "unavailable" ? "bg-amber-400" : status === "checking" ? "bg-slate-400" : "bg-teal-400";
   return (
-    <div className="hidden items-center gap-2 rounded-md border border-[#30423F] bg-[#12201D] px-3 py-1.5 text-xs font-semibold text-[#BCE6DB] sm:flex">
+    <div role="status" className="hidden items-center gap-2 rounded-md border border-[#30423F] bg-[#12201D] px-3 py-1.5 text-xs font-semibold text-[#BCE6DB] sm:flex">
       <span className={`w-2 h-2 rounded-full animate-pulse ${dotColor}`}></span>
       {label}
     </div>
