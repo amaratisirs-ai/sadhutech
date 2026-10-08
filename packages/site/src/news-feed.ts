@@ -13,8 +13,12 @@ export interface NewsItem {
 const sources = [
   { name: "Chainalysis", url: "https://www.chainalysis.com/blog/feed/", host: "www.chainalysis.com", category: "Crypto safety" },
   { name: "Cointelegraph", url: "https://cointelegraph.com/rss/tag/security", host: "cointelegraph.com", category: "Crypto safety" },
+  { name: "Decrypt", url: "https://decrypt.co/feed", host: "decrypt.co", category: "Crypto safety" },
   { name: "BleepingComputer", url: "https://www.bleepingcomputer.com/feed/", host: "www.bleepingcomputer.com", category: "Security" },
   { name: "The Record", url: "https://therecord.media/feed", host: "therecord.media", category: "Security" },
+  { name: "The Hacker News", url: "https://feeds.feedburner.com/TheHackersNews", host: "thehackernews.com", category: "Security" },
+  { name: "SecurityWeek", url: "https://www.securityweek.com/feed/", host: "www.securityweek.com", category: "Security" },
+  { name: "Krebs on Security", url: "https://krebsonsecurity.com/feed/", host: "krebsonsecurity.com", category: "Security" },
 ] as const;
 
 const relevant = /hack|breach|exploit|vulnerab|phish|scam|fraud|ransomware|malware|wallet|drain|theft|stolen|steal|attack|security|zero.day|compromis|launder|sanction|backdoor|credential|data leak|data expos|cyberattack/i;
@@ -38,7 +42,7 @@ export function parseNewsFeed(xml: string, source: { name: string; host: string;
   if (!items) return [];
   return (Array.isArray(items) ? items : [items]).flatMap((item: Record<string, unknown>) => {
     if (typeof item.title !== "string" || typeof item.link !== "string" || typeof item.pubDate !== "string") return [];
-    const title = item.title.trim().replace(/&#(?:0*38|x0*26);/gi, "&");
+    const title = convert(item.title, { wordwrap: false }).trim();
     const publishedAt = new Date(item.pubDate);
     let url: URL;
     try {
@@ -63,5 +67,5 @@ export async function getLatestNews(): Promise<NewsItem[]> {
   if (results.every((result) => result.status === "rejected")) throw new Error("News feeds unavailable");
   return [...new Map(items.map((item) => [item.url, item])).values()]
     .sort((first, second) => second.publishedAt.localeCompare(first.publishedAt))
-    .slice(0, 24);
+    .slice(0, 100);
 }

@@ -1,9 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import Image from "next/image";
 import { withGenesisStyle } from "@/components/Genesis";
 import { Icon } from "@/components/Icon";
 import type { NewsItem } from "@/src/news-feed";
+import { getNewsPage } from "@/src/news-pagination";
 
 type Tab = "news" | "threats" | "articles" | "tips" | "stats";
 
@@ -108,6 +110,11 @@ export default function NewsPage() {
   const [news, setNews] = useState<NewsItem[]>([]);
   const [newsLoading, setNewsLoading] = useState(true);
   const [newsError, setNewsError] = useState(false);
+  const [newsPage, setNewsPage] = useState(1);
+  const [newsCategory, setNewsCategory] = useState<NewsItem["category"] | "All">("All");
+  const [newsPublisher, setNewsPublisher] = useState("All");
+  const [newsReload, setNewsReload] = useState(0);
+  const newsSection = useRef<HTMLElement>(null);
 
   // Fetch threats with pagination
   const fetchThreats = async (fetchOffset: number = 0) => {
@@ -167,15 +174,23 @@ export default function NewsPage() {
   }, []);
 
   useEffect(() => {
-    fetch("/api/news")
+    const controller = new AbortController();
+    fetch("/api/news", { signal: controller.signal })
       .then((response) => {
         if (!response.ok) throw new Error("News unavailable");
         return response.json();
       })
-      .then((data: { items: NewsItem[] }) => setNews(data.items))
-      .catch(() => setNewsError(true))
-      .finally(() => setNewsLoading(false));
-  }, []);
+      .then((data: { items: NewsItem[] }) => {
+        if (!controller.signal.aborted) setNews(data.items);
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) setNewsError(true);
+      })
+      .finally(() => {
+        if (!controller.signal.aborted) setNewsLoading(false);
+      });
+    return () => controller.abort();
+  }, [newsReload]);
 
   // Load more handler
   const handleLoadMore = () => {
@@ -183,73 +198,164 @@ export default function NewsPage() {
   };
 
   const filteredThreats = filter ? allThreats.filter((t) => t.category === filter) : allThreats;
+  const newsResults = getNewsPage(news, newsPage, newsCategory, newsPublisher);
+  const publishers = [...new Set(news.map((story) => story.source))].sort();
+
+  const changeNewsPage = (page: number) => {
+    setNewsPage(page);
+    newsSection.current?.focus({ preventScroll: true });
+    newsSection.current?.scrollIntoView({ behavior: "instant", block: "start" });
+  };
 
   return (
-    <div className="space-y-6 max-w-6xl">
+    <div className="mx-auto max-w-6xl space-y-8">
       {/* Header */}
       <div>
         <div className="flex items-center gap-3 mb-2">
-          <svg className="w-8 h-8 text-amber-500" fill="currentColor" viewBox="0 0 24 24">
-            <path d="M15.5 1h-8C6.12 1 5 2.12 5 3.5v17C5 21.88 6.12 23 7.5 23h8c1.38 0 2.5-1.12 2.5-2.5v-17C18 2.12 16.88 1 15.5 1zm-4 21c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm4.5-4H7V4h9v14z" />
-          </svg>
-          <h1 className="text-4xl font-bold text-white">News &amp; Articles</h1>
+          <Icon name="newspaper" className="h-7 w-7 shrink-0 text-teal-400" />
+          <h1 className="text-3xl font-bold text-white sm:text-4xl">News &amp; Articles</h1>
         </div>
-        <p className="text-slate-400 mt-2">
-          Security and crypto safety reporting from independent publishers, alongside GENESIS research and practical safety guidance.
+        <p className="mt-3 max-w-2xl text-sm text-slate-400 sm:text-base">
+          The latest in crypto safety and cybersecurity. Independent reporting, GENESIS research, and practical perspectives.
         </p>
       </div>
 
       {/* Tab Navigation */}
-      <div className="grid grid-cols-3 gap-2 p-2 bg-slate-900/30 rounded-lg border border-slate-700 sm:flex">
+      <div className="grid grid-cols-3 border-b border-slate-700 sm:flex" role="group" aria-label="News and research">
         {[
-          { id: "news" as Tab, label: "Latest News" },
-          { id: "articles" as Tab, label: "Articles & Research" },
-          { id: "tips" as Tab, label: "Safety Tips" },
+          { id: "news" as Tab, label: "Latest News", icon: "newspaper" },
+          { id: "articles" as Tab, label: "Articles & Research", icon: "document" },
+          { id: "tips" as Tab, label: "Safety Tips", icon: "shield" },
         ].map((tab) => (
           <button
             key={tab.id}
+            aria-pressed={activeTab === tab.id}
             onClick={() => {
               setActiveTab(tab.id);
               setFilter(null);
             }}
-            className={`min-h-12 px-1.5 py-2 rounded-lg font-semibold leading-tight transition-all text-xs sm:px-4 sm:text-sm ${
+            className={`flex min-h-14 items-center justify-center gap-2 border-b-2 px-2 py-3 text-xs font-semibold leading-tight transition-colors focus-visible:outline-2 focus-visible:outline-teal-400 sm:px-5 sm:text-sm ${
               activeTab === tab.id
-                ? "bg-indigo-600 text-white shadow-lg"
-                : "bg-slate-800 text-slate-300 hover:bg-slate-700"
+                ? "border-teal-400 text-teal-300"
+                : "border-transparent text-slate-400 hover:border-slate-500 hover:text-white"
             }`}
           >
+            <Icon name={tab.icon} className="hidden h-4 w-4 shrink-0 sm:block" />
             {tab.label}
           </button>
         ))}
       </div>
 
       {activeTab === "news" && (
-        <section className="space-y-4" aria-label="Latest security news">
-          {newsLoading && <p className="text-slate-400">Loading latest news...</p>}
-          {newsError && <p role="alert" className="text-amber-300">News feeds are temporarily unavailable. Try again later, or browse our Articles &amp; Research tab.</p>}
-          {!newsLoading && !newsError && news.length === 0 && (
-            <p className="text-slate-400">No recent security stories from our sources right now. Check back later.</p>
-          )}
-          {news.map((story) => (
-            <a
-              key={story.url}
-              href={story.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="block border-t border-slate-700 py-4 transition-colors hover:border-teal-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-400"
+        <section ref={newsSection} tabIndex={-1} className="scroll-mt-28 space-y-6" aria-labelledby="latest-news-heading" aria-busy={newsLoading}>
+          <div className="flex flex-wrap items-end justify-between gap-3">
+            <div>
+              <p className="mb-1 text-xs font-medium uppercase text-teal-400">Security briefing</p>
+              <h2 id="latest-news-heading" className="text-2xl font-semibold text-white">Latest headlines</h2>
+            </div>
+            {!newsLoading && !newsError && (
+              <p className="text-xs text-slate-400">{news.length} stories <span aria-hidden="true">/</span> {publishers.length} publishers</p>
+            )}
+          </div>
+
+          <div className="flex flex-col gap-4 border-y border-slate-700/80 py-4 sm:flex-row sm:items-center sm:justify-between">
+            <div role="group" aria-label="News category" className="grid grid-cols-3 gap-1 rounded-md bg-slate-900/70 p-1 sm:flex">
+              {(["All", "Crypto safety", "Security"] as const).map((category) => (
+                <button
+                  key={category}
+                  type="button"
+                  aria-pressed={newsCategory === category}
+                  onClick={() => { setNewsCategory(category); setNewsPage(1); }}
+                  className={`min-h-10 rounded px-3 text-xs font-medium transition-colors focus-visible:outline-2 focus-visible:outline-teal-400 sm:text-sm ${newsCategory === category ? "bg-teal-400 text-slate-950" : "text-slate-300 hover:bg-slate-700"}`}
+                >
+                  {category === "All" ? "All news" : category}
+                </button>
+              ))}
+            </div>
+            <select
+              aria-label="News publisher"
+              value={newsPublisher}
+              onChange={(event) => { setNewsPublisher(event.target.value); setNewsPage(1); }}
+              className="min-h-11 w-full rounded-md border border-slate-600 bg-slate-900 px-3 text-sm text-slate-200 focus-visible:outline-2 focus-visible:outline-teal-400 sm:w-52"
             >
-              <div className="mb-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-teal-300">
-                <span>{story.category}</span>
-                <span className="text-slate-400">{story.source}</span>
-                <time dateTime={story.publishedAt} className="text-slate-400">
-                  {new Date(story.publishedAt).toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" })}
-                </time>
+              <option value="All">All publishers</option>
+              {publishers.map((publisher) => <option key={publisher} value={publisher}>{publisher}</option>)}
+            </select>
+          </div>
+
+          {newsLoading && (
+            <div role="status" className="divide-y divide-slate-700/60">
+              <span className="sr-only">Loading latest news...</span>
+              {Array.from({ length: 3 }, (_, index) => (
+                <div key={index} aria-hidden="true" className="space-y-3 py-6 motion-safe:animate-pulse">
+                  <div className="h-3 w-36 rounded bg-slate-700" />
+                  <div className="h-5 w-4/5 rounded bg-slate-700" />
+                  <div className="h-3 w-3/5 rounded bg-slate-800" />
+                </div>
+              ))}
+            </div>
+          )}
+          {newsError && (
+            <div role="alert" className="flex flex-col items-start gap-3 border-l-2 border-amber-400 py-4 pl-5">
+              <p className="text-sm text-slate-300">News feeds are temporarily unavailable.</p>
+              <button type="button" onClick={() => { setNewsError(false); setNewsLoading(true); setNewsReload((value) => value + 1); }} className="flex min-h-11 items-center gap-2 text-sm font-semibold text-teal-300 hover:text-teal-200 focus-visible:outline-2 focus-visible:outline-teal-400">
+                <Icon name="refresh" className="h-4 w-4" /> Try again
+              </button>
+            </div>
+          )}
+          {!newsLoading && !newsError && newsResults.total === 0 && (
+            <div className="py-10 text-center">
+              <Icon name="newspaper" className="mx-auto mb-3 h-8 w-8 text-slate-500" />
+              <p className="font-medium text-slate-200">{news.length === 0 ? "No recent stories right now" : "No stories match these filters"}</p>
+              {news.length > 0 && <button type="button" onClick={() => { setNewsCategory("All"); setNewsPublisher("All"); setNewsPage(1); }} className="mt-3 min-h-11 text-sm font-semibold text-teal-300 focus-visible:outline-2 focus-visible:outline-teal-400">Clear filters</button>}
+            </div>
+          )}
+
+          {!newsLoading && !newsError && newsResults.total > 0 && (
+            <>
+              <div className="flex items-center justify-between gap-3 text-xs text-slate-400" role="status" aria-live="polite">
+                <span>{newsResults.start}-{newsResults.end} of {newsResults.total} stories</span>
+                <span>Newest first</span>
               </div>
-              <h2 className="text-base font-semibold text-white sm:text-lg">{story.title} <span aria-hidden="true" className="text-teal-300">↗</span></h2>
-              {story.summary && <p className="mt-2 text-sm leading-relaxed text-slate-300">{story.summary}</p>}
-            </a>
-          ))}
-          {news.length > 0 && <p className="text-xs text-slate-400">Headlines link to the original publishers. GENESIS does not independently verify their reporting.</p>}
+              <div className="divide-y divide-slate-700/70 border-b border-slate-700/70">
+                {newsResults.items.map((story, index) => (
+                  <article key={story.url} data-news-story className="group py-6">
+                    <a href={story.url} target="_blank" rel="noopener noreferrer" className="flex items-start gap-4 rounded-sm focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-teal-400 sm:gap-6">
+                      <span aria-hidden="true" className="hidden w-7 shrink-0 pt-1 font-mono text-sm text-slate-500 sm:block">{String(newsResults.start + index).padStart(2, "0")}</span>
+                      <div className="min-w-0 flex-1">
+                        <div className="mb-3 flex flex-wrap items-center gap-x-3 gap-y-2 text-xs">
+                          <span className="inline-flex items-center gap-2 font-semibold text-slate-200">
+                            <Image src={`https://www.google.com/s2/favicons?domain=${new URL(story.url).hostname}&sz=64`} width={18} height={18} alt="" unoptimized className="h-[18px] w-[18px] rounded-sm object-contain" />
+                            {story.source}
+                          </span>
+                          <span className={story.category === "Crypto safety" ? "text-teal-300" : "text-amber-300"}>{story.category}</span>
+                          <time dateTime={story.publishedAt} className="text-slate-400">{new Date(story.publishedAt).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" })}</time>
+                        </div>
+                        <h3 className="max-w-3xl break-words text-lg font-semibold leading-snug text-white transition-colors group-hover:text-teal-300 sm:text-xl">{story.title}</h3>
+                        {story.summary && <p className="mt-2 max-w-3xl break-words text-sm leading-relaxed text-slate-400">{story.summary}</p>}
+                      </div>
+                      <Icon name="arrowRight" className="mt-1 h-5 w-5 shrink-0 -rotate-45 text-slate-500 transition-colors group-hover:text-teal-300" />
+                    </a>
+                  </article>
+                ))}
+              </div>
+              <nav aria-label="News pagination" className="flex flex-wrap items-center justify-between gap-4">
+                <p className="text-xs text-slate-400">Page {newsResults.page} of {newsResults.pageCount}</p>
+                <div className="flex items-center gap-2">
+                  <button type="button" aria-label="Previous news page" title="Previous news page" disabled={newsResults.page === 1} onClick={() => changeNewsPage(newsResults.page - 1)} className="flex h-11 w-11 items-center justify-center rounded-md border border-slate-600 text-slate-200 transition-colors hover:border-teal-400 hover:text-teal-300 focus-visible:outline-2 focus-visible:outline-teal-400 disabled:cursor-not-allowed disabled:opacity-30">
+                    <Icon name="arrowRight" className="h-4 w-4 rotate-180" />
+                  </button>
+                  <select aria-label="News page" value={newsResults.page} onChange={(event) => changeNewsPage(Number(event.target.value))} className="h-11 rounded-md border border-slate-600 bg-slate-900 px-3 text-sm text-slate-200 focus-visible:outline-2 focus-visible:outline-teal-400">
+                    {Array.from({ length: newsResults.pageCount }, (_, index) => <option key={index + 1} value={index + 1}>Page {index + 1}</option>)}
+                  </select>
+                  <button type="button" aria-label="Next news page" title="Next news page" disabled={newsResults.page === newsResults.pageCount} onClick={() => changeNewsPage(newsResults.page + 1)} className="flex h-11 w-11 items-center justify-center rounded-md border border-slate-600 text-slate-200 transition-colors hover:border-teal-400 hover:text-teal-300 focus-visible:outline-2 focus-visible:outline-teal-400 disabled:cursor-not-allowed disabled:opacity-30">
+                    <Icon name="arrowRight" className="h-4 w-4" />
+                  </button>
+                </div>
+              </nav>
+              <p className="border-t border-slate-700/60 pt-4 text-xs text-slate-500">Independent reporting. Links open the original publisher; GENESIS does not independently verify these stories.</p>
+            </>
+          )}
         </section>
       )}
 
