@@ -1,6 +1,9 @@
 # Threat Sources Architecture
 
-**Status**: Production-ready, 7 active sources, **4,121 threats loaded**
+**Historical baseline**: 4,121 address reports loaded in the initial rollout.
+Counts and source availability below are historical, not live health metrics.
+See [Public Address Feed Imports](PUBLIC-ADDRESS-FEEDS.md) for the added sources,
+duplicate prevention, and the October 2026 read-only coverage comparison.
 
 ## Current Threat Count Breakdown
 
