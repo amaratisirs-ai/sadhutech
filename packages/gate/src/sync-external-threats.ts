@@ -50,6 +50,7 @@ import { readFile } from "fs/promises";
 import { fileURLToPath } from "url";
 import { dirname, join } from "path";
 import type { Address, ThreatCategory } from "@genesis/shared";
+import { deduplicateThreatAddresses, fetchPublicAddressFeed, persistThreatBatches, publicAddressFeeds } from "./public-address-feeds.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const feedPath = join(__dirname, "..", "data", "threat-feeds.json");
@@ -151,7 +152,7 @@ async function fetchScamSnifferThreats(): Promise<ExternalThreat[]> {
     // Scam Sniffer database: https://github.com/scamsniffer/scam-database/blob/main/blacklist/address.json
     const res = await fetch(
       "https://raw.githubusercontent.com/scamsniffer/scam-database/main/blacklist/address.json",
-      { headers: { "User-Agent": "GENESIS-Gate/1.0" } }
+      { headers: { "User-Agent": "GENESIS-Gate/1.0" }, signal: AbortSignal.timeout(15_000) }
     );
 
     if (!res.ok) {
@@ -164,9 +165,8 @@ async function fetchScamSnifferThreats(): Promise<ExternalThreat[]> {
     if (!Array.isArray(addresses)) return [];
 
     const threats = addresses
-      .slice(0, 1000) // Limit to prevent overload
-      .map((addr: string) => ({
-        address: (addr || "").toString().toLowerCase().trim(),
+      .map((addr: unknown) => ({
+        address: typeof addr === "string" ? addr.toLowerCase().trim() : "",
         category: "phishing" as ThreatCategory,
         source: "scam-sniffer",
         title: "Scam Sniffer: Phishing/Scam Address",
@@ -515,7 +515,8 @@ function mapBlockaidThreatType(blockaidType: string, riskLevel: string): ThreatC
  * Idempotent: safe to run multiple times.
  */
 export async function syncExternalThreats(
-  intel: ThreatIntelPostgres
+  intel: ThreatIntelPostgres,
+  options: { publicOnly?: boolean } = {}
 ): Promise<SyncReport> {
   console.log("[sync] Starting threat intelligence sync...");
   const startTime = Date.now();
@@ -533,7 +534,8 @@ export async function syncExternalThreats(
       { name: "chainabuse", fn: fetchChainAbuseThreats },
       { name: "rugdoc", fn: fetchRugdocThreats },
       { name: "slowmist", fn: fetchSlowMistThreats },
-    ];
+      ...publicAddressFeeds.map((source) => ({ name: source.name, fn: () => fetchPublicAddressFeed(source) })),
+    ].filter((source) => !options.publicOnly || ["curated", "scam-sniffer", "cryptoscamdb", ...publicAddressFeeds.map((feed) => feed.name)].includes(source.name));
 
     // Load sources sequentially for better debugging and error visibility
     const allThreats: ExternalThreat[] = [];
@@ -582,33 +584,11 @@ export async function syncExternalThreats(
       `[sync] Loaded ${allThreats.length} total threats from ${sources.length} sources`
     );
 
-    // Deduplicate by address (keep first occurrence, track removed)
-    const uniqueThreats = new Map<string, ExternalThreat>();
-    for (const threat of allThreats) {
-      const key = threat.address.toLowerCase() as Address;
-      if (!uniqueThreats.has(key)) {
-        uniqueThreats.set(key, threat);
-      }
-    }
-    const deduped = allThreats.length - uniqueThreats.size;
-
-    // Insert into database (individual inserts for reliability)
-    for (const threat of uniqueThreats.values()) {
-      try {
-        const result = await intel.report({
-          address: threat.address as Address,
-          category: threat.category,
-          reporterId: `sync-${threat.source}`,
-        });
-        totalSynced++;
-        if (totalSynced % 100 === 0) {
-          console.log(`[sync] Inserted ${totalSynced} threats...`);
-        }
-      } catch (err) {
-        console.error(`[sync] Failed to insert ${threat.address}:`, err instanceof Error ? err.message : String(err));
-        totalErrors++;
-      }
-    }
+    const uniqueThreats = deduplicateThreatAddresses(allThreats);
+    const deduped = allThreats.length - uniqueThreats.length;
+    const persisted = await persistThreatBatches(intel, uniqueThreats);
+    totalSynced = persisted.processed;
+    totalErrors += persisted.errors;
 
     const totalDuration = Date.now() - startTime;
     console.log(

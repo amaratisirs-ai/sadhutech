@@ -26,10 +26,10 @@ async function main(): Promise<void> {
     await intel.initialize();
 
     console.log("[cli] Starting manual sync...");
-    const report = await syncExternalThreats(intel);
+    const report = await syncExternalThreats(intel, { publicOnly: process.argv.includes("--public-only") });
 
     console.log(`[cli] ✅ Sync complete:`);
-    console.log(`     Total: ${report.total_threats} threats added`);
+    console.log(`     Total: ${report.total_threats} unique addresses processed (new or existing)`);
     console.log(`     Errors: ${report.total_errors}`);
     console.log(`     Deduped: ${report.deduplication_removed}`);
     console.log(`     Duration: ${report.total_duration_ms}ms`);
