@@ -5,6 +5,7 @@ import { resolveDecisionOutcome, type DecisionOutcome } from "../../src/decision
 import { addressCheckResult, addressProbe } from "@/src/address-check";
 import { Icon } from "@/components/Icon";
 import { useWallet } from "@/src/wallet/useWallet";
+import { useCredits } from "@/src/wallet/useCredits";
 import { useProAuth, WalletTimeoutError } from "@/src/wallet/useProAuth";
 import { friendlyWalletError } from "@/src/wallet/errors";
 import { DEEP_CHECK_ENABLED } from "@/src/pro-status";
@@ -128,7 +129,7 @@ export default function CheckPage() {
   const [dataInput, setDataInput] = useState("");
   const [checking, setChecking] = useState(false);
   const [result, setResult] = useState<Result | null>(null);
-  const [credits, setCredits] = useState<number | null>(null);
+  const { credits, refreshStatus, updateCredits } = useCredits(isConnected ? address : undefined);
   const [lastTx, setLastTx] = useState<Record<string, unknown> | null>(null);
   const [deepBusy, setDeepBusy] = useState(false);
   const [deepPhase, setDeepPhase] = useState<DeepCheckPhase>("credits");
@@ -237,18 +238,6 @@ export default function CheckPage() {
     }
   };
 
-  const refreshStatus = async (addr: string) => {
-    try {
-      const r = await fetch(`${GATE_URL}/v1/pro/status/${addr}`, { signal: AbortSignal.timeout(10_000), cache: "no-store" });
-      if (!r.ok) return null;
-      const s = await r.json();
-      setCredits(typeof s.credits === "number" ? s.credits : 0);
-      return s as { credits?: number; premium?: boolean };
-    } catch {
-      return null;
-    }
-  };
-
   // Stays under the gate's 24-hour signature-freshness window (server.ts) so a cached
   // signature is never rejected as stale, while avoiding a fresh wallet prompt on every click.
   const runDeepCheck = async () => {
@@ -309,7 +298,7 @@ export default function CheckPage() {
           : "No additional address risk signals were found.";
         setDeepMsg(`Deep check complete: ${resultText} 1 credit used.`);
       }
-      if (typeof data.creditsLeft === "number") setCredits(data.creditsLeft);
+      if (typeof data.creditsLeft === "number") await updateCredits(address, data.creditsLeft);
     } catch (e: unknown) {
       setDeepMsg(e instanceof Error && (e.name === "TimeoutError" || e.name === "AbortError")
         ? "The deep-check response timed out. The request may still have completed; check your credit balance before retrying."
@@ -369,7 +358,7 @@ export default function CheckPage() {
         return { address: r.address, outcome, message: intel ? intel.description : r.plainEnglish || outcome.reason };
       });
       setBulkResults(results);
-      if (typeof data.creditsLeft === "number") setCredits(data.creditsLeft);
+      if (typeof data.creditsLeft === "number") await updateCredits(address, data.creditsLeft);
     } catch (e: unknown) {
       setBulkMsg(describeError(e));
       trackEvent(e instanceof WalletTimeoutError ? "stuck" : "error", { page: "/check", wallet: address, meta: { flow: "bulk-check", message: describeError(e) } });

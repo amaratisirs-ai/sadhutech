@@ -1,10 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { encodeFunctionData, erc20Abi } from "viem";
 import { base } from "@reown/appkit/networks";
 import { useSendTransaction, useSwitchChain, useWalletClient } from "wagmi";
 import { useWallet } from "@/src/wallet/useWallet";
+import { useCredits } from "@/src/wallet/useCredits";
 import { friendlyWalletError } from "@/src/wallet/errors";
 import { DEEP_CHECK_ENABLED } from "@/src/pro-status";
 import { Genesis } from "@/components/Genesis";
@@ -25,26 +26,12 @@ export default function ProPage() {
   const { sendTransactionAsync } = useSendTransaction();
   const { data: walletClient } = useWalletClient();
 
-  const [credits, setCredits] = useState<number>(0);
+  const { credits, updateCredits } = useCredits(isConnected ? address : undefined);
   const [amount, setAmount] = useState<number>(MIN_USDC);
   const [busy, setBusy] = useState<"idle" | "paying" | "verifying">("idle");
   const [message, setMessage] = useState<string>("");
   const [error, setError] = useState<string>("");
   const [verifyAttempt, setVerifyAttempt] = useState(0);
-
-  const loadCredits = async (addr: string) => {
-    try {
-      const r = await fetch(`${GATE_URL}/v1/pro/status/${addr}`);
-      if (r.ok) setCredits((await r.json()).credits ?? 0);
-    } catch {
-      /* ignore */
-    }
-  };
-
-  useEffect(() => {
-    if (address) loadCredits(address);
-    else setCredits(0);
-  }, [address]);
 
   const pollVerify = async (addr: string) => {
     for (let i = 0; i < 4; i++) {
@@ -57,7 +44,7 @@ export default function ProPage() {
       const d = await r.json().catch(() => ({}));
       if (r.ok && d.ok) {
         setVerifyAttempt(0);
-        setCredits(d.balance ?? credits);
+        if (typeof d.balance === "number") await updateCredits(addr, d.balance);
         setMessage(`Added ${d.credited} check${d.credited === 1 ? "" : "s"} — you now have ${d.balance}.`);
         return true;
       }
@@ -155,7 +142,7 @@ export default function ProPage() {
             </div>
           </div>
           <div className="rounded-xl border border-emerald-500/40 bg-emerald-900/15 p-4 text-center">
-            <p className="text-3xl font-black text-white">{credits}</p>
+            <p className="text-3xl font-black text-white">{credits ?? "..."}</p>
             <p className="text-xs text-emerald-200">deep checks available</p>
           </div>
 
@@ -216,7 +203,7 @@ export default function ProPage() {
 
           {message && <p className="text-sm text-teal-200">{message}</p>}
           {error && <p className="text-sm text-rose-300">{error}</p>}
-          {credits > 0 && (
+          {credits !== null && credits > 0 && (
             <a href="/check" className="block text-center text-sm font-semibold text-teal-300 hover:text-white hover:underline">
               Continue to Check →
             </a>

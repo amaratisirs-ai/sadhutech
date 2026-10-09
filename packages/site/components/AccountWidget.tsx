@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { useWallet } from "@/src/wallet/useWallet";
+import { useCredits } from "@/src/wallet/useCredits";
 
 const GATE_URL = process.env.NEXT_PUBLIC_GATE_URL || "https://genesis-gate.onrender.com";
 const CONSENT_VERSION = "2026-09";
@@ -26,7 +27,7 @@ function postConsent(address: string | undefined, context: string, email?: strin
 /** Persistent "logged in" pill shown in the nav once a wallet is connected — address + live credit balance. */
 export function AccountWidget({ autoConnect = false }: { autoConnect?: boolean }) {
   const { address, isConnected, connect, disconnect } = useWallet();
-  const [credits, setCredits] = useState<number | null>(null);
+  const { credits } = useCredits(isConnected ? address : undefined);
   const [open, setOpen] = useState(false);
   const [showConsent, setShowConsent] = useState(() => autoConnect && typeof window !== "undefined" && !window.localStorage.getItem(CONSENT_ACCEPTED_KEY));
   const [copied, setCopied] = useState(false);
@@ -41,23 +42,8 @@ export function AccountWidget({ autoConnect = false }: { autoConnect?: boolean }
   }, [autoConnect, connect]);
 
   useEffect(() => {
-    if (!isConnected || !address) {
-      setCredits(null);
-      return;
-    }
+    if (!isConnected || !address) return;
     window.localStorage.setItem(WALLET_CONNECTED_KEY, "1");
-    let cancelled = false;
-    fetch(`${GATE_URL}/v1/pro/status/${address}`)
-      .then((r) => (r.ok ? r.json() : null))
-      .then((s) => {
-        if (!cancelled) setCredits(typeof s?.credits === "number" ? s.credits : 0);
-      })
-      .catch(() => {
-        if (!cancelled) setCredits(null);
-      });
-    return () => {
-      cancelled = true;
-    };
   }, [isConnected, address]);
 
   // Once an address is known, record a durable, address-tagged consent event —
